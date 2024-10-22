@@ -2,13 +2,13 @@
 
 ## 🖥️ Přehled
 
-**SVPM** je aplikace určená k správě virtuálních serverů a uživatelských účtů. Poskytuje intuitivní rozhraní pro administraci serverů, úpravu přihlašovacích údajů a zobrazení hardwarových specifikací jednotlivých serverů. Aplikace je navržena pro snadné použití v podnikových prostředích.
+**SVPM** je aplikace určená k správě virtuálních serverů a zákaznických účtů. Poskytuje intuitivní rozhraní pro administraci serverů, úpravu přihlašovacích údajů a zobrazení hardwarových specifikací jednotlivých serverů. Aplikace je navržena pro snadné použití v podnikových prostředích.
 
 ---
 
 ## 🚀 Hlavní funkce (Některé funkce v beta verzi chybí)
 
-- **🔑 Správa uživatelů:** Možnost přidávat, upravovat a mazat uživatele.
+- **🔑 Správa zákazníků:** Možnost přidávat, upravovat a mazat zákazníky.
 - **🖥️ Správa serverů:** Seznam připojených serverů, jejich hardwarové specifikace a přihlašovací údaje.
 - **🔐 Účty na serverech:** Možnost spravovat uživatelské účty přiřazené k jednotlivým serverům.
 - **🔗 Připojení k SQL databázi:** Připojení k databázi pro načítání a ukládání dat.
@@ -26,7 +26,7 @@
 
 ### Postup instalace:
 
-1. **Stažení aplikace:** Stáhni si poslední verzi aplikace [zde](#).
+1. **Stažení aplikace:** Stáhni si poslední verzi aplikace [zde](https://drive.google.com/drive/folders/1hZUfGk7Sktbm8tDw2FPRsvNTGqG14k6O?usp=drive_link).
 2. **Rozbalení:** Rozbal stažený soubor do zvoleného adresáře.
 3. **Spuštění aplikace:** Dvojklikem na soubor `SVPM-Setup.exe` či `SVPM-Setup.msi` spusť instalaci.
    - **Také**: Můžete použít `SVPM (portable).zip` a extrahováním ze zipu aplikaci spustíte.
@@ -50,9 +50,9 @@ Při prvním spuštění aplikace je nutné nastavit připojení k SQL databázi
 
 Po úspěšném přihlášení se zobrazí hlavní obrazovka aplikace, která se skládá ze tří záložek:
 
-1. **👥 Uživatelé**:
-   - Zobrazení seznamu uživatelů.
-   - Možnost upravovat přihlašovací údaje a kontaktní informace.
+1. **👥 Zákazníci**:
+   - Zobrazení seznamu zákazníků.
+   - Možnost upravovat osobních údajů a kontaktní informace.
    
 2. **🌐 Servery**:
    - Výpis přiřazených serverů s podrobnými informacemi o CPU, RAM a dalších specifikacích.
@@ -96,7 +96,7 @@ Nebo vytvořte požadavek zde na gitu v [issues.](https://git.starlit.cz/Praktik
 
 ### 📢 Kontaktní informace
 - **Email:** [martinnovan01@gmail.com](mailto:martinnovan01@gmail.com)
-- **Telefon:** +420 123 456 789
+- **Telefon:** +420 703 397 132
 
 ---
 
