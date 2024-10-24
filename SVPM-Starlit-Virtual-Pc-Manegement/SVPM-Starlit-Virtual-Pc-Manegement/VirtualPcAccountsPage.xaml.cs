@@ -6,9 +6,9 @@ namespace SVPM_Starlit_Virtual_Pc_Manegement
 {
     public partial class VirtualPcAccountsPage : ContentPage
     {
-        private int _VirtualPcID;
+        private Guid _VirtualPcID;
 
-        public VirtualPcAccountsPage(int VirtualPcID)
+        public VirtualPcAccountsPage(Guid VirtualPcID)
         {
             InitializeComponent();
             _VirtualPcID = VirtualPcID;
@@ -25,7 +25,7 @@ namespace SVPM_Starlit_Virtual_Pc_Manegement
                 using (SqlConnection connection = new SqlConnection(connectionString))
                 {
                     await connection.OpenAsync();
-                    using (SqlCommand command = new SqlCommand($"SELECT CPU_Cores, RAM_Size_GB, Disk_Size_GB, VirtualPcName FROM {GlobalSettings.VirtualPcTable} WHERE ServerID = @VirtualPcID", connection))
+                    using (SqlCommand command = new SqlCommand($"SELECT CPU_Cores, RAM_Size_GB, Disk_Size_GB, VirtualPcName FROM {GlobalSettings.VirtualPcTable} WHERE VirtualPcID = @VirtualPcID", connection))
                     {
                         command.Parameters.AddWithValue("@VirtualPcID", _VirtualPcID);
 
@@ -62,7 +62,7 @@ namespace SVPM_Starlit_Virtual_Pc_Manegement
                 using (SqlConnection connection = new SqlConnection(connectionString))
                 {
                     await connection.OpenAsync();
-                    using (SqlCommand command = new SqlCommand($"SELECT AccountID, Username, Password, IsAdmin, LastUpdated FROM {GlobalSettings.AccountTable} WHERE ServerID = @VirtualPcID", connection))
+                    using (SqlCommand command = new SqlCommand($"SELECT AccountID, Username, Password, IsAdmin, LastUpdated FROM {GlobalSettings.AccountTable} WHERE VirtualPcID = @VirtualPcID", connection))
                     {
                         command.Parameters.AddWithValue("@VirtualPcID", _VirtualPcID);
                         using (SqlDataReader reader = await command.ExecuteReaderAsync())
@@ -71,7 +71,7 @@ namespace SVPM_Starlit_Virtual_Pc_Manegement
                             {
                                 accounts.Add(new Account
                                 {
-                                    AccountID = reader.GetInt32(0),
+                                    AccountID = reader.GetGuid(0),
                                     Username = reader.GetString(1),
                                     Password = reader.GetString(2),
                                     IsAdmin = reader.GetBoolean(3), // Opravený datový typ
@@ -92,7 +92,7 @@ namespace SVPM_Starlit_Virtual_Pc_Manegement
 
         public class VirtualPc
         {
-            public int ServerID { get; set; }
+            public Guid VirtualPcID { get; set; }
             public int CPU_Cores { get; set; }
             public int RAM_Size_GB { get; set; }
             public int Disk_Size_GB { get; set; }
@@ -101,7 +101,7 @@ namespace SVPM_Starlit_Virtual_Pc_Manegement
 
         public class Account
         {
-            public int AccountID { get; set; }
+            public Guid AccountID { get; set; }
             public string Username { get; set; }
             public string Password { get; set; }
             public bool IsAdmin { get; set; }

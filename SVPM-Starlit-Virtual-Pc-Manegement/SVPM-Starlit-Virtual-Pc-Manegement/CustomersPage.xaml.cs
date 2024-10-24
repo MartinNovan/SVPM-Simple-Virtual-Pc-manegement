@@ -17,37 +17,44 @@ namespace SVPM_Starlit_Virtual_Pc_Manegement
 
         private async void LoadCustomers()
         {
-            string connectionString = GlobalSettings.ConnectionString;
-            customers.Clear(); // Vyprázdni seznam před načtením nových zákazníků
-
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            try
             {
-                await connection.OpenAsync();
+                string connectionString = GlobalSettings.ConnectionString;
+                customers.Clear(); // Vyprázdni seznam před načtením nových zákazníků
 
-                using (SqlCommand command = new SqlCommand($"SELECT CustomerID, FullName, Email, Phone FROM {GlobalSettings.CustomerTable}", connection))
+                using (SqlConnection connection = new SqlConnection(connectionString))
                 {
-                    using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                    await connection.OpenAsync();
+
+                    using (SqlCommand command = new SqlCommand($"SELECT CustomerID, FullName, Email, Phone FROM {GlobalSettings.CustomerTable}", connection))
                     {
-                        while (await reader.ReadAsync())
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync())
                         {
-                            customers.Add(new Customer
+                            while (await reader.ReadAsync())
                             {
-                                CustomerID = reader.GetInt32(0),
-                                FullName = reader.GetString(1),
-                                Email = reader.IsDBNull(2) ? " " : reader.GetString(2),
-                                Phone = reader.IsDBNull(3) ? " " : reader.GetString(3)
-                            });
+                                customers.Add(new Customer
+                                {
+                                    CustomerID = reader.GetGuid(0),
+                                    FullName = reader.GetString(1),
+                                    Email = reader.IsDBNull(2) ? " " : reader.GetString(2),
+                                    Phone = reader.IsDBNull(3) ? " " : reader.GetString(3)
+                                });
+                            }
                         }
                     }
                 }
+            CustomersListView.ItemsSource = customers; // Zobraz všechny zákazníky
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("Chyba", ex.Message, "OK");
             }
 
-            CustomersListView.ItemsSource = customers; // Zobraz všechny zákazníky
         }
 
         public class Customer
         {
-            public int CustomerID { get; set; }
+            public Guid CustomerID { get; set; }
             public string? FullName { get; set; }
             public string? Phone { get; set; }
             public string? Email { get; set; }

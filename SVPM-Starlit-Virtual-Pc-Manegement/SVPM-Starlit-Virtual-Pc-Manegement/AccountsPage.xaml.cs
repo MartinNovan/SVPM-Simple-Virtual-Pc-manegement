@@ -25,7 +25,7 @@ namespace SVPM_Starlit_Virtual_Pc_Manegement
                 using (SqlConnection connection = new SqlConnection(connectionString))
                 {
                     await connection.OpenAsync();
-                    using (SqlCommand command = new SqlCommand($@"SELECT a.AccountID, a.ServerID, a.Username, a.Password, a.IsAdmin, a.LastUpdated, s.VirtualPcName, c.FullName FROM {GlobalSettings.AccountTable} a INNER JOIN {GlobalSettings.VirtualPcTable} s ON a.ServerID = s.ServerID INNER JOIN {GlobalSettings.CustomerTable} c ON s.CustomerID = c.CustomerID", connection))
+                    using (SqlCommand command = new SqlCommand($@"SELECT a.AccountID, a.VirtualPcID, a.Username, a.Password, a.IsAdmin, a.LastUpdated, s.VirtualPcName, c.FullName FROM {GlobalSettings.AccountTable} a INNER JOIN {GlobalSettings.VirtualPcTable} s ON a.VirtualPcID = s.VirtualPcID INNER JOIN {GlobalSettings.CustomerTable} c ON s.CustomerID = c.CustomerID", connection))
                     {
                         using (SqlDataReader reader = await command.ExecuteReaderAsync())
                         {
@@ -33,8 +33,8 @@ namespace SVPM_Starlit_Virtual_Pc_Manegement
                             {
                                 accounts.Add(new Account
                                 {
-                                    AccountID = reader.GetInt32(0),
-                                    ServerID = reader.GetInt32(1),
+                                    AccountID = reader.GetGuid(0),
+                                    VirtualPcID = reader.GetGuid(1),
                                     Username = reader.IsDBNull(2) ? " " : reader.GetString(2),
                                     Password = reader.IsDBNull(3) ? " " : reader.GetString(3),
                                     IsAdmin = reader.GetBoolean(4),
@@ -75,8 +75,8 @@ namespace SVPM_Starlit_Virtual_Pc_Manegement
 
         public class Account
         {
-            public int AccountID { get; set; }
-            public int ServerID { get; set; }
+            public Guid AccountID { get; set; }
+            public Guid VirtualPcID { get; set; }
             public string? Username { get; set; }
             public string? Password { get; set; }
             public bool IsAdmin { get; set; }

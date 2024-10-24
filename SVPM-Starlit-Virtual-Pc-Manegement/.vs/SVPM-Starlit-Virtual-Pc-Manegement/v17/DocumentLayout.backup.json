@@ -3,36 +3,24 @@
   "WorkspaceRootPath": "C:\\Users\\Mnova\\Documents\\GitHub\\SVPM-Starlit-Virtual-Pc-manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{2D3C0BE8-73D9-4F7D-8BC8-1BCDB9450BC1}|SVPM-Starlit-Virtual-Pc-Manegement\\SVPM-Starlit-Virtual-Pc-Manegement.csproj|c:\\users\\mnova\\documents\\github\\svpm-starlit-virtual-pc-manegement\\svpm-starlit-virtual-pc-manegement\\svpm-starlit-virtual-pc-manegement\\customervirtualpcspage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{2D3C0BE8-73D9-4F7D-8BC8-1BCDB9450BC1}|SVPM-Starlit-Virtual-Pc-Manegement\\SVPM-Starlit-Virtual-Pc-Manegement.csproj|solutionrelative:svpm-starlit-virtual-pc-manegement\\customervirtualpcspage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+      "AbsoluteMoniker": "D:0:0:{2D3C0BE8-73D9-4F7D-8BC8-1BCDB9450BC1}|SVPM-Starlit-Virtual-Pc-Manegement\\SVPM-Starlit-Virtual-Pc-Manegement.csproj|c:\\users\\mnova\\documents\\github\\svpm-starlit-virtual-pc-manegement\\svpm-starlit-virtual-pc-manegement\\svpm-starlit-virtual-pc-manegement\\customerspage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2D3C0BE8-73D9-4F7D-8BC8-1BCDB9450BC1}|SVPM-Starlit-Virtual-Pc-Manegement\\SVPM-Starlit-Virtual-Pc-Manegement.csproj|solutionrelative:svpm-starlit-virtual-pc-manegement\\customerspage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{2D3C0BE8-73D9-4F7D-8BC8-1BCDB9450BC1}|SVPM-Starlit-Virtual-Pc-Manegement\\SVPM-Starlit-Virtual-Pc-Manegement.csproj|c:\\users\\mnova\\documents\\github\\svpm-starlit-virtual-pc-manegement\\svpm-starlit-virtual-pc-manegement\\svpm-starlit-virtual-pc-manegement\\sqlconnectionpage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{2D3C0BE8-73D9-4F7D-8BC8-1BCDB9450BC1}|SVPM-Starlit-Virtual-Pc-Manegement\\SVPM-Starlit-Virtual-Pc-Manegement.csproj|solutionrelative:svpm-starlit-virtual-pc-manegement\\sqlconnectionpage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2D3C0BE8-73D9-4F7D-8BC8-1BCDB9450BC1}|SVPM-Starlit-Virtual-Pc-Manegement\\SVPM-Starlit-Virtual-Pc-Manegement.csproj|c:\\users\\mnova\\documents\\github\\svpm-starlit-virtual-pc-manegement\\svpm-starlit-virtual-pc-manegement\\svpm-starlit-virtual-pc-manegement\\sqlconnectionpage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2D3C0BE8-73D9-4F7D-8BC8-1BCDB9450BC1}|SVPM-Starlit-Virtual-Pc-Manegement\\SVPM-Starlit-Virtual-Pc-Manegement.csproj|solutionrelative:svpm-starlit-virtual-pc-manegement\\sqlconnectionpage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{2D3C0BE8-73D9-4F7D-8BC8-1BCDB9450BC1}|SVPM-Starlit-Virtual-Pc-Manegement\\SVPM-Starlit-Virtual-Pc-Manegement.csproj|c:\\users\\mnova\\documents\\github\\svpm-starlit-virtual-pc-manegement\\svpm-starlit-virtual-pc-manegement\\svpm-starlit-virtual-pc-manegement\\virtualpcaccountspage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2D3C0BE8-73D9-4F7D-8BC8-1BCDB9450BC1}|SVPM-Starlit-Virtual-Pc-Manegement\\SVPM-Starlit-Virtual-Pc-Manegement.csproj|solutionrelative:svpm-starlit-virtual-pc-manegement\\virtualpcaccountspage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{2D3C0BE8-73D9-4F7D-8BC8-1BCDB9450BC1}|SVPM-Starlit-Virtual-Pc-Manegement\\SVPM-Starlit-Virtual-Pc-Manegement.csproj|c:\\users\\mnova\\documents\\github\\svpm-starlit-virtual-pc-manegement\\svpm-starlit-virtual-pc-manegement\\svpm-starlit-virtual-pc-manegement\\customervirtualpcspage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{2D3C0BE8-73D9-4F7D-8BC8-1BCDB9450BC1}|SVPM-Starlit-Virtual-Pc-Manegement\\SVPM-Starlit-Virtual-Pc-Manegement.csproj|solutionrelative:svpm-starlit-virtual-pc-manegement\\customervirtualpcspage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{2D3C0BE8-73D9-4F7D-8BC8-1BCDB9450BC1}|SVPM-Starlit-Virtual-Pc-Manegement\\SVPM-Starlit-Virtual-Pc-Manegement.csproj|c:\\users\\mnova\\documents\\github\\svpm-starlit-virtual-pc-manegement\\svpm-starlit-virtual-pc-manegement\\svpm-starlit-virtual-pc-manegement\\virtualpcpage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{2D3C0BE8-73D9-4F7D-8BC8-1BCDB9450BC1}|SVPM-Starlit-Virtual-Pc-Manegement\\SVPM-Starlit-Virtual-Pc-Manegement.csproj|solutionrelative:svpm-starlit-virtual-pc-manegement\\virtualpcpage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+      "AbsoluteMoniker": "D:0:0:{2D3C0BE8-73D9-4F7D-8BC8-1BCDB9450BC1}|SVPM-Starlit-Virtual-Pc-Manegement\\SVPM-Starlit-Virtual-Pc-Manegement.csproj|c:\\users\\mnova\\documents\\github\\svpm-starlit-virtual-pc-manegement\\svpm-starlit-virtual-pc-manegement\\svpm-starlit-virtual-pc-manegement\\virtualpcpage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2D3C0BE8-73D9-4F7D-8BC8-1BCDB9450BC1}|SVPM-Starlit-Virtual-Pc-Manegement\\SVPM-Starlit-Virtual-Pc-Manegement.csproj|solutionrelative:svpm-starlit-virtual-pc-manegement\\virtualpcpage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{2D3C0BE8-73D9-4F7D-8BC8-1BCDB9450BC1}|SVPM-Starlit-Virtual-Pc-Manegement\\SVPM-Starlit-Virtual-Pc-Manegement.csproj|c:\\users\\mnova\\documents\\github\\svpm-starlit-virtual-pc-manegement\\svpm-starlit-virtual-pc-manegement\\svpm-starlit-virtual-pc-manegement\\maintabbedpage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2D3C0BE8-73D9-4F7D-8BC8-1BCDB9450BC1}|SVPM-Starlit-Virtual-Pc-Manegement\\SVPM-Starlit-Virtual-Pc-Manegement.csproj|solutionrelative:svpm-starlit-virtual-pc-manegement\\maintabbedpage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2D3C0BE8-73D9-4F7D-8BC8-1BCDB9450BC1}|SVPM-Starlit-Virtual-Pc-Manegement\\SVPM-Starlit-Virtual-Pc-Manegement.csproj|c:\\users\\mnova\\documents\\github\\svpm-starlit-virtual-pc-manegement\\svpm-starlit-virtual-pc-manegement\\svpm-starlit-virtual-pc-manegement\\globalsettings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2D3C0BE8-73D9-4F7D-8BC8-1BCDB9450BC1}|SVPM-Starlit-Virtual-Pc-Manegement\\SVPM-Starlit-Virtual-Pc-Manegement.csproj|solutionrelative:svpm-starlit-virtual-pc-manegement\\globalsettings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2D3C0BE8-73D9-4F7D-8BC8-1BCDB9450BC1}|SVPM-Starlit-Virtual-Pc-Manegement\\SVPM-Starlit-Virtual-Pc-Manegement.csproj|c:\\users\\mnova\\documents\\github\\svpm-starlit-virtual-pc-manegement\\svpm-starlit-virtual-pc-manegement\\svpm-starlit-virtual-pc-manegement\\accountspage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{2D3C0BE8-73D9-4F7D-8BC8-1BCDB9450BC1}|SVPM-Starlit-Virtual-Pc-Manegement\\SVPM-Starlit-Virtual-Pc-Manegement.csproj|solutionrelative:svpm-starlit-virtual-pc-manegement\\accountspage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+      "AbsoluteMoniker": "D:0:0:{2D3C0BE8-73D9-4F7D-8BC8-1BCDB9450BC1}|SVPM-Starlit-Virtual-Pc-Manegement\\SVPM-Starlit-Virtual-Pc-Manegement.csproj|c:\\users\\mnova\\documents\\github\\svpm-starlit-virtual-pc-manegement\\svpm-starlit-virtual-pc-manegement\\svpm-starlit-virtual-pc-manegement\\accountspage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2D3C0BE8-73D9-4F7D-8BC8-1BCDB9450BC1}|SVPM-Starlit-Virtual-Pc-Manegement\\SVPM-Starlit-Virtual-Pc-Manegement.csproj|solutionrelative:svpm-starlit-virtual-pc-manegement\\accountspage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -42,110 +30,71 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "AccountsPage.xaml.cs",
+              "DocumentMoniker": "C:\\Users\\Mnova\\Documents\\GitHub\\SVPM-Starlit-Virtual-Pc-manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\AccountsPage.xaml.cs",
+              "RelativeDocumentMoniker": "SVPM-Starlit-Virtual-Pc-Manegement\\AccountsPage.xaml.cs",
+              "ToolTip": "C:\\Users\\Mnova\\Documents\\GitHub\\SVPM-Starlit-Virtual-Pc-manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\AccountsPage.xaml.cs",
+              "RelativeToolTip": "SVPM-Starlit-Virtual-Pc-Manegement\\AccountsPage.xaml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACMAAAA+AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-10-24T10:46:08.188Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "CustomerVirtualPCsPage.xaml",
-              "DocumentMoniker": "C:\\Users\\Mnova\\Documents\\GitHub\\SVPM-Starlit-Virtual-Pc-manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\CustomerVirtualPCsPage.xaml",
-              "RelativeDocumentMoniker": "SVPM-Starlit-Virtual-Pc-Manegement\\CustomerVirtualPCsPage.xaml",
-              "ToolTip": "C:\\Users\\Mnova\\Documents\\GitHub\\SVPM-Starlit-Virtual-Pc-manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\CustomerVirtualPCsPage.xaml",
-              "RelativeToolTip": "SVPM-Starlit-Virtual-Pc-Manegement\\CustomerVirtualPCsPage.xaml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2024-10-22T10:08:44.119Z",
+              "Title": "CustomersPage.xaml.cs",
+              "DocumentMoniker": "C:\\Users\\Mnova\\Documents\\GitHub\\SVPM-Starlit-Virtual-Pc-manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\CustomersPage.xaml.cs",
+              "RelativeDocumentMoniker": "SVPM-Starlit-Virtual-Pc-Manegement\\CustomersPage.xaml.cs",
+              "ToolTip": "C:\\Users\\Mnova\\Documents\\GitHub\\SVPM-Starlit-Virtual-Pc-manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\CustomersPage.xaml.cs",
+              "RelativeToolTip": "SVPM-Starlit-Virtual-Pc-Manegement\\CustomersPage.xaml.cs",
+              "ViewState": "AgIAADwAAAAAAAAAAAAQwEcAAAAdAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-10-24T10:41:36.036Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "SqlConnectionPage.xaml.cs",
-              "DocumentMoniker": "C:\\Users\\Mnova\\Documents\\GitHub\\SVPM-Starlit-Virtual-Pc-manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\SqlConnectionPage.xaml.cs",
-              "RelativeDocumentMoniker": "SVPM-Starlit-Virtual-Pc-Manegement\\SqlConnectionPage.xaml.cs",
-              "ToolTip": "C:\\Users\\Mnova\\Documents\\GitHub\\SVPM-Starlit-Virtual-Pc-manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\SqlConnectionPage.xaml.cs",
-              "RelativeToolTip": "SVPM-Starlit-Virtual-Pc-Manegement\\SqlConnectionPage.xaml.cs",
-              "ViewState": "AgIAAGMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-22T10:01:54.592Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "SqlConnectionPage.xaml",
-              "DocumentMoniker": "C:\\Users\\Mnova\\Documents\\GitHub\\SVPM-Starlit-Virtual-Pc-manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\SqlConnectionPage.xaml",
-              "RelativeDocumentMoniker": "SVPM-Starlit-Virtual-Pc-Manegement\\SqlConnectionPage.xaml",
-              "ToolTip": "C:\\Users\\Mnova\\Documents\\GitHub\\SVPM-Starlit-Virtual-Pc-manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\SqlConnectionPage.xaml",
-              "RelativeToolTip": "SVPM-Starlit-Virtual-Pc-Manegement\\SqlConnectionPage.xaml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2024-10-22T10:01:42.727Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "VirtualPcPage.xaml",
-              "DocumentMoniker": "C:\\Users\\Mnova\\Documents\\GitHub\\SVPM-Starlit-Virtual-Pc-manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\VirtualPcPage.xaml",
-              "RelativeDocumentMoniker": "SVPM-Starlit-Virtual-Pc-Manegement\\VirtualPcPage.xaml",
-              "ToolTip": "C:\\Users\\Mnova\\Documents\\GitHub\\SVPM-Starlit-Virtual-Pc-manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\VirtualPcPage.xaml",
-              "RelativeToolTip": "SVPM-Starlit-Virtual-Pc-Manegement\\VirtualPcPage.xaml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2024-10-22T04:35:19.338Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
               "Title": "CustomerVirtualPCsPage.xaml.cs",
               "DocumentMoniker": "C:\\Users\\Mnova\\Documents\\GitHub\\SVPM-Starlit-Virtual-Pc-manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\CustomerVirtualPCsPage.xaml.cs",
               "RelativeDocumentMoniker": "SVPM-Starlit-Virtual-Pc-Manegement\\CustomerVirtualPCsPage.xaml.cs",
               "ToolTip": "C:\\Users\\Mnova\\Documents\\GitHub\\SVPM-Starlit-Virtual-Pc-manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\CustomerVirtualPCsPage.xaml.cs",
               "RelativeToolTip": "SVPM-Starlit-Virtual-Pc-Manegement\\CustomerVirtualPCsPage.xaml.cs",
-              "ViewState": "AgIAACYAAAAAAAAAAAAiwC0AAABmAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAqAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-22T04:16:39.287Z",
+              "WhenOpened": "2024-10-24T10:41:38.609Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "MainTabbedPage.xaml.cs",
-              "DocumentMoniker": "C:\\Users\\Mnova\\Documents\\GitHub\\SVPM-Starlit-Virtual-Pc-manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\MainTabbedPage.xaml.cs",
-              "RelativeDocumentMoniker": "SVPM-Starlit-Virtual-Pc-Manegement\\MainTabbedPage.xaml.cs",
-              "ToolTip": "C:\\Users\\Mnova\\Documents\\GitHub\\SVPM-Starlit-Virtual-Pc-manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\MainTabbedPage.xaml.cs",
-              "RelativeToolTip": "SVPM-Starlit-Virtual-Pc-Manegement\\MainTabbedPage.xaml.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "DocumentIndex": 1,
+              "Title": "VirtualPcAccountsPage.xaml.cs",
+              "DocumentMoniker": "C:\\Users\\Mnova\\Documents\\GitHub\\SVPM-Starlit-Virtual-Pc-manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\VirtualPcAccountsPage.xaml.cs",
+              "RelativeDocumentMoniker": "SVPM-Starlit-Virtual-Pc-Manegement\\VirtualPcAccountsPage.xaml.cs",
+              "ToolTip": "C:\\Users\\Mnova\\Documents\\GitHub\\SVPM-Starlit-Virtual-Pc-manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\VirtualPcAccountsPage.xaml.cs",
+              "RelativeToolTip": "SVPM-Starlit-Virtual-Pc-Manegement\\VirtualPcAccountsPage.xaml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAApAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-22T04:16:35.478Z",
+              "WhenOpened": "2024-10-24T10:48:27.477Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "GlobalSettings.cs",
-              "DocumentMoniker": "C:\\Users\\Mnova\\Documents\\GitHub\\SVPM-Starlit-Virtual-Pc-manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\GlobalSettings.cs",
-              "RelativeDocumentMoniker": "SVPM-Starlit-Virtual-Pc-Manegement\\GlobalSettings.cs",
-              "ToolTip": "C:\\Users\\Mnova\\Documents\\GitHub\\SVPM-Starlit-Virtual-Pc-manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\GlobalSettings.cs",
-              "RelativeToolTip": "SVPM-Starlit-Virtual-Pc-Manegement\\GlobalSettings.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "DocumentIndex": 3,
+              "Title": "VirtualPcPage.xaml.cs",
+              "DocumentMoniker": "C:\\Users\\Mnova\\Documents\\GitHub\\SVPM-Starlit-Virtual-Pc-manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\VirtualPcPage.xaml.cs",
+              "RelativeDocumentMoniker": "SVPM-Starlit-Virtual-Pc-Manegement\\VirtualPcPage.xaml.cs",
+              "ToolTip": "C:\\Users\\Mnova\\Documents\\GitHub\\SVPM-Starlit-Virtual-Pc-manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\VirtualPcPage.xaml.cs",
+              "RelativeToolTip": "SVPM-Starlit-Virtual-Pc-Manegement\\VirtualPcPage.xaml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAFsAAABJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-22T04:16:28.297Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "AccountsPage.xaml",
-              "DocumentMoniker": "C:\\Users\\Mnova\\Documents\\GitHub\\SVPM-Starlit-Virtual-Pc-manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\AccountsPage.xaml",
-              "RelativeDocumentMoniker": "SVPM-Starlit-Virtual-Pc-Manegement\\AccountsPage.xaml",
-              "ToolTip": "C:\\Users\\Mnova\\Documents\\GitHub\\SVPM-Starlit-Virtual-Pc-manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\SVPM-Starlit-Virtual-Pc-Manegement\\AccountsPage.xaml",
-              "RelativeToolTip": "SVPM-Starlit-Virtual-Pc-Manegement\\AccountsPage.xaml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2024-10-22T04:16:21.795Z",
+              "WhenOpened": "2024-10-24T10:49:08.831Z",
               "EditorCaption": ""
             }
           ]

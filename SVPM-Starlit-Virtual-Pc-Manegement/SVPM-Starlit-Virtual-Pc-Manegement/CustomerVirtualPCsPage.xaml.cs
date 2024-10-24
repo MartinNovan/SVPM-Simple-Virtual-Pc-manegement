@@ -6,13 +6,13 @@ namespace SVPM_Starlit_Virtual_Pc_Manegement
 {
     public partial class CustomerVirtualPCsPage : ContentPage
     {
-        private int _customerId;
+        private Guid _customerId;
 
         public string FullName { get; set; }
         public string Email { get; set; }
         public string Phone { get; set; }
 
-        public CustomerVirtualPCsPage(int customerId)
+        public CustomerVirtualPCsPage(Guid customerId)
         {
             InitializeComponent();
             _customerId = customerId;
@@ -30,7 +30,7 @@ namespace SVPM_Starlit_Virtual_Pc_Manegement
                 using (SqlConnection connection = new SqlConnection(connectionString))
                 {
                     await connection.OpenAsync();
-                    using (SqlCommand command = new SqlCommand($"SELECT ServerID, CPU_Cores, RAM_Size_GB, Disk_Size_GB, VirtualPcName FROM {GlobalSettings.VirtualPcTable} WHERE CustomerID = @CustomerID", connection))
+                    using (SqlCommand command = new SqlCommand($"SELECT VirtualPcID, CPU_Cores, RAM_Size_GB, Disk_Size_GB, VirtualPcName FROM {GlobalSettings.VirtualPcTable} WHERE CustomerID = @CustomerID", connection))
                     {
                         command.Parameters.AddWithValue("@CustomerID", _customerId);
                         using (SqlDataReader reader = await command.ExecuteReaderAsync())
@@ -39,7 +39,7 @@ namespace SVPM_Starlit_Virtual_Pc_Manegement
                             {
                                 virtualPCs.Add(new VirtualPC
                                 {
-                                    ServerID = reader.GetInt32(0),
+                                    VirtualPcID = reader.GetGuid(0),
                                     CPU_Cores = reader.GetInt32(1),
                                     RAM_Size_GB = reader.GetInt32(2),
                                     Disk_Size_GB = reader.GetInt32(3),
@@ -97,7 +97,7 @@ namespace SVPM_Starlit_Virtual_Pc_Manegement
         }
         public class VirtualPC
         {
-            public int ServerID { get; set; }
+            public Guid VirtualPcID { get; set; }
             public int CPU_Cores { get; set; }
             public int RAM_Size_GB { get; set; }
             public int Disk_Size_GB { get; set; }
@@ -106,7 +106,7 @@ namespace SVPM_Starlit_Virtual_Pc_Manegement
 
         public class Customer
         {
-            public int CustomerID { get; set; }
+            public Guid CustomerID { get; set; }
             public string FullName { get; set; }
             public string Email { get; set; }
             public string Phone { get; set; }
@@ -118,7 +118,7 @@ namespace SVPM_Starlit_Virtual_Pc_Manegement
                 var selectedVirtualPC= e.Item as VirtualPC;
                 if (selectedVirtualPC != null)
                 {
-                    await Navigation.PushAsync(new VirtualPcAccountsPage(selectedVirtualPC.ServerID));
+                    await Navigation.PushAsync(new VirtualPcAccountsPage(selectedVirtualPC.VirtualPcID));
                 }
             }
         }

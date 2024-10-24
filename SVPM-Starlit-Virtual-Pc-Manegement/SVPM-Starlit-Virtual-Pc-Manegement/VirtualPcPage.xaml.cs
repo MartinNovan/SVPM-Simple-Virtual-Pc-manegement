@@ -25,7 +25,7 @@ namespace SVPM_Starlit_Virtual_Pc_Manegement
                 using (SqlConnection connection = new SqlConnection(connectionString))
                 {
                     await connection.OpenAsync();
-                    using (SqlCommand command = new SqlCommand($@"SELECT s.ServerID, s.CustomerID, s.CPU_Cores, s.RAM_Size_GB, s.Disk_Size_GB, s.VirtualPcName, c.FullName FROM {GlobalSettings.VirtualPcTable} s INNER JOIN {GlobalSettings.CustomerTable} c ON s.CustomerID = c.CustomerID", connection))
+                    using (SqlCommand command = new SqlCommand($@"SELECT s.VirtualPcID, s.CustomerID, s.CPU_Cores, s.RAM_Size_GB, s.Disk_Size_GB, s.VirtualPcName, c.FullName FROM {GlobalSettings.VirtualPcTable} s INNER JOIN {GlobalSettings.CustomerTable} c ON s.CustomerID = c.CustomerID", connection))
                     {
                         using (SqlDataReader reader = await command.ExecuteReaderAsync())
                         {
@@ -33,8 +33,8 @@ namespace SVPM_Starlit_Virtual_Pc_Manegement
                             {
                                 virtualPCs.Add(new VirtualPC
                                 {
-                                    ServerID = reader.GetInt32(0),
-                                    CustomerID = reader.GetInt32(1),
+                                    VirtualPcID = reader.GetGuid(0),
+                                    CustomerID = reader.GetGuid(1),
                                     CPU_Cores = reader.GetInt32(2),
                                     RAM_Size_GB = reader.GetInt32(3),
                                     Disk_Size_GB = reader.IsDBNull(4) ? 0 : reader.GetInt32(4), // Kontrola na NULL
@@ -73,8 +73,8 @@ namespace SVPM_Starlit_Virtual_Pc_Manegement
 
         public class VirtualPC
         {
-            public int ServerID { get; set; }
-            public int CustomerID { get; set; }
+            public Guid VirtualPcID { get; set; }
+            public Guid CustomerID { get; set; }
             public string? FullName { get; set; } // Vlastník serveru
             public int CPU_Cores { get; set; }
             public int RAM_Size_GB { get; set; }
@@ -89,7 +89,7 @@ namespace SVPM_Starlit_Virtual_Pc_Manegement
                 var selectedVirtualPC = e.Item as VirtualPC;
                 if (selectedVirtualPC != null)
                 {
-                    await Navigation.PushAsync(new VirtualPcAccountsPage(selectedVirtualPC.ServerID));
+                    await Navigation.PushAsync(new VirtualPcAccountsPage(selectedVirtualPC.VirtualPcID));
                 }
             }
         }
