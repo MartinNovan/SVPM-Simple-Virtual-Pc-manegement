@@ -4,6 +4,13 @@
 ./SVPM-Setup.exe
 ./SVPM-Setup.msi
 ./SVPM (Portable).zip
-
-
-
+*.exe
+/SVPM-Starlit-Virtual-Pc-Manegement/Setup1
+/SVPM-Starlit-Virtual-Pc-Manegement/SVPM-Starlit-Virtual-Pc-Manegement/bin
+/SVPM-Starlit-Virtual-Pc-Manegement/Setup1
+/SVPM-Starlit-Virtual-Pc-Manegement/SVPM-Starlit-Virtual-Pc-Manegement/obj/Debug
+/SVPM-Starlit-Virtual-Pc-Manegement/SVPM-Starlit-Virtual-Pc-Manegement/obj
+/SVPM-Starlit-Virtual-Pc-Manegement/Setup1
+*.msi
+SVPM (Portable).zip
+/SVPM-Starlit-Virtual-Pc-Manegement/Setup1/Release

@@ -27,8 +27,8 @@
 		<ApplicationId>com.companyname.svpmstarlitvirtualpcmanegement</ApplicationId>
 
 		<!-- Versions -->
-		<ApplicationDisplayVersion>0.1</ApplicationDisplayVersion>
-		<ApplicationVersion>0.1</ApplicationVersion>
+		<ApplicationDisplayVersion>1</ApplicationDisplayVersion>
+		<ApplicationVersion>1</ApplicationVersion>
 
 		<WindowsPackageType Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">None</WindowsPackageType>
 
