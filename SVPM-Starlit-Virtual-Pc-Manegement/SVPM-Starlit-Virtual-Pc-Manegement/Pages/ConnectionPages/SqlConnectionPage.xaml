@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SVPM_Starlit_Virtual_Pc_Manegement.Pages.ConnectionPages.SqlConnectionPage">
+    <StackLayout Padding="10">
+        <Label Text="Seznam připojení:" FontSize="Large" HorizontalOptions="Center" />
+        <ListView ItemsSource="{Binding Connections}" ItemTapped="SqlConnection_ItemTapped">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ViewCell>
+                        <StackLayout Padding="5" Orientation="Vertical">
+                            <StackLayout Orientation="Horizontal">
+                                <Image Source="sql_connection.png" HeightRequest="40" WidthRequest="40" Margin="5" />
+                                <StackLayout Margin="10,0,0,0" VerticalOptions="Center">
+                                    <Label Text="{Binding Name}" FontSize="Medium" FontAttributes="Bold" />
+                                    <Label Text="{Binding ServerAddress}" FontSize="Small"/>
+                                    <Label Text="{Binding DatabaseName}" FontSize="Small"/>
+                                </StackLayout>
+                            </StackLayout>
+                            <BoxView HeightRequest="1" Color="Gray" Margin="0,10,0,0" />
+                        </StackLayout>
+                    </ViewCell>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </StackLayout>
+</ContentPage>

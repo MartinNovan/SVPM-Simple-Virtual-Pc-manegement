@@ -1,7 +1,8 @@
-﻿using Microsoft.UI.Xaml;
-
-// To learn more about WinUI, the WinUI project structure,
+﻿// To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
+
+using Microsoft.Maui;
+using Microsoft.Maui.Hosting;
 
 namespace SVPM_Starlit_Virtual_Pc_Manegement.WinUI
 {

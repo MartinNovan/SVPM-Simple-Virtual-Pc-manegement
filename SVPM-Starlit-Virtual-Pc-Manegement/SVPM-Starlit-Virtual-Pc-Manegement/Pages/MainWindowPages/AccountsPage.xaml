@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SVPM_Starlit_Virtual_Pc_Manegement.Pages.MainWindowPages.AccountsPage">
+    <StackLayout Padding="10">
+        <Label Text="Účty na počítačích:" FontSize="24" />
+        <SearchBar
+            Placeholder="Hledat účty na počítačích..."
+                TextChanged="OnSearchBarTextChanged" />
+        <ListView x:Name="AccountsListView">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ViewCell>
+                        <StackLayout Padding="5" Margin="5">
+                            <StackLayout Orientation="Horizontal">
+                                <Image Source="account.png" HeightRequest="50" WidthRequest="50" />
+                                <StackLayout Margin="10">
+                                    <Label Text="{Binding Username}" FontSize="Medium" />
+                                    <StackLayout Orientation="Vertical">
+                                        <Label Text="{Binding Password, StringFormat='   Heslo: {0}'}" FontSize="Small" />
+                                        <Label Text="{Binding IsAdmin, StringFormat='   Admin: {0}'}" FontSize="Small" />
+                                        <Label Text="{Binding LastUpdated, StringFormat='   Aktualizováno: {0}'}" FontSize="Small" />
+                                        <Label Text="{Binding ServerName, StringFormat='   Přidružený server: {0}'}" FontSize="Small" />
+                                        <Label Text="{Binding FullName, StringFormat='   Zákazník: {0}'}" FontSize="Small" />
+                                    </StackLayout>
+                                </StackLayout>
+                            </StackLayout>
+                            <BoxView HeightRequest="1" Color="Gray" Margin="0,5,0,5" />
+                        </StackLayout>
+                    </ViewCell>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </StackLayout>
+</ContentPage>

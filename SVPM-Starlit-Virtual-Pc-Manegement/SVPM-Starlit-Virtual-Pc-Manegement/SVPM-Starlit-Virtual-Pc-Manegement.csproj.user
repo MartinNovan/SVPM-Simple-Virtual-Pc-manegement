@@ -21,7 +21,7 @@
     <MauiXaml Update="AccountsPage.xaml">
       <SubType>Designer</SubType>
     </MauiXaml>
-    <MauiXaml Update="MainTabbedPage.xaml">
+    <MauiXaml Update="Pages\MainWindowPages\MainTabbedPage.xaml">
       <SubType>Designer</SubType>
     </MauiXaml>
     <MauiXaml Update="VirtualPcPage.xaml">
@@ -36,7 +36,7 @@
     <MauiXaml Update="CustomersPage.xaml">
       <SubType>Designer</SubType>
     </MauiXaml>
-    <MauiXaml Update="SqlConnectionPage.xaml">
+    <MauiXaml Update="Pages\ConnectionPages\SqlConnectionPage.xaml">
       <SubType>Designer</SubType>
     </MauiXaml>
   </ItemGroup>

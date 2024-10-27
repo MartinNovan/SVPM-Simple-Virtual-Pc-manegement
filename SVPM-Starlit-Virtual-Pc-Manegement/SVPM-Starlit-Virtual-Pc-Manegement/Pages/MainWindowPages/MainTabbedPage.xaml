@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<TabbedPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+            xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+            xmlns:mainWindowPages="using:SVPM_Starlit_Virtual_Pc_Manegement.Pages.MainWindowPages"
+            x:Class="SVPM_Starlit_Virtual_Pc_Manegement.Pages.MainWindowPages.MainTabbedPage"
+            Title="Dashboard">
+    
+    <TabbedPage.Children>
+        <NavigationPage Title="Zákazníci">
+            <x:Arguments>
+                <mainWindowPages:CustomersPage />
+            </x:Arguments>
+        </NavigationPage>
+        
+        <NavigationPage Title="Virtuální Počítače">
+            <x:Arguments>
+                <mainWindowPages:VirtualPcPage />
+            </x:Arguments>
+        </NavigationPage>
+
+        <NavigationPage Title="Účty">
+            <x:Arguments>
+                <mainWindowPages:AccountsPage />
+            </x:Arguments>
+        </NavigationPage>
+    </TabbedPage.Children>
+
+</TabbedPage>

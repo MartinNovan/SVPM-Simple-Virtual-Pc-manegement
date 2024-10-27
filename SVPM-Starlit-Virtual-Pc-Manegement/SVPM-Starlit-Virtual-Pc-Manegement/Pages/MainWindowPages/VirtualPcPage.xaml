@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SVPM_Starlit_Virtual_Pc_Manegement.Pages.MainWindowPages.VirtualPcPage">
+    <StackLayout Padding="10">
+        <Label Text="Virtuální počítače:" FontSize="24" />
+        <SearchBar 
+                Placeholder="Hledat virtuální počítače..." 
+                    TextChanged="OnSearchBarTextChanged" />
+        <ListView x:Name="VirtualPCsListView" ItemTapped="VirtualPcListView_ItemTapped">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ViewCell>
+                        <StackLayout Padding="5" Margin="5">
+                            <StackLayout Orientation="Horizontal">
+                                <Image Source="server.png" HeightRequest="50" WidthRequest="50" />
+                                <StackLayout Margin="10">
+                                    <Label Text="{Binding VirtualPcName}" FontSize="Medium" />
+                                    <StackLayout Orientation="Vertical">
+                                        <Label Text="{Binding CpuCores, StringFormat='   CPU: {0} jader'}" FontSize="Small" />
+                                        <Label Text="{Binding RamSizeGb, StringFormat='   RAM: {0} GB'}" FontSize="Small" />
+                                        <Label Text="{Binding DiskSizeGb, StringFormat='   Disk: {0} GB'}" FontSize="Small" />
+                                        <Label Text="{Binding FullName, StringFormat='   Zákazník: {0}'}" FontSize="Small" />
+                                    </StackLayout>
+                                </StackLayout>
+                            </StackLayout>
+                            <BoxView HeightRequest="1" Color="Gray" Margin="0,5,0,5" />
+                        </StackLayout>
+                    </ViewCell>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </StackLayout>
+</ContentPage>
