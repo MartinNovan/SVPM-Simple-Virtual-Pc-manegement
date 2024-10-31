@@ -4,19 +4,29 @@
              x:Class="SVPM_Starlit_Virtual_Pc_Manegement.Pages.ConnectionPages.SqlConnectionPage">
     <StackLayout Padding="10">
         <Label Text="Seznam připojení:" FontSize="Large" HorizontalOptions="Center" />
-        <ListView ItemsSource="{Binding Connections}" ItemTapped="SqlConnection_ItemTapped">
+        <Grid ColumnDefinitions="*,Auto" Padding="5,0">
+            <Label Text="Jednorázové/přidat připojení:" FontSize="Medium" FontAttributes="Bold" VerticalOptions="Center" Grid.Column="0" />
+            <Button Text="Přejít na stránku" VerticalOptions="Center" Grid.Column="1" Clicked="Button_OnClicked"/>
+        </Grid>
+         <ListView ItemsSource="{Binding Connections}" ItemTapped="SqlConnection_ItemTapped">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <ViewCell>
-                        <StackLayout Padding="5" Orientation="Vertical">
-                            <StackLayout Orientation="Horizontal">
-                                <Image Source="sql_connection.png" HeightRequest="40" WidthRequest="40" Margin="5" />
-                                <StackLayout Margin="10,0,0,0" VerticalOptions="Center">
+                        <StackLayout>
+                            <Grid Padding="5" ColumnDefinitions="Auto,*,Auto">
+                                <Image Source="sql_connection.png" HeightRequest="40" WidthRequest="40" Margin="5" Grid.Column="0" />
+                                
+                                <StackLayout Grid.Column="1" Margin="10,0,0,0" VerticalOptions="Center">
                                     <Label Text="{Binding Name}" FontSize="Medium" FontAttributes="Bold" />
-                                    <Label Text="{Binding ServerAddress}" FontSize="Small"/>
-                                    <Label Text="{Binding DatabaseName}" FontSize="Small"/>
+                                    <Label Text="{Binding ServerAddress}" FontSize="Small" />
+                                    <Label Text="{Binding DatabaseName}" FontSize="Small" />
                                 </StackLayout>
-                            </StackLayout>
+                                
+                                <StackLayout Grid.Column="2">
+                                <ImageButton Source="pencil_icon.png" Scale="0.8" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" BackgroundColor="Transparent" Clicked="EditConnection_Clicked"/>
+                                <ImageButton Source="trash_icon.png" Scale="0.8" WidthRequest="20"  HeightRequest="20" VerticalOptions="Center" BackgroundColor="Transparent" Margin="0,0,4,0" Clicked="OnDeleteButtonClicked"/>
+                                </StackLayout>
+                            </Grid>
                             <BoxView HeightRequest="1" Color="Gray" Margin="0,10,0,0" />
                         </StackLayout>
                     </ViewCell>

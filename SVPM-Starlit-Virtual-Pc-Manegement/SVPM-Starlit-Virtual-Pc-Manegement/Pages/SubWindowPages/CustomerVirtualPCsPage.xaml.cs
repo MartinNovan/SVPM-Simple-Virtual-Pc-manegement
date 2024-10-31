@@ -5,11 +5,11 @@ namespace SVPM_Starlit_Virtual_Pc_Manegement.Pages.SubWindowPages
     public partial class CustomerVirtualPCsPage
     {
         private readonly Guid _customerId;
-        private List<VirtualPc> _virtualPCs;
+        private List<VirtualPc>? _virtualPCs;
 
-        public string FullName { get; set; }
-        public string Email { get; set; }
-        public string Phone { get; set; }
+        public string? FullName { get; set; }
+        public string? Email { get; set; }
+        public string? Phone { get; set; }
 
         public CustomerVirtualPCsPage(Guid customerId)
         {

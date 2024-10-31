@@ -1,29 +1,39 @@
 ﻿<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="SVPM_Starlit_Virtual_Pc_Manegement.Pages.ConnectionPages.SqlCreateConnectionPage">
+    <ScrollView>
     <StackLayout Padding="10">
         <Label Text="Vytvoření připojení k databázi" 
        FontSize="24" 
        HorizontalOptions="Center" />
+        <Label Text="Název spojení:" />
+        <Entry x:Name="NameEntry" Placeholder="Zadejte název" />
         <Label Text="Server:" />
-        <Entry x:Name="ServerEntry" Placeholder="Zadejte server" />
+        <Entry x:Name="ServerEntry" Placeholder="Zadejte adresu serveru" />
         <Label Text="Databáze:" />
-        <Entry x:Name="DatabaseEntry" Placeholder="Zadejte databázi" />
+        <Entry x:Name="DatabaseEntry" Placeholder="Zadejte název databáze" />
 
-        <Label Text="Windows Authentication" />
+        <Label Text="Windows Authentication:" />
         <Switch x:Name="WindowsAuthSwitch" Toggled="OnWindowsAuthToggled" />
 
-        <Label Text="Uživatelské jméno:" />
-        <Entry x:Name="UsernameEntry" Placeholder="Zadejte uživatelské jméno" IsEnabled="false" />
+        <Label x:Name="UsernameText" Text="Uživatelské jméno:" IsVisible="false"/>
+        <Entry x:Name="UsernameEntry" Placeholder="Zadejte uživatelské jméno" IsVisible="false" />
         
-        <Label Text="Heslo:" />
-        <Entry x:Name="PasswordEntry" Placeholder="Zadejte heslo" IsEnabled="false" IsPassword="true" />
+        <Label x:Name="PasswordText" Text="Heslo:" IsVisible="false"/>
+        <Entry x:Name="PasswordEntry" Placeholder="Zadejte heslo" IsVisible="false" IsPassword="true" />
 
-        <Label Text="Trust server certificate" />
-        <Switch x:Name="TrustCertificateSwitch" Toggled="CertificateToggled"/>
-        <Label Text="Cesta k certifikátu (pokud je vyžadována):" />
-        <Entry x:Name="CertificatePathEntry" Placeholder="Host name in certificate" IsEnabled="false" />
+        
+        <Label Text="Použití certifikátu:" />
+        <Switch x:Name="CertificateSwitch" Toggled="CertificateToggled"/>
+        <Label x:Name="CertificateText" Text="Cesta k certifikátu (pokud je vyžadována):" IsVisible="false"/>
+        <Entry x:Name="CertificatePathEntry" Placeholder="Host name in certificate" IsVisible="false"/>
+        
+        <StackLayout Orientation="Horizontal">
+            <CheckBox x:Name="Save" VerticalOptions="Center"/>
+            <Label Text="Zapamatovat připojení" VerticalOptions="Center"/>
+        </StackLayout>
         
         <Button Text="Připojit" Clicked="OnConnectButtonClicked" Margin="0,20,0,0"/>
     </StackLayout>
+    </ScrollView>
 </ContentPage>
