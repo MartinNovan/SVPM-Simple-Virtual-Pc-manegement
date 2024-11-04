@@ -1,13 +1,14 @@
 ﻿using Microsoft.Data.SqlClient;
 using System.Security.Cryptography.X509Certificates;
 using SVPM_Starlit_Virtual_Pc_Manegement.Pages.MainWindowPages;
-using Microsoft.Maui.Controls;
+using System.Text.Json;
 
 namespace SVPM_Starlit_Virtual_Pc_Manegement.Pages.ConnectionPages
 {
     public partial class SqlCreateConnectionPage
     {
-        public SqlCreateConnectionPage(SqlConnectionPage.SqlConnections connection = null)
+        private readonly string _connectionlist = GlobalSettings.ConnectionListPath;
+        public SqlCreateConnectionPage(SqlConnectionPage.SqlConnections? connection = null)
         {
             InitializeComponent();
             if (connection != null)
@@ -15,10 +16,10 @@ namespace SVPM_Starlit_Virtual_Pc_Manegement.Pages.ConnectionPages
                 NameEntry.Text = connection.Name;
                 ServerEntry.Text = connection.ServerAddress;
                 DatabaseEntry.Text = connection.DatabaseName;
-                
+
                 OnWindowsAuthToggled(WindowsAuthSwitch, new ToggledEventArgs(connection.UseWindowsAuth));
                 WindowsAuthSwitch.IsToggled = connection.UseWindowsAuth;
-                
+
                 UsernameText.IsVisible = !connection.UseWindowsAuth;
                 UsernameEntry.IsVisible = !connection.UseWindowsAuth;
                 UsernameEntry.Text = connection.Username;
@@ -27,43 +28,39 @@ namespace SVPM_Starlit_Virtual_Pc_Manegement.Pages.ConnectionPages
                 PasswordEntry.IsVisible = !connection.UseWindowsAuth;
                 PasswordEntry.Text = connection.Password;
 
-                CertificateToggled(CertificateSwitch, new ToggledEventArgs(connection.UseCertificate)); 
+                CertificateToggled(CertificateSwitch, new ToggledEventArgs(connection.UseCertificate));
                 CertificateSwitch.IsToggled = connection.UseCertificate;
-                CertificateText.IsVisible = connection.UseCertificate;
-                CertificatePathEntry.IsVisible = connection.UseCertificate;
                 CertificatePathEntry.Text = connection.CertificatePath;
-                
-                Save.IsChecked = true;
+
+                SaveForLater.IsChecked = true;
             }
             else
             {
                 WindowsAuthSwitch.IsToggled = true;
-                OnWindowsAuthToggled(WindowsAuthSwitch, new ToggledEventArgs(true));
                 CertificateSwitch.IsToggled = true;
-                CertificateToggled(CertificateSwitch, new ToggledEventArgs(true));   
             }
         }
 
         private async void OnConnectButtonClicked(object sender, EventArgs e)
         {
+            string connectionName = NameEntry.Text;
             string server = ServerEntry.Text;
             string database = DatabaseEntry.Text;
             string username = UsernameEntry.Text;
             string password = PasswordEntry.Text;
             string certificatePath = CertificatePathEntry.Text;
-            
-            if (string.IsNullOrWhiteSpace(server))
+
+            if (SaveForLater.IsChecked)
             {
-                await DisplayAlert("Chyba", "Zadejte prosím adresu serveru.", "OK");
+                await SaveConnectionAsync(connectionName, server, database, username, password, certificatePath);
+            }
+
+            if (string.IsNullOrWhiteSpace(server) || string.IsNullOrWhiteSpace(database))
+            {
+                await DisplayAlert("Chyba", "Zadejte prosím adresu serveru a název databáze.", "OK");
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(database))
-            {
-                await DisplayAlert("Chyba", "Zadejte prosím název databáze.", "OK");
-                return;
-            }
-            
             string connectionString = $"Server={server};Database={database};";
 
             if (WindowsAuthSwitch.IsToggled)
@@ -77,14 +74,10 @@ namespace SVPM_Starlit_Virtual_Pc_Manegement.Pages.ConnectionPages
 
             if (CertificateSwitch.IsToggled && !string.IsNullOrWhiteSpace(certificatePath))
             {
-                if (!IsCertificateValid(certificatePath))
-                {
-                    await DisplayAlert("Chyba", "Certifikát není platný.", "OK");
-                    return;
-                }
+                if (!await IsCertificateValidAsync(certificatePath)) return;
                 connectionString += $"Certificate={certificatePath};";
             }
-            else if (!CertificateSwitch.IsToggled)
+            else
             {
                 connectionString += "TrustServerCertificate=True;";
             }
@@ -102,49 +95,70 @@ namespace SVPM_Starlit_Virtual_Pc_Manegement.Pages.ConnectionPages
             }
         }
 
+        private async Task SaveConnectionAsync(string name, string server, string database, string username, string password, string certificatePath)
+        {
+            try
+            {
+                var saveSqlConnection = new SqlConnectionPage.SqlConnections
+                {
+                    Name = name,
+                    ServerAddress = server,
+                    DatabaseName = database,
+                    UseWindowsAuth = WindowsAuthSwitch.IsToggled,
+                    Username = username,
+                    Password = password,
+                    UseCertificate = CertificateSwitch.IsToggled,
+                    CertificatePath = certificatePath
+                };
+
+                List<SqlConnectionPage.SqlConnections> connections;
+                if (File.Exists(_connectionlist))
+                {
+                    string json = await File.ReadAllTextAsync(_connectionlist);
+                    connections = JsonSerializer.Deserialize<List<SqlConnectionPage.SqlConnections>>(json) ?? new List<SqlConnectionPage.SqlConnections>();
+                }
+                else
+                {
+                    connections = new List<SqlConnectionPage.SqlConnections>();
+                }
+
+                connections.Add(saveSqlConnection);
+                string jsonString = JsonSerializer.Serialize(connections);
+                await File.WriteAllTextAsync(_connectionlist, jsonString);
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("Chyba", $"Nepodařilo se uložit připojení: {ex.Message}", "OK");
+            }
+        }
+
+        private async Task<bool> IsCertificateValidAsync(string certPath)
+        {
+            try
+            {
+                var cert = new X509Certificate2(certPath);
+                if (!cert.Verify())
+                {
+                    await DisplayAlert("Chyba certifikátu", "Certifikát je neplatný nebo vypršel.", "OK");
+                    return false;
+                }
+            }
+            catch (Exception)
+            {
+                await DisplayAlert("Chyba", "Certifikát se nepodařilo načíst.", "OK");
+                return false;
+            }
+            return true;
+        }
+
         private void OnWindowsAuthToggled(object sender, ToggledEventArgs e)
         {
-            UsernameEntry.IsVisible = !e.Value;
-            UsernameText.IsVisible = !e.Value;
-            PasswordEntry.IsVisible = !e.Value;
-            PasswordText.IsVisible = !e.Value;
+            UsernameText.IsVisible = PasswordText.IsVisible = UsernameEntry.IsVisible = PasswordEntry.IsVisible = !e.Value;
         }
 
         private void CertificateToggled(object sender, ToggledEventArgs e)
         {
             CertificatePathEntry.IsVisible = e.Value;
-            CertificateText.IsVisible = e.Value;
-        }
-
-        private bool IsCertificateValid(string certificatePath)
-        {
-            try
-            {
-                X509Certificate2 certificate = new X509Certificate2(certificatePath);
-                
-                if (certificate.NotAfter < DateTime.Now)
-                {
-                    DisplayAlert("Chyba", "Certifikát je propadlý.", "OK");
-                    return false;
-                }
-                
-                X509Chain chain = new X509Chain();
-                chain.ChainPolicy.RevocationMode = X509RevocationMode.Online;
-                chain.ChainPolicy.RevocationFlag = X509RevocationFlag.ExcludeRoot;
-
-                bool isValid = chain.Build(certificate);
-                if (!isValid)
-                {
-                    DisplayAlert("Chyba", "Certifikát nebyl vydán důvěryhodnou certifikační autoritou.", "OK");
-                }
-
-                return isValid;
-            }
-            catch (Exception ex)
-            {
-                DisplayAlert("Chyba", $"Nelze načíst certifikát: {ex.Message}", "OK");
-                return false;
-            }
         }
     }
 }
