@@ -8,9 +8,12 @@ namespace SVPM_Starlit_Virtual_Pc_Manegement.Pages.ConnectionPages
     public partial class SqlCreateConnectionPage
     {
         private readonly string _connectionlist = GlobalSettings.ConnectionListPath;
+
         public SqlCreateConnectionPage(SqlConnectionPage.SqlConnections? connection = null)
         {
             InitializeComponent();
+
+            // Načtení hodnot pro úpravu připojení
             if (connection != null)
             {
                 NameEntry.Text = connection.Name;
@@ -37,7 +40,7 @@ namespace SVPM_Starlit_Virtual_Pc_Manegement.Pages.ConnectionPages
             else
             {
                 WindowsAuthSwitch.IsToggled = true;
-                CertificateSwitch.IsToggled = true;
+                CertificateSwitch.IsToggled = false;
             }
         }
 
@@ -99,19 +102,8 @@ namespace SVPM_Starlit_Virtual_Pc_Manegement.Pages.ConnectionPages
         {
             try
             {
-                var saveSqlConnection = new SqlConnectionPage.SqlConnections
-                {
-                    Name = name,
-                    ServerAddress = server,
-                    DatabaseName = database,
-                    UseWindowsAuth = WindowsAuthSwitch.IsToggled,
-                    Username = username,
-                    Password = password,
-                    UseCertificate = CertificateSwitch.IsToggled,
-                    CertificatePath = certificatePath
-                };
-
                 List<SqlConnectionPage.SqlConnections> connections;
+                
                 if (File.Exists(_connectionlist))
                 {
                     string json = await File.ReadAllTextAsync(_connectionlist);
@@ -121,9 +113,41 @@ namespace SVPM_Starlit_Virtual_Pc_Manegement.Pages.ConnectionPages
                 {
                     connections = new List<SqlConnectionPage.SqlConnections>();
                 }
+                
+                var existingConnection = connections.FirstOrDefault(c => c.Name == name);
+                if (existingConnection != null)
+                {
+                    existingConnection.ServerAddress = server;
+                    existingConnection.DatabaseName = database;
+                    existingConnection.UseWindowsAuth = WindowsAuthSwitch.IsToggled;
+                    existingConnection.Username = username;
+                    existingConnection.Password = password;
+                    existingConnection.UseCertificate = CertificateSwitch.IsToggled;
+                    existingConnection.CertificatePath = certificatePath;
 
-                connections.Add(saveSqlConnection);
-                string jsonString = JsonSerializer.Serialize(connections);
+                    bool confirm = await DisplayAlert("Info", "Existující připojení bude aktualizováno.", "OK", "Cancel");
+                    if (!confirm) return;
+                }
+                else
+                {
+                    var newConnection = new SqlConnectionPage.SqlConnections
+                    {
+                        Name = name,
+                        ServerAddress = server,
+                        DatabaseName = database,
+                        UseWindowsAuth = WindowsAuthSwitch.IsToggled,
+                        Username = username,
+                        Password = password,
+                        UseCertificate = CertificateSwitch.IsToggled,
+                        CertificatePath = certificatePath
+                    };
+                    connections.Add(newConnection);
+
+                    await DisplayAlert("Info", "Nové připojení bylo přidáno.", "OK");
+                }
+                
+                var options = new JsonSerializerOptions { WriteIndented = true };
+                string jsonString = JsonSerializer.Serialize(connections, options);
                 await File.WriteAllTextAsync(_connectionlist, jsonString);
             }
             catch (Exception ex)

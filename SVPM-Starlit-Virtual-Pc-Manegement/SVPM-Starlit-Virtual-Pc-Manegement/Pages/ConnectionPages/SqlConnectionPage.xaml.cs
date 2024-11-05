@@ -60,8 +60,12 @@ public partial class SqlConnectionPage
 
     private async Task CreateEmptyConnectionsFile()
     {
+        var options = new JsonSerializerOptions
+        {
+            WriteIndented = true
+        };
         var emptyConnections = new List<SqlConnections>();
-        string emptyJson = JsonSerializer.Serialize(emptyConnections);
+        string emptyJson = JsonSerializer.Serialize(emptyConnections, options);
         await File.WriteAllTextAsync(_connectionlist, emptyJson);
     }
 
