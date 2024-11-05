@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SVPM-Backend-API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c41dd8aafe7ee1dc555036cfeb954f6c6fea264f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+291ee7633665d8d00b5b831c325935abde7fc417")]
 [assembly: System.Reflection.AssemblyProductAttribute("SVPM-Backend-API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SVPM-Backend-API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

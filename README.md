@@ -33,7 +33,7 @@
 
 ---
 
-## ⚙️ Nastavení SQL připojení (Některé funkce v beta verzi chybí)
+## ⚙️ Nastavení SQL připojení (Některé funkce v beta verzi 1.0 chybí)
 
 Při prvním spuštění aplikace je nutné nastavit připojení k SQL databázi:
 
@@ -42,7 +42,7 @@ Při prvním spuštění aplikace je nutné nastavit připojení k SQL databázi
    - **Databáze**: Název databáze.
    - **Přihlašovací údaje**: Uživatelské jméno a heslo k databázi či použítí windows auth.
    
-2. **Uložení připojení**: Po vyplnění klikni na **Uložit připojení**.
+2. **Uložení připojení**: Po vyplnění klikni na **Zapamatovat připojení** a připojení se uloží do šablony.
 
 ---
 
