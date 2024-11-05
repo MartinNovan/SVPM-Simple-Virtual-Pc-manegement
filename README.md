@@ -26,7 +26,7 @@
 
 ### Postup instalace:
 
-1. **Stažení aplikace:** Stáhni si poslední verzi aplikace [zde](https://drive.google.com/drive/folders/1hZUfGk7Sktbm8tDw2FPRsvNTGqG14k6O?usp=drive_link).
+1. **Stažení aplikace:** Stáhni si poslední verzi aplikace [zde](https://drive.google.com/drive/folders/1m-GEgfXPfE_agB2caelzvXPlPX92VYDk?usp=sharing).
 2. **Rozbalení:** Rozbal stažený soubor do zvoleného adresáře.
 3. **Spuštění aplikace:** Dvojklikem na soubor `SVPM-Setup.exe` či `SVPM-Setup.msi` spusť instalaci.
    - **Také**: Můžete použít `SVPM (portable).zip` a extrahováním ze zipu aplikaci spustíte.
