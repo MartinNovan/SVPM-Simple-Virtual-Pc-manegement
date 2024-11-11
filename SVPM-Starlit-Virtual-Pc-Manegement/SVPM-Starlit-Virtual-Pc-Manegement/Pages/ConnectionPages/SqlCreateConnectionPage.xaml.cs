@@ -12,8 +12,6 @@ namespace SVPM_Starlit_Virtual_Pc_Manegement.Pages.ConnectionPages
         public SqlCreateConnectionPage(SqlConnectionPage.SqlConnections? connection = null)
         {
             InitializeComponent();
-
-            // Načtení hodnot pro úpravu připojení
             if (connection != null)
             {
                 NameEntry.Text = connection.Name;
@@ -53,43 +51,36 @@ namespace SVPM_Starlit_Virtual_Pc_Manegement.Pages.ConnectionPages
             string password = PasswordEntry.Text;
             string certificatePath = CertificatePathEntry.Text;
 
-            if (SaveForLater.IsChecked)
+            var builder = new SqlConnectionStringBuilder
             {
-                await SaveConnectionAsync(connectionName, server, database, username, password, certificatePath);
-            }
+                DataSource = server,
+                InitialCatalog = database,
+                IntegratedSecurity = WindowsAuthSwitch.IsToggled,
+                TrustServerCertificate = !CertificateSwitch.IsToggled
+            };
 
-            if (string.IsNullOrWhiteSpace(server) || string.IsNullOrWhiteSpace(database))
+            if (!WindowsAuthSwitch.IsToggled)
             {
-                await DisplayAlert("Chyba", "Zadejte prosím adresu serveru a název databáze.", "OK");
-                return;
-            }
-
-            string connectionString = $"Server={server};Database={database};";
-
-            if (WindowsAuthSwitch.IsToggled)
-            {
-                connectionString += "Integrated Security=True;";
-            }
-            else
-            {
-                connectionString += $"User Id={username};Password={password};";
+                builder.UserID = username;
+                builder.Password = password;
             }
 
             if (CertificateSwitch.IsToggled && !string.IsNullOrWhiteSpace(certificatePath))
             {
                 if (!await IsCertificateValidAsync(certificatePath)) return;
-                connectionString += $"Certificate={certificatePath};";
             }
-            else
-            {
-                connectionString += "TrustServerCertificate=True;";
-            }
+
+            string connectionString = builder.ToString();
 
             await using SqlConnection connection = new(connectionString);
             try
             {
                 await connection.OpenAsync();
                 GlobalSettings.ConnectionString = connectionString;
+                if (SaveForLater.IsChecked)
+                {
+                    await SaveConnectionAsync(connectionName, server, database, username, password, certificatePath);
+                }
                 await Navigation.PushAsync(new MainTabbedPage());
             }
             catch (Exception ex)
@@ -98,8 +89,9 @@ namespace SVPM_Starlit_Virtual_Pc_Manegement.Pages.ConnectionPages
             }
         }
 
+
         private async Task SaveConnectionAsync(string name, string server, string database, string username, string password, string certificatePath)
-        {
+        { 
             try
             {
                 List<SqlConnectionPage.SqlConnections> connections;

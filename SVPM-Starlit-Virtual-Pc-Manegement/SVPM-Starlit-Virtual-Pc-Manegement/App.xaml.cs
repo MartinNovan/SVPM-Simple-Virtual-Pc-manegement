@@ -1,9 +1,8 @@
-﻿using Microsoft.Maui.Controls;
-using SVPM_Starlit_Virtual_Pc_Manegement.Pages.ConnectionPages;
+﻿using SVPM_Starlit_Virtual_Pc_Manegement.Pages.ConnectionPages;
 
 namespace SVPM_Starlit_Virtual_Pc_Manegement
 {
-    public partial class App : Application
+    public partial class App
     {
         public App()
         {
@@ -12,3 +11,4 @@ namespace SVPM_Starlit_Virtual_Pc_Manegement
         }
     }
 }
+    

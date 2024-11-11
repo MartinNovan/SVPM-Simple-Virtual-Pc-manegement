@@ -6,7 +6,7 @@
         <Label Text="Seznam připojení:" FontSize="Large" HorizontalOptions="Center" />
         <Grid ColumnDefinitions="*,Auto" Padding="5,0">
             <Label Text="Jednorázové/přidat připojení:" FontSize="Medium" FontAttributes="Bold" VerticalOptions="Center" Grid.Column="0" />
-            <Button Text="Přejít na stránku" VerticalOptions="Center" Grid.Column="1" Clicked="Button_OnClicked"/>
+            <Button Text="Přejít na stránku" VerticalOptions="Center" Grid.Column="1" Clicked="CreateConnection_Clicked"/>
         </Grid>
         <Grid ColumnDefinitions="*,Auto" Padding="5,0">
         <Button VerticalOptions="End" Text="Refresh" Clicked="RefreshButton_Clicked" Margin="5,5,5,5" Grid.Column="1" />
