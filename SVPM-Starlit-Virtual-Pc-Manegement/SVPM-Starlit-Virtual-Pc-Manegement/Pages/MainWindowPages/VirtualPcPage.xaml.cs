@@ -1,94 +1,94 @@
-﻿using Microsoft.Data.SqlClient;
-using Microsoft.Maui.Controls;
+﻿using SVPM_Starlit_Virtual_Pc_Manegement.Pages.CreateRecordsPages;
 using SVPM_Starlit_Virtual_Pc_Manegement.Pages.SubWindowPages;
 
-namespace SVPM_Starlit_Virtual_Pc_Manegement.Pages.MainWindowPages
+namespace SVPM_Starlit_Virtual_Pc_Manegement.Pages.MainWindowPages;
+
+public partial class VirtualPcPage
 {
-    public partial class VirtualPcPage
+    public VirtualPcPage()
     {
-        private List<VirtualPc>? _virtualPCs;
+        InitializeComponent();
+    }
 
-        public VirtualPcPage()
+    private void VirtualPCsListView_OnLoaded(object? sender, EventArgs e)
+    {
+        VirtualPCsListView.ItemsSource = VirtualPcRepository.VirtualPcsList.Where(vpc => vpc.RecordState != Models.RecordStates.Deleted).OrderBy(vpc => vpc.VirtualPcName);
+    }
+
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+        VirtualPCsListView.ItemsSource = null;
+    }
+    private void OnSearchBarTextChanged(object sender, TextChangedEventArgs e)
+    {
+        string? searchText = e.NewTextValue?.ToLower();
+
+        if (string.IsNullOrWhiteSpace(searchText))
         {
-            InitializeComponent();
-            LoadVirtualPCs();
+            VirtualPCsListView.ItemsSource = VirtualPcRepository.VirtualPcsList.Where(vpc => vpc.RecordState != Models.RecordStates.Deleted).OrderBy(vpc => vpc.VirtualPcName);
         }
-
-        private async void LoadVirtualPCs()
+        else
         {
-            try
-            {
-                string? connectionString = GlobalSettings.ConnectionString;
-                _virtualPCs = new List<VirtualPc>();
+            VirtualPCsListView.ItemsSource = VirtualPcRepository.VirtualPcsList
+                .Where(vpc => vpc is { VirtualPcName: not null } &&
+                            (vpc.VirtualPcName.ToLower().Contains(searchText) ||
+                             vpc.OwningCustomersNames.ToLower().Contains(searchText)) && vpc.RecordState != Models.RecordStates.Deleted)
+                .OrderBy(vpc => vpc.VirtualPcName);
+        }
+    }
 
-                await using (SqlConnection connection = new SqlConnection(connectionString))
-                {
-                    await connection.OpenAsync();
-                    await using (SqlCommand command = new SqlCommand($@"SELECT s.VirtualPcID, s.CustomerID, s.CPU_Cores, s.RAM_Size_GB, s.Disk_Size_GB, s.VirtualPcName, c.FullName FROM {GlobalSettings.VirtualPcTable} s INNER JOIN {GlobalSettings.CustomerTable} c ON s.CustomerID = c.CustomerID", connection))
-                    {
-                        await using (SqlDataReader reader = await command.ExecuteReaderAsync())
-                        {
-                            while (await reader.ReadAsync())
-                            {
-                                _virtualPCs.Add(new VirtualPc
-                                {
-                                    VirtualPcId = reader.GetGuid(0),
-                                    CustomerId = reader.GetGuid(1),
-                                    CpuCores = reader.GetInt32(2),
-                                    RamSizeGb = reader.GetInt32(3),
-                                    DiskSizeGb = reader.IsDBNull(4) ? 0 : reader.GetInt32(4),
-                                    VirtualPcName = reader.IsDBNull(5) ? "(Bez Jména)" : reader.GetString(5),
-                                    FullName = reader.IsDBNull(6) ? " " : reader.GetString(6)
-                                });
-                            }
-                        }
-                    }
-                }
-
-                VirtualPCsListView.ItemsSource = _virtualPCs;
-            }
-            catch (Exception ex)
+    private async void VirtualPcListView_ItemTapped(object sender, ItemTappedEventArgs e)
+    {
+        try
+        {
+            if (e.Item is Models.VirtualPC selectedVirtualPc)
             {
-                await DisplayAlert("Chyba", ex.Message, "OK");
+                await Navigation.PushAsync(new VirtualPcAccountsPage(selectedVirtualPc.VirtualPcID));
             }
         }
-
-        private void OnSearchBarTextChanged(object sender, TextChangedEventArgs e)
+        catch (Exception ex)
         {
-            string? searchText = e.NewTextValue?.ToLower();
-
-            if (string.IsNullOrWhiteSpace(searchText))
-            {
-                VirtualPCsListView.ItemsSource = _virtualPCs;
-            }
-            else
-            {
-                if (_virtualPCs != null)
-                    VirtualPCsListView.ItemsSource = _virtualPCs
-                        .Where(a => a is { FullName: not null, VirtualPcName: not null } && 
-                                    (a.VirtualPcName.ToLower().Contains(searchText) ||
-                                    a.FullName.ToLower().Contains(searchText)))
-                        .ToList();
-            }
+            await DisplayAlert("Error", ex.Message, "OK");
         }
-
-        public class VirtualPc
+    }
+    
+    private async void AddButton_OnClicked(object? sender, EventArgs e)
+    {
+        try
         {
-            public Guid VirtualPcId { get; init; }
-            public Guid CustomerId { get; set; }
-            public string? FullName { get; init; }
-            public int CpuCores { get; set; }
-            public int RamSizeGb { get; set; }
-            public int DiskSizeGb { get; set; }
-            public string? VirtualPcName { get; init; }
+            await Navigation.PushAsync(new CreateVirtualPc());
         }
-
-        private async void VirtualPcListView_ItemTapped(object sender, ItemTappedEventArgs e)
+        catch (Exception ex)
         {
-            if (e.Item is VirtualPc selectedVirtualPc)
-            {
-                await Navigation.PushAsync(new VirtualPcAccountsPage(selectedVirtualPc.VirtualPcId));
-            }
+            await DisplayAlert("Error", ex.Message, "OK");
+        }
+    }
+
+    private void ReloadButton_OnClicked(object? sender, EventArgs e)
+    {
+        VirtualPCsListView.ItemsSource = VirtualPcRepository.VirtualPcsList.Where(vpc => vpc.RecordState != Models.RecordStates.Deleted).OrderBy(vpc => vpc.VirtualPcName);
+    }
+    private void EditConnection_Clicked(object? sender, EventArgs e)
+    {
+        Navigation.PushAsync(new CreateVirtualPc());
+    }
+
+    private async void OnDeleteButtonClicked(object? sender, EventArgs e)
+    {
+        try
+        {
+            if (sender is not ImageButton button || button.BindingContext is not Models.VirtualPC virtualPc) return;
+
+            bool confirm = await DisplayAlert("Warning!", "Do you really want to delete this virtual pc?", "OK", "Cancel");
+            if (!confirm) return;
+
+            virtualPc.RecordState = Models.RecordStates.Deleted;
+            VirtualPCsListView.ItemsSource = VirtualPcRepository.VirtualPcsList.Where(vpc => vpc.RecordState != Models.RecordStates.Deleted).OrderBy(vpc => vpc.VirtualPcName);
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Error", $"Failed to delete virtual pc: {ex.Message}", "OK");
         }
     }
 }

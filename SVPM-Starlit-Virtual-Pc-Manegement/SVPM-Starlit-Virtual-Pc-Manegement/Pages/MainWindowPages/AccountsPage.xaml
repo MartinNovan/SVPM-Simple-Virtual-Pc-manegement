@@ -2,30 +2,36 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="SVPM_Starlit_Virtual_Pc_Manegement.Pages.MainWindowPages.AccountsPage">
-    <StackLayout Padding="10">
-        <Label Text="Účty na počítačích:" FontSize="24" />
-        <SearchBar
-            Placeholder="Hledat účty na počítačích..."
-                TextChanged="OnSearchBarTextChanged" />
-        <ListView x:Name="AccountsListView">
+    <StackLayout Padding="5">
+        <Grid ColumnDefinitions="auto, *, auto, auto" ColumnSpacing="5" Margin="5">
+            <Label Grid.Column="0" Text="Accounts:" FontSize="24" VerticalOptions="Center"/>
+            <SearchBar Grid.Column="1" Placeholder="Search for accounts..." TextChanged="OnSearchBarTextChanged" />
+            <Button Grid.Column="2" Text="+" Clicked="AddButton_OnClicked" VerticalOptions="End" FontSize="20" ToolTipProperties.Text="Add a new record." />
+            <Button Grid.Column="3" Text="⟳" Clicked="ReloadButton_OnClicked" VerticalOptions="End" FontSize="20" ToolTipProperties.Text="Refresh this list."/>
+        </Grid>
+        <ListView x:Name="AccountsListView" Loaded="AccountsListView_OnLoaded">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <ViewCell>
-                        <StackLayout Padding="5" Margin="5">
-                            <StackLayout Orientation="Horizontal">
-                                <Image Source="account.png" HeightRequest="50" WidthRequest="50" />
-                                <StackLayout Margin="10">
+                        <StackLayout>
+                            <Grid ColumnDefinitions="auto, *, auto">
+                                <Image Grid.Column="0" Source="account.png" HeightRequest="50" WidthRequest="50" Margin="5" />
+                                <StackLayout Grid.Column="1" Margin="10">
                                     <Label Text="{Binding Username}" FontSize="Medium" />
                                     <StackLayout Orientation="Vertical">
-                                        <Label Text="{Binding Password, StringFormat='   Heslo: {0}'}" FontSize="Small" />
-                                        <Label Text="{Binding IsAdmin, StringFormat='   Admin: {0}'}" FontSize="Small" />
-                                        <Label Text="{Binding LastUpdated, StringFormat='   Aktualizováno: {0}'}" FontSize="Small" />
-                                        <Label Text="{Binding ServerName, StringFormat='   Přidružený server: {0}'}" FontSize="Small" />
-                                        <Label Text="{Binding FullName, StringFormat='   Zákazník: {0}'}" FontSize="Small" />
+                                        <Label Text="{Binding Password, StringFormat='   Password: {0}'}" />
+                                        <Label Text="{Binding IsAdmin, StringFormat='   Admin: {0}'}" />
+                                        <Label Text="{Binding LastUpdated, StringFormat='   Updated: {0}'}" />
+                                        <Label Text="{Binding VirtualPcName, StringFormat='   Associated PC: {0}'}" />
+                                        <Label Text="{Binding OriginalPassword, StringFormat='   Original password: {0}'}" />
                                     </StackLayout>
                                 </StackLayout>
-                            </StackLayout>
-                            <BoxView HeightRequest="1" Color="Gray" Margin="0,5,0,5" />
+                                <StackLayout Grid.Column="2" HorizontalOptions="Center" VerticalOptions="Center">
+                                    <ImageButton Source="pencil_icon.png" Scale="0.7" CornerRadius="3" HeightRequest="10" WidthRequest="10" VerticalOptions="Center" BackgroundColor="Gray" Clicked="EditConnection_Clicked" ToolTipProperties.Text="Click to edit this connection." />
+                                    <ImageButton Source="trash_icon.png"  Scale="0.7" CornerRadius="3" HeightRequest="10" WidthRequest="10" VerticalOptions="Center" BackgroundColor="Gray" Clicked="OnDeleteButtonClicked" ToolTipProperties.Text="Click to remove this connection." Margin="0,0,3,0"/>
+                                </StackLayout>
+                            </Grid>
+                            <BoxView HeightRequest="1" Color="Gray" Margin="5,0"/>
                         </StackLayout>
                     </ViewCell>
                 </DataTemplate>

@@ -1,14 +1,16 @@
 ﻿using SVPM_Starlit_Virtual_Pc_Manegement.Pages.ConnectionPages;
 
-namespace SVPM_Starlit_Virtual_Pc_Manegement
+namespace SVPM_Starlit_Virtual_Pc_Manegement;
+
+public partial class App
 {
-    public partial class App
+    public App()
     {
-        public App()
-        {
-            InitializeComponent();
-            MainPage = new NavigationPage(new SqlConnectionPage());
-        }
+        InitializeComponent();
+    }
+
+    protected override Window CreateWindow(IActivationState? activationState)
+    {
+        return new Window(new NavigationPage(new SqlConnectionPage()));
     }
 }
-    

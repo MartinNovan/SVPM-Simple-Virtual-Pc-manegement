@@ -1,7 +1,6 @@
-﻿using Microsoft.Data.SqlClient;
-using System.Security.Cryptography.X509Certificates;
+﻿using System.Text.Json;
+using Microsoft.Data.SqlClient;
 using SVPM_Starlit_Virtual_Pc_Manegement.Pages.MainWindowPages;
-using System.Text.Json;
 
 namespace SVPM_Starlit_Virtual_Pc_Manegement.Pages.ConnectionPages
 {
@@ -9,31 +8,12 @@ namespace SVPM_Starlit_Virtual_Pc_Manegement.Pages.ConnectionPages
     {
         private readonly string _connectionlist = GlobalSettings.ConnectionListPath;
 
-        public SqlCreateConnectionPage(SqlConnectionPage.SqlConnections? connection = null)
+        public SqlCreateConnectionPage(Models.SqlConnections? connection = null)
         {
             InitializeComponent();
             if (connection != null)
             {
-                NameEntry.Text = connection.Name;
-                ServerEntry.Text = connection.ServerAddress;
-                DatabaseEntry.Text = connection.DatabaseName;
-
-                OnWindowsAuthToggled(WindowsAuthSwitch, new ToggledEventArgs(connection.UseWindowsAuth));
-                WindowsAuthSwitch.IsToggled = connection.UseWindowsAuth;
-
-                UsernameText.IsVisible = !connection.UseWindowsAuth;
-                UsernameEntry.IsVisible = !connection.UseWindowsAuth;
-                UsernameEntry.Text = connection.Username;
-
-                PasswordText.IsVisible = !connection.UseWindowsAuth;
-                PasswordEntry.IsVisible = !connection.UseWindowsAuth;
-                PasswordEntry.Text = connection.Password;
-
-                CertificateToggled(CertificateSwitch, new ToggledEventArgs(connection.UseCertificate));
-                CertificateSwitch.IsToggled = connection.UseCertificate;
-                CertificatePathEntry.Text = connection.CertificatePath;
-
-                SaveForLater.IsChecked = true;
+                PopulateFields(connection);
             }
             else
             {
@@ -42,139 +22,175 @@ namespace SVPM_Starlit_Virtual_Pc_Manegement.Pages.ConnectionPages
             }
         }
 
+        private void PopulateFields(Models.SqlConnections connection)
+        {
+            NameEntry.Text = connection.Name ?? string.Empty;
+            ServerEntry.Text = connection.ServerAddress ?? string.Empty;
+            DatabaseEntry.Text = connection.DatabaseName ?? string.Empty;
+
+            WindowsAuthSwitch.IsToggled = connection.UseWindowsAuth;
+            SetVisibility(!connection.UseWindowsAuth);
+            UsernameEntry.Text = connection.Username ?? string.Empty;
+            PasswordEntry.Text = connection.Password ?? string.Empty;
+
+            CertificateSwitch.IsToggled = connection.UseCertificate;
+            SaveForLater.IsChecked = true;
+        }
+
+        private void SetVisibility(bool isVisible)
+        {
+            UsernameText.IsVisible = isVisible;
+            UsernameEntry.IsVisible = isVisible;
+            PasswordText.IsVisible = isVisible;
+            PasswordEntry.IsVisible = isVisible;
+        }
+
         private async void OnConnectButtonClicked(object sender, EventArgs e)
         {
-            string connectionName = NameEntry.Text;
-            string server = ServerEntry.Text;
-            string database = DatabaseEntry.Text;
-            string username = UsernameEntry.Text;
-            string password = PasswordEntry.Text;
-            string certificatePath = CertificatePathEntry.Text;
+            if (!ValidateInputs())
+            {
+                await ShowErrorMessage("Please fill in all required fields.");
+                return;
+            }
 
+            var connectionString = BuildConnectionString();
+
+            await using SqlConnection connection = new(connectionString);
+            try
+            {
+                IsProcessing.IsVisible = true;
+                await connection.OpenAsync();
+                GlobalSettings.ConnectionString = connectionString;
+
+                if (SaveForLater.IsChecked)
+                {
+                    await SaveConnectionAsync();
+                }
+                IsProcessing.IsVisible = false;
+                await Navigation.PushAsync(new MainTabbedPage());
+            }
+            catch (SqlException sqlEx)
+            {
+                IsProcessing.IsVisible = false;
+                await ShowErrorMessage($"Database connection error: {sqlEx.Message}");
+            }
+            catch (Exception ex)
+            {
+                IsProcessing.IsVisible = false;
+                await ShowErrorMessage($"Connection failed: {ex.Message}");
+            }
+        }
+
+        private bool ValidateInputs()
+        {
+            return !string.IsNullOrWhiteSpace(NameEntry.Text) &&
+                   !string.IsNullOrWhiteSpace(ServerEntry.Text) &&
+                   !string.IsNullOrWhiteSpace(DatabaseEntry.Text);
+        }
+
+        private string BuildConnectionString()
+        {
             var builder = new SqlConnectionStringBuilder
             {
-                DataSource = server,
-                InitialCatalog = database,
+                DataSource = ServerEntry.Text,
+                InitialCatalog = DatabaseEntry.Text,
                 IntegratedSecurity = WindowsAuthSwitch.IsToggled,
                 TrustServerCertificate = !CertificateSwitch.IsToggled
             };
 
             if (!WindowsAuthSwitch.IsToggled)
             {
-                builder.UserID = username;
-                builder.Password = password;
+                builder.UserID = UsernameEntry.Text;
+                builder.Password = PasswordEntry.Text;
             }
 
-            if (CertificateSwitch.IsToggled && !string.IsNullOrWhiteSpace(certificatePath))
-            {
-                if (!await IsCertificateValidAsync(certificatePath)) return;
-            }
-
-            string connectionString = builder.ToString();
-
-            await using SqlConnection connection = new(connectionString);
-            try
-            {
-                await connection.OpenAsync();
-                GlobalSettings.ConnectionString = connectionString;
-                if (SaveForLater.IsChecked)
-                {
-                    await SaveConnectionAsync(connectionName, server, database, username, password, certificatePath);
-                }
-                await Navigation.PushAsync(new MainTabbedPage());
-            }
-            catch (Exception ex)
-            {
-                await DisplayAlert("Chyba", $"Připojení selhalo: {ex.Message}", "OK");
-            }
+            return builder.ToString();
         }
 
-
-        private async Task SaveConnectionAsync(string name, string server, string database, string username, string password, string certificatePath)
-        { 
+        private async Task SaveConnectionAsync()
+        {
             try
             {
-                List<SqlConnectionPage.SqlConnections> connections;
-                
-                if (File.Exists(_connectionlist))
-                {
-                    string json = await File.ReadAllTextAsync(_connectionlist);
-                    connections = JsonSerializer.Deserialize<List<SqlConnectionPage.SqlConnections>>(json) ?? new List<SqlConnectionPage.SqlConnections>();
-                }
-                else
-                {
-                    connections = new List<SqlConnectionPage.SqlConnections>();
-                }
-                
-                var existingConnection = connections.FirstOrDefault(c => c.Name == name);
+                List<Models.SqlConnections> connections = await LoadConnectionsAsync();
+                var existingConnection = connections.FirstOrDefault(c => c.Name == NameEntry.Text);
+
                 if (existingConnection != null)
                 {
-                    existingConnection.ServerAddress = server;
-                    existingConnection.DatabaseName = database;
-                    existingConnection.UseWindowsAuth = WindowsAuthSwitch.IsToggled;
-                    existingConnection.Username = username;
-                    existingConnection.Password = password;
-                    existingConnection.UseCertificate = CertificateSwitch.IsToggled;
-                    existingConnection.CertificatePath = certificatePath;
-
-                    bool confirm = await DisplayAlert("Info", "Existující připojení bude aktualizováno.", "OK", "Cancel");
+                    UpdateExistingConnection(existingConnection);
+                    bool confirm = await DisplayAlert("Info", "Existing connection will be updated.", "OK", "Cancel");
                     if (!confirm) return;
                 }
                 else
                 {
-                    var newConnection = new SqlConnectionPage.SqlConnections
-                    {
-                        Name = name,
-                        ServerAddress = server,
-                        DatabaseName = database,
-                        UseWindowsAuth = WindowsAuthSwitch.IsToggled,
-                        Username = username,
-                        Password = password,
-                        UseCertificate = CertificateSwitch.IsToggled,
-                        CertificatePath = certificatePath
-                    };
-                    connections.Add(newConnection);
-
-                    await DisplayAlert("Info", "Nové připojení bylo přidáno.", "OK");
+                    connections.Add(CreateNewConnection());
+                    await DisplayAlert("Info", "New connection has been added.", "OK");
                 }
-                
-                var options = new JsonSerializerOptions { WriteIndented = true };
-                string jsonString = JsonSerializer.Serialize(connections, options);
-                await File.WriteAllTextAsync(_connectionlist, jsonString);
+
+                await SaveConnectionsToFileAsync(connections);
             }
             catch (Exception ex)
             {
-                await DisplayAlert("Chyba", $"Nepodařilo se uložit připojení: {ex.Message}", "OK");
+                await ShowErrorMessage($"Failed to save connection: {ex.Message}");
             }
         }
 
-        private async Task<bool> IsCertificateValidAsync(string certPath)
+        private void UpdateExistingConnection(Models.SqlConnections existingConnection)
         {
-            try
+            existingConnection.ServerAddress = ServerEntry.Text;
+            existingConnection.DatabaseName = DatabaseEntry.Text;
+            existingConnection.UseWindowsAuth = WindowsAuthSwitch.IsToggled;
+            existingConnection.Username = UsernameEntry.Text;
+            existingConnection.Password = PasswordEntry.Text;
+            existingConnection.UseCertificate = CertificateSwitch.IsToggled;
+            existingConnection.CertificatePath = CertificatePathEntry.Text;
+        }
+
+        private Models.SqlConnections CreateNewConnection()
+        {
+            return new Models.SqlConnections
             {
-                var cert = new X509Certificate2(certPath);
-                if (!cert.Verify())
-                {
-                    await DisplayAlert("Chyba certifikátu", "Certifikát je neplatný nebo vypršel.", "OK");
-                    return false;
-                }
-            }
-            catch (Exception)
+                Name = NameEntry.Text,
+                ServerAddress = ServerEntry.Text,
+                DatabaseName = DatabaseEntry.Text,
+                UseWindowsAuth = WindowsAuthSwitch.IsToggled,
+                Username = UsernameEntry.Text,
+                Password = PasswordEntry.Text,
+                UseCertificate = CertificateSwitch.IsToggled,
+                CertificatePath = CertificatePathEntry.Text
+            };
+        }
+
+        private async Task<List<Models.SqlConnections>> LoadConnectionsAsync()
+        {
+            if (File.Exists(_connectionlist))
             {
-                await DisplayAlert("Chyba", "Certifikát se nepodařilo načíst.", "OK");
-                return false;
+                string json = await File.ReadAllTextAsync(_connectionlist);
+                return JsonSerializer.Deserialize<List<Models.SqlConnections>>(json) ?? new List<Models.SqlConnections>();
             }
-            return true;
+            return new List<Models.SqlConnections>();
+        }
+
+        private async Task SaveConnectionsToFileAsync(List<Models.SqlConnections> connections)
+        {
+            var options = new JsonSerializerOptions { WriteIndented = true };
+            string jsonString = JsonSerializer.Serialize(connections, options);
+            await File.WriteAllTextAsync(_connectionlist, jsonString);
+        }
+
+        private async Task ShowErrorMessage(string message)
+        {
+            await DisplayAlert("Error", message, "OK");
         }
 
         private void OnWindowsAuthToggled(object sender, ToggledEventArgs e)
         {
-            UsernameText.IsVisible = PasswordText.IsVisible = UsernameEntry.IsVisible = PasswordEntry.IsVisible = !e.Value;
+            SetVisibility(!e.Value);
         }
 
         private void CertificateToggled(object sender, ToggledEventArgs e)
         {
             CertificatePathEntry.IsVisible = e.Value;
+            CertificateText.IsVisible = e.Value;
         }
     }
 }

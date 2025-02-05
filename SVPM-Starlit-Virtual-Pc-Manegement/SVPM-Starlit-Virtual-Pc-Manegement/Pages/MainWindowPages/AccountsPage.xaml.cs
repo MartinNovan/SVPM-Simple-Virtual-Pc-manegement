@@ -1,88 +1,78 @@
-﻿using Microsoft.Data.SqlClient;
-using Microsoft.Maui.Controls;
+﻿using SVPM_Starlit_Virtual_Pc_Manegement.Pages.CreateRecordsPages;
 
 namespace SVPM_Starlit_Virtual_Pc_Manegement.Pages.MainWindowPages
 {
     public partial class AccountsPage
     {
-        private List<Account>? _accounts;
-
         public AccountsPage()
         {
             InitializeComponent();
-            LoadAccounts();
         }
 
-        private async void LoadAccounts()
+        private void AccountsListView_OnLoaded(object? sender, EventArgs e)
         {
-            try
-            {
-                string? connectionString = GlobalSettings.ConnectionString;
-                _accounts = new List<Account>();
-
-                await using (SqlConnection connection = new SqlConnection(connectionString))
-                {
-                    await connection.OpenAsync();
-                    await using (SqlCommand command = new SqlCommand($@"SELECT a.AccountID, a.VirtualPcID, a.Username, a.Password, a.IsAdmin, a.LastUpdated, s.VirtualPcName, c.FullName FROM {GlobalSettings.AccountTable} a INNER JOIN {GlobalSettings.VirtualPcTable} s ON a.VirtualPcID = s.VirtualPcID INNER JOIN {GlobalSettings.CustomerTable} c ON s.CustomerID = c.CustomerID", connection))
-                    {
-                        await using (SqlDataReader reader = await command.ExecuteReaderAsync())
-                        {
-                            while (await reader.ReadAsync())
-                            {
-                                _accounts.Add(new Account
-                                {
-                                    AccountId = reader.GetGuid(0),
-                                    VirtualPcId = reader.GetGuid(1),
-                                    Username = reader.IsDBNull(2) ? " " : reader.GetString(2),
-                                    Password = reader.IsDBNull(3) ? " " : reader.GetString(3),
-                                    IsAdmin = reader.GetBoolean(4),
-                                    LastUpdated = reader.GetDateTime(5).ToString("g"),
-                                    ServerName = reader.IsDBNull(6) ? " " : reader.GetString(6),
-                                    FullName = reader.IsDBNull(7) ? " " : reader.GetString(7)
-                                });
-                            }
-                        }
-                    }
-                }
-
-                AccountsListView.ItemsSource = _accounts;
-            }
-            catch (Exception ex)
-            {
-                await DisplayAlert("Chyba", ex.Message, "OK");
-            }
+            AccountsListView.ItemsSource = AccountRepository.AccountsList.Where(account => account.RecordState != Models.RecordStates.Deleted).OrderBy(a => a.Username);
         }
 
+        protected override void OnDisappearing()
+        {
+            base.OnDisappearing();
+            AccountsListView.ItemsSource = null;
+        }
         private void OnSearchBarTextChanged(object sender, TextChangedEventArgs e)
         {
             string searchText = e.NewTextValue.ToLower();
 
             if (string.IsNullOrWhiteSpace(searchText))
             {
-                AccountsListView.ItemsSource = _accounts;
+                AccountsListView.ItemsSource = AccountRepository.AccountsList.Where(account => account.RecordState != Models.RecordStates.Deleted).OrderBy(a => a.Username);
             }
             else
             {
-                if (_accounts != null)
-                    AccountsListView.ItemsSource = _accounts
-                        .Where(a => a is { Username: not null, ServerName: not null, FullName: not null } &&
-                                    (a.Username.ToLower().Contains(searchText) ||
-                                     a.ServerName.ToLower().Contains(searchText) ||
-                                     a.FullName.ToLower().Contains(searchText)))
-                        .ToList();
+                AccountsListView.ItemsSource = AccountRepository.AccountsList
+                    .Where(a => a is { Username: not null, VirtualPcName: not null} &&
+                                (a.Username.ToLower().Contains(searchText) ||
+                                 a.VirtualPcName.ToLower().Contains(searchText)) && a.RecordState != Models.RecordStates.Deleted)
+                    .ToList().OrderBy(a => a.Username);
+            }
+        }
+        private async void AddButton_OnClicked(object? sender, EventArgs e)
+        {
+            try
+            {
+                await Navigation.PushAsync(new CreateAccount());
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("Error", ex.Message, "OK");
             }
         }
 
-        public class Account
+        private void ReloadButton_OnClicked(object? sender, EventArgs e)
         {
-            public Guid AccountId { get; set; }
-            public Guid VirtualPcId {get; set; }
-            public string? Username { get; init; }
-            public string? Password { get; set; }
-            public bool IsAdmin { get; set; }
-            public string? LastUpdated { get; set; }
-            public string? ServerName { get; init; }
-            public string? FullName { get; init; } 
+            AccountsListView.ItemsSource = AccountRepository.AccountsList.Where(account => account.RecordState != Models.RecordStates.Deleted).OrderBy(a => a.Username);
+        }
+        private void EditConnection_Clicked(object? sender, EventArgs e)
+        {
+            Navigation.PushAsync(new CreateAccount());
+        }
+
+        private async void OnDeleteButtonClicked(object? sender, EventArgs e)
+        {
+            try
+            {
+                if (sender is not ImageButton button || button.BindingContext is not Models.Account account) return;
+
+                bool confirm = await DisplayAlert("Warning!", "Do you really want to delete this customer?", "OK", "Cancel");
+                if (!confirm) return;
+
+                account.RecordState = Models.RecordStates.Deleted;
+                AccountsListView.ItemsSource = AccountRepository.AccountsList.Where(acc => acc.RecordState != Models.RecordStates.Deleted).OrderBy(acc => acc.Username);
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("Error", $"Failed to delete customer: {ex.Message}", "OK");
+            }
         }
     }
 }

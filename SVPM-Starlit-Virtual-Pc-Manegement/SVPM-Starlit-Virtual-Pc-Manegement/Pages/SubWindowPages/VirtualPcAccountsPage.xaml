@@ -1,21 +1,52 @@
 ﻿<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="SVPM_Starlit_Virtual_Pc_Manegement.Pages.SubWindowPages.VirtualPcAccountsPage">
+             x:Class="SVPM_Starlit_Virtual_Pc_Manegement.Pages.SubWindowPages.VirtualPcAccountsPage"
+             NavigationPage.HasNavigationBar="False">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="300"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-
-        <StackLayout Padding="10" Grid.Column="0">
-            <Image Source="server.png" HeightRequest="200" WidthRequest="500" />
-            <Label Text="Virtuální počítač:" FontSize="24" FontAttributes="Bold" />
-            <Label Text="{Binding VirtualPcName}" FontSize="18" />
-            <Label Text="{Binding CpuCores, StringFormat='   CPU jader: {0}'}" FontSize="18" />
-            <Label Text="{Binding RamSizeGb, StringFormat='   RAM: {0} GB'}" FontSize="18" />
-            <Label Text="{Binding DiskSizeGb, StringFormat='   Disk: {0} GB'}" FontSize="18" />
-        </StackLayout>
-
+        <ScrollView Grid.Column="0">
+            <StackLayout Padding="10" Grid.Column="0">
+                <Image Source="server.png" HeightRequest="200" WidthRequest="500" />
+                <Label Text="Název:"/>
+                <Label Text="{Binding VirtualPcName}" FontSize="18" />
+                <BoxView HeightRequest="1" Color="Gray" Margin="0,5,0,5" />
+                <Label Text="Služba:"/>
+                <Label Text="{Binding ServiceName}" FontSize="18" />
+                <BoxView HeightRequest="1" Color="Gray" Margin="0,5,0,5" />
+                <Label Text="Operační systém:"/>
+                <Label Text="{Binding OperatingSystem}" FontSize="18" />
+                <BoxView HeightRequest="1" Color="Gray" Margin="0,5,0,5" />
+                <Label Text="CPU:"/>
+                <Label Text="{Binding CPU_Cores, StringFormat='{0} jader'}" FontSize="18" />
+                <BoxView HeightRequest="1" Color="Gray" Margin="0,5,0,5" />
+                <Label Text="RAM:"/>
+                <Label Text="{Binding RAM_Size_GB, StringFormat='{0} GB'}" FontSize="18" />
+                <BoxView HeightRequest="1" Color="Gray" Margin="0,5,0,5" />
+                <Label Text="Disk:"/>
+                <Label Text="{Binding Disk_Size_GB, StringFormat='{0} GB'}" FontSize="18" />
+                <BoxView HeightRequest="1" Color="Gray" Margin="0,5,0,5" />
+                <Label Text="Zálohování:"/>
+                <Label Text="{Binding Backupping}" FontSize="18" />
+                <BoxView HeightRequest="1" Color="Gray" Margin="0,5,0,5" />
+                <Label Text="Administrace:"/>
+                <Label Text="{Binding Administration}" FontSize="18" />
+                <BoxView HeightRequest="1" Color="Gray" Margin="0,5,0,5" />
+                <Label Text="IP adresa:"/>
+                <Label Text="{Binding IP_Address}" FontSize="18" />
+                <BoxView HeightRequest="1" Color="Gray" Margin="0,5,0,5" />
+                <Label Text="FQDN:"/>
+                <Label Text="{Binding FQDN}" FontSize="18" />
+                <BoxView HeightRequest="1" Color="Gray" Margin="0,5,0,5" />
+                <Label Text="Zákazník:"/>
+                <Label Text="{Binding OwningCustomers}" FontSize="18" />
+                <BoxView HeightRequest="1" Color="Gray" Margin="0,5,0,5" />
+                <Label Text="Poznámky:"/>
+                <Label Text="{Binding Notes}" FontSize="18" />
+            </StackLayout>
+        </ScrollView>
         <StackLayout Padding="10" Grid.Column="1">
             <Label Text="Účty na počítači:" FontSize="24" />
             <ListView x:Name="AccountsListView">
