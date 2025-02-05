@@ -4,7 +4,7 @@ namespace SVPM_Starlit_Virtual_Pc_Manegement.Pages.CreateRecordsPages;
 public partial class CreateCustomer
 {
     //TODO: Edit this code to be able to use it to editing the customer & fix the picker bug
-    public ObservableCollection<Models.VirtualPC> VirtualPcs { get; set; } = new (VirtualPcRepository.VirtualPcsList);
+    public ObservableCollection<Models.VirtualPC>? VirtualPcs { get; set; } = new (VirtualPcRepository.VirtualPcsList);
 
     public ObservableCollection<Models.VirtualPC> SelectedVirtualPcs { get; set; } = new();
     public CreateCustomer()
@@ -63,23 +63,40 @@ public partial class CreateCustomer
     {
         try
         {
+            Picker.SelectedIndexChanged -= Picker_OnSelectedIndexChanged;
             Picker.IsEnabled = false;
+
             if (Picker.SelectedItem is Models.VirtualPC selectedVirtualPc)
             {
+                Console.WriteLine($"Selected VirtualPC: {selectedVirtualPc}");
                 SelectedVirtualPcs.Add(selectedVirtualPc);
-                VirtualPcs.Remove(selectedVirtualPc);
-                Picker.SelectedIndex = -1; //TODO: Fix this, it freezes the selected item in the picker and picker is not usable after this (usually happens when there is 3 left in the picker)
-                await Task.Delay(100);
-                Picker.IsEnabled = true;
+                if (VirtualPcs.Count == 1)
+                {
+                    VirtualPcs = null;
+                }
+                else
+                {
+                    VirtualPcs.Remove(selectedVirtualPc);
+                }
+                Picker.SelectedIndex = -1;
+                Picker.ItemsSource = VirtualPcs;
             }
+            else
+            {
+                Console.WriteLine("NULL CATCHED");
+            }
+
             Picker.IsEnabled = true;
+            Picker.SelectedIndexChanged += Picker_OnSelectedIndexChanged; // Znovu připojíme událost
         }
         catch (Exception ex)
         {
             await DisplayAlert("Error", ex.Message, "OK");
             Picker.IsEnabled = true;
+            Picker.SelectedIndexChanged += Picker_OnSelectedIndexChanged; // Znovu připojíme událost v případě chyby
         }
     }
+
 
     private void DeleteSelected(object? sender, EventArgs e)
     {
