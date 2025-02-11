@@ -1,8 +1,0 @@
-﻿<maui:MauiWinUIApplication
-    x:Class="SVPM_Starlit_Virtual_Pc_Manegement.WinUI.App"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:maui="using:Microsoft.Maui"
-    xmlns:local="using:SVPM_Starlit_Virtual_Pc_Manegement.WinUI">
-
-</maui:MauiWinUIApplication>

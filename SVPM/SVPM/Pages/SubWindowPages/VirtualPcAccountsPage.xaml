@@ -1,0 +1,76 @@
+﻿<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SVPM.Pages.SubWindowPages.VirtualPcAccountsPage"
+             NavigationPage.HasNavigationBar="False">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <ScrollView Grid.Column="0">
+            <StackLayout Padding="10" Grid.Column="0">
+                <Image Source="server.png" HeightRequest="200" WidthRequest="500" />
+                <Label Text="Název:"/>
+                <Label Text="{Binding VirtualPcName}" FontSize="18" />
+                <BoxView HeightRequest="1" Color="Gray" Margin="0,5,0,5" />
+                <Label Text="Služba:"/>
+                <Label Text="{Binding ServiceName}" FontSize="18" />
+                <BoxView HeightRequest="1" Color="Gray" Margin="0,5,0,5" />
+                <Label Text="Operační systém:"/>
+                <Label Text="{Binding OperatingSystem}" FontSize="18" />
+                <BoxView HeightRequest="1" Color="Gray" Margin="0,5,0,5" />
+                <Label Text="CPU:"/>
+                <Label Text="{Binding CPU_Cores, StringFormat='{0} jader'}" FontSize="18" />
+                <BoxView HeightRequest="1" Color="Gray" Margin="0,5,0,5" />
+                <Label Text="RAM:"/>
+                <Label Text="{Binding RAM_Size_GB, StringFormat='{0} GB'}" FontSize="18" />
+                <BoxView HeightRequest="1" Color="Gray" Margin="0,5,0,5" />
+                <Label Text="Disk:"/>
+                <Label Text="{Binding Disk_Size_GB, StringFormat='{0} GB'}" FontSize="18" />
+                <BoxView HeightRequest="1" Color="Gray" Margin="0,5,0,5" />
+                <Label Text="Zálohování:"/>
+                <Label Text="{Binding Backupping}" FontSize="18" />
+                <BoxView HeightRequest="1" Color="Gray" Margin="0,5,0,5" />
+                <Label Text="Administrace:"/>
+                <Label Text="{Binding Administration}" FontSize="18" />
+                <BoxView HeightRequest="1" Color="Gray" Margin="0,5,0,5" />
+                <Label Text="IP adresa:"/>
+                <Label Text="{Binding IP_Address}" FontSize="18" />
+                <BoxView HeightRequest="1" Color="Gray" Margin="0,5,0,5" />
+                <Label Text="FQDN:"/>
+                <Label Text="{Binding FQDN}" FontSize="18" />
+                <BoxView HeightRequest="1" Color="Gray" Margin="0,5,0,5" />
+                <Label Text="Zákazník:"/>
+                <Label Text="{Binding OwningCustomers}" FontSize="18" />
+                <BoxView HeightRequest="1" Color="Gray" Margin="0,5,0,5" />
+                <Label Text="Poznámky:"/>
+                <Label Text="{Binding Notes}" FontSize="18" />
+            </StackLayout>
+        </ScrollView>
+        <StackLayout Padding="10" Grid.Column="1">
+            <Label Text="Účty na počítači:" FontSize="24" />
+            <ListView x:Name="AccountsListView">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <StackLayout Padding="5" Margin="5">
+                                <StackLayout Orientation="Horizontal">
+                                    <Image Source="account.png" HeightRequest="50" WidthRequest="50" />
+                                    <StackLayout Margin="10">
+                                        <Label Text="{Binding Username}" FontSize="Medium" />
+                                        <StackLayout Orientation="Vertical">
+                                            <Label Text="{Binding Password, StringFormat='   Heslo: {0}'}" FontSize="Small" />
+                                            <Label Text="{Binding IsAdmin, StringFormat='   Admin: {0}'}" FontSize="Small" />
+                                            <Label Text="{Binding LastUpdated, StringFormat='   Aktualizováno: {0}'}" FontSize="Small" />
+                                        </StackLayout>
+                                    </StackLayout>
+                                </StackLayout>
+                                <BoxView HeightRequest="1" Color="Gray" Margin="0,5,0,5" />
+                            </StackLayout>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </StackLayout>
+    </Grid>
+</ContentPage>

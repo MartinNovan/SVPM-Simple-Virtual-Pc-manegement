@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SVPM.Pages.MainWindowPages.VirtualPcPage">
+    <StackLayout Padding="5">
+        <Grid ColumnDefinitions="auto, *, auto, auto" ColumnSpacing="5" Margin="5">
+            <Label Grid.Column="0" Text="Virtual PCs:" FontSize="24" VerticalOptions="Center"/>
+            <SearchBar Grid.Column="1" Placeholder="Search for virtual PCs..." TextChanged="OnSearchBarTextChanged" />
+            <Button Grid.Column="2" Text="+" Clicked="AddButton_OnClicked" VerticalOptions="End" FontSize="20" ToolTipProperties.Text="Add a new record." />
+            <Button Grid.Column="3" Text="⟳" Clicked="ReloadButton_OnClicked" VerticalOptions="End" FontSize="20" ToolTipProperties.Text="Refresh this list."/>
+        </Grid>
+        <ListView x:Name="VirtualPCsListView" ItemTapped="VirtualPcListView_ItemTapped" Loaded="VirtualPCsListView_OnLoaded">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ViewCell>
+                        <StackLayout>
+                            <Grid ColumnDefinitions="auto, *, auto">
+                                <Image Grid.Column="0" Source="server.png" HeightRequest="50" WidthRequest="50" Margin="5"/>
+                                <StackLayout Grid.Column="1">
+                                    <Label Text="{Binding VirtualPcName}" FontSize="Medium" />
+                                    <Grid ColumnDefinitions="auto, *" ColumnSpacing="15" Margin="15,0,0,0">
+                                        <StackLayout Grid.Column="0">
+                                            <Label Text="{Binding ServiceName, StringFormat='Service: {0}'}" />
+                                            <Label Text="{Binding OperatingSystem, StringFormat='OS: {0}'}" />
+                                            <Label Text="{Binding CPU_Cores, StringFormat='CPU: {0} cores'}" />
+                                            <Label Text="{Binding RAM_Size_GB, StringFormat='RAM: {0} GB'}" />
+                                            <Label Text="{Binding Disk_Size_GB, StringFormat='Drive: {0} GB'}" />
+                                        </StackLayout>
+                                        <StackLayout Grid.Column="1">
+                                            <Label Text="{Binding Backupping, StringFormat='Backupping: {0}'}" />
+                                            <Label Text="{Binding Administration, StringFormat='Administration: {0}'}" />
+                                            <Label Text="{Binding IP_Address, StringFormat='IP: {0}'}" />
+                                            <Label Text="{Binding FQDN, StringFormat='FQDN: {0}'}" />
+                                            <Label Text="{Binding OwningCustomersNames, StringFormat='Customer: {0}'}" />
+                                        </StackLayout>
+                                    </Grid>
+                                </StackLayout>
+                                <StackLayout Grid.Column="2" VerticalOptions="Center" HorizontalOptions="Center">
+                                    <ImageButton Source="pencil_icon.png" Scale="0.7" CornerRadius="3" HeightRequest="10" WidthRequest="10" VerticalOptions="Center" BackgroundColor="Gray" Clicked="EditConnection_Clicked" ToolTipProperties.Text="Click to edit this connection." />
+                                    <ImageButton Source="trash_icon.png"  Scale="0.7" CornerRadius="3" HeightRequest="10" WidthRequest="10" VerticalOptions="Center" BackgroundColor="Gray" Clicked="OnDeleteButtonClicked" ToolTipProperties.Text="Click to remove this connection." Margin="0,0,3,0"/>
+                                </StackLayout>
+                            </Grid>
+                            <BoxView HeightRequest="1" Color="Gray" Margin="5,0" />
+                        </StackLayout>
+                    </ViewCell>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </StackLayout>
+</ContentPage>
