@@ -2,7 +2,7 @@
 
 public partial class LoadingPage
 {
-    public LoadingPage(bool isPushing)
+    public LoadingPage(bool isPushing, bool isFromConnectionPage)
     {
         InitializeComponent();
         Text.Text = "Loading...";
@@ -13,6 +13,10 @@ public partial class LoadingPage
         else
         {
             LoadingData();
+            if (isFromConnectionPage)
+            {
+                Navigation.PushAsync(new MainTabbedPage());
+            }
         }
     }
 
@@ -33,7 +37,6 @@ public partial class LoadingPage
             await AccountRepository.GetAllAccountsAsync();
             ProgressBar.Progress = 1;
             Text.Text = "Done!";
-            await Navigation.PushAsync(new MainTabbedPage());
             Navigation.RemovePage(this);
         }
         catch (Exception ex)
@@ -45,38 +48,46 @@ public partial class LoadingPage
     {
         try
         {
-            //TODO: Finish uploading data to database with verification (more in models.cs TODO)
-            Text.Text = "Uploading customers changes...";
-            foreach (var customer in CustomerRepository.CustomersList.Where(c => c.RecordState != Models.RecordStates.Loaded))
+            await UpdateTextAsync("Uploading customers changes...");
+            foreach (var customer in CustomerRepository.CustomersList)
             {
                 await customer.SaveChanges();
             }
-            ProgressBar.Progress = 0.25;
-            Text.Text = "Uploading mappings changes...";
-            foreach (var mapping in CustomersVirtualPCsRepository.MappingList.Where(m => m.RecordState != Models.RecordStates.Loaded))
-            {
-                await mapping.SaveChanges();
-            }
-            ProgressBar.Progress = 0.5;
-            Text.Text = "Uploading Virtual PCs changes...";
-            foreach (var virtualPc in VirtualPcRepository.VirtualPcsList.Where(vpc => vpc.RecordState != Models.RecordStates.Loaded))
+            await UpdateProgressAsync(0.25);
+            await UpdateTextAsync("Uploading Virtual PCs changes...");
+            foreach (var virtualPc in VirtualPcRepository.VirtualPcsList)
             {
                 await virtualPc.SaveChanges();
             }
-            ProgressBar.Progress = 0.75;
-            Text.Text = "Uploading accounts changes...";
-            foreach (var account in VirtualPcRepository.VirtualPcsList.Where(acc => acc.RecordState != Models.RecordStates.Loaded))
+            await UpdateProgressAsync(0.5);
+            await UpdateTextAsync("Uploading mappings changes...");
+            foreach (var mapping in CustomersVirtualPCsRepository.MappingList)
+            {
+                await mapping.SaveChanges();
+            }
+            await UpdateProgressAsync(0.75);
+            await UpdateTextAsync("Uploading accounts changes...");
+            foreach (var account in AccountRepository.AccountsList)
             {
                 await account.SaveChanges();
             }
-            ProgressBar.Progress = 1;
-            Text.Text = "Done!";
-            await Navigation.PushAsync(new MainTabbedPage());
+            await UpdateProgressAsync(1);
+            await UpdateTextAsync("Done!");
             Navigation.RemovePage(this);
         }
         catch (Exception ex)
         {
             await Application.Current!.Windows[0].Page!.DisplayAlert("Error", $"Error while pushing data to database: {ex.Message}", "OK");
         }
+    }
+
+    private Task UpdateTextAsync(string text)
+    {
+        return Device.InvokeOnMainThreadAsync(() => Text.Text = text);
+    }
+
+    private Task UpdateProgressAsync(double progress)
+    {
+        return Device.InvokeOnMainThreadAsync(() => ProgressBar.Progress = progress);
     }
 }

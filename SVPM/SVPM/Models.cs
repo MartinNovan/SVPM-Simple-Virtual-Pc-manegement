@@ -99,7 +99,7 @@ public static class Models
         public string OriginalPassword { get; set; }
         public string? VirtualPcName => AssociatedVirtualPc?.VirtualPcName;
         public RecordStates RecordState { get; set; }
-        public async void SaveChanges()
+        public async Task SaveChanges()
         {
             try
             {

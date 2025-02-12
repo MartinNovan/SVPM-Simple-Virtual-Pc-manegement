@@ -21,19 +21,17 @@ namespace SVPM.Pages.MainWindowPages
         }
         private void OnSearchBarTextChanged(object sender, TextChangedEventArgs e)
         {
-            string searchText = e.NewTextValue.ToLower();
-
-            if (string.IsNullOrWhiteSpace(searchText))
+            string searchText = e.NewTextValue?.ToLower() ?? "";
+            if (String.IsNullOrWhiteSpace(searchText))
             {
-                AccountsListView.ItemsSource = AccountRepository.AccountsList.Where(account => account.RecordState != Models.RecordStates.Deleted).OrderBy(a => a.Username);
+                return;
             }
-            else
+            var match = AccountRepository.AccountsList
+                .FirstOrDefault(a => (a.Username?.ToLower().Contains(searchText) ?? false) &&
+                                       a.RecordState != Models.RecordStates.Deleted);
+            if (match != null)
             {
-                AccountsListView.ItemsSource = AccountRepository.AccountsList
-                    .Where(a => a is { Username: not null, VirtualPcName: not null} &&
-                                (a.Username.ToLower().Contains(searchText) ||
-                                 a.VirtualPcName.ToLower().Contains(searchText)) && a.RecordState != Models.RecordStates.Deleted)
-                    .ToList().OrderBy(a => a.Username);
+                AccountsListView.ScrollTo(match, position: ScrollToPosition.Start, animated: true);
             }
         }
         private async void AddButton_OnClicked(object? sender, EventArgs e)
@@ -48,10 +46,6 @@ namespace SVPM.Pages.MainWindowPages
             }
         }
 
-        private void ReloadButton_OnClicked(object? sender, EventArgs e)
-        {
-            AccountsListView.ItemsSource = AccountRepository.AccountsList.Where(account => account.RecordState != Models.RecordStates.Deleted).OrderBy(a => a.Username);
-        }
         private void EditConnection_Clicked(object? sender, EventArgs e)
         {
             Navigation.PushAsync(new CreateAccount());

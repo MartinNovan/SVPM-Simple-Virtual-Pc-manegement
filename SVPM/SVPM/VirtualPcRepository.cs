@@ -6,37 +6,38 @@ public static class VirtualPcRepository
 {
     private static readonly SqlConnection Connection = new(GlobalSettings.ConnectionString);
     public static ObservableCollection<Models.VirtualPC> VirtualPcsList { get; set; } = new();
+
     public static async Task GetAllVirtualPCsAsync()
     {
-        VirtualPcsList.Clear();
-        await Connection.OpenAsync();
-        
-        var query = $"SELECT * FROM {GlobalSettings.VirtualPcTable}";
-        var command = new SqlCommand(query, Connection);
-        var reader = await command.ExecuteReaderAsync();
-
-        while (await reader.ReadAsync())
-        {
-            VirtualPcsList.Add(new Models.VirtualPC
-            {
-                VirtualPcID = reader.GetGuid(0),
-                VirtualPcName = reader.GetString(1),
-                ServiceName = reader.GetString(2),
-                OperatingSystem = reader.GetString(3),
-                CPU_Cores = reader.GetInt32(4),
-                RAM_Size_GB = reader.GetInt32(5),
-                Disk_Size_GB = reader.GetInt32(6),
-                Backupping = reader.GetBoolean(7),
-                Administration = reader.GetBoolean(8),
-                IP_Address = reader.IsDBNull(9) ? string.Empty : reader.GetString(9),
-                FQDN = reader.IsDBNull(10) ? string.Empty : reader.GetString(10),
-                Notes = reader.IsDBNull(11) ? string.Empty : reader.GetString(11),
-                RecordState = Models.RecordStates.Loaded
-            });
-        }
-        await Connection.CloseAsync();
         try
         {
+            VirtualPcsList.Clear();
+            await Connection.OpenAsync();
+
+            var query = $"SELECT * FROM {GlobalSettings.VirtualPcTable}";
+            var command = new SqlCommand(query, Connection);
+            var reader = await command.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                VirtualPcsList.Add(new Models.VirtualPC
+                {
+                    VirtualPcID = reader.GetGuid(0),
+                    VirtualPcName = reader.GetString(1),
+                    ServiceName = reader.GetString(2),
+                    OperatingSystem = reader.GetString(3),
+                    CPU_Cores = reader.GetInt32(4),
+                    RAM_Size_GB = reader.GetInt32(5),
+                    Disk_Size_GB = reader.GetInt32(6),
+                    Backupping = reader.GetBoolean(7),
+                    Administration = reader.GetBoolean(8),
+                    IP_Address = reader.IsDBNull(9) ? string.Empty : reader.GetString(9),
+                    FQDN = reader.IsDBNull(10) ? string.Empty : reader.GetString(10),
+                    Notes = reader.IsDBNull(11) ? string.Empty : reader.GetString(11),
+                    RecordState = Models.RecordStates.Loaded
+                });
+            }
+
             foreach (var virtualPc in VirtualPcsList)
             {
                 virtualPc.OwningCustomers = new List<Models.Customer>();
@@ -50,7 +51,11 @@ public static class VirtualPcRepository
         }
         catch (Exception ex)
         {
-            await Application.Current!.Windows[0].Page!.DisplayAlert("Error", $"Error while mapping customer to virtual PCs: {ex.Message}", "OK");
+            await Application.Current!.Windows[0].Page!.DisplayAlert("Error", $"Error while loading virtual PCs: {ex.Message}", "OK");
+        }
+        finally
+        {
+            await Connection.CloseAsync();
         }
     }
 
@@ -58,7 +63,7 @@ public static class VirtualPcRepository
     {
         try
         {
-            Connection.Open();
+            await Connection.OpenAsync();
 
             var query = $@"
             INSERT INTO {GlobalSettings.VirtualPcTable} 
@@ -78,61 +83,64 @@ public static class VirtualPcRepository
             command.Parameters.AddWithValue("@IP_Address", virtualPc.IP_Address ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@FQDN", virtualPc.FQDN ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@Notes", virtualPc.Notes ?? (object)DBNull.Value);
-            command.ExecuteNonQuery();
+
+            await command.ExecuteNonQueryAsync();
         }
         catch (Exception ex)
         {
-            await Application.Current!.Windows[0].Page!.DisplayAlert("Error", ex.Message, "OK");
+            await Application.Current!.Windows[0].Page!.DisplayAlert("Error", $"Error when adding virtual PC: {ex.Message}", "OK");
+        }
+        finally
+        {
+            await Connection.CloseAsync();
         }
     }
 
     public static async Task DeleteVirtualPc(Guid virtualPcId)
     {
-        Connection.Open();
-        await using var transaction = Connection.BeginTransaction();
         try
         {
-            var query = $"DELETE FROM {GlobalSettings.VirtualPcTable} WHERE VirtualPcID = @VirtualPcID";
-            using var virtualPcCommand = new SqlCommand(query, Connection);
-            virtualPcCommand.Parameters.AddWithValue("@VirtualPcID", virtualPcId);
-            virtualPcCommand.ExecuteNonQuery();
+            await Connection.OpenAsync();
+            await using var transaction = Connection.BeginTransaction();
 
-            var mappingQuery = $"DELETE FROM {GlobalSettings.CustomersVirtualPcTable} WHERE VirtualPcID = @VirtualPcID";
-            using var mappingCommand = new SqlCommand(mappingQuery, Connection);
-            mappingCommand.Parameters.AddWithValue("@VirtualPcID", virtualPcId);
-            mappingCommand.ExecuteNonQuery();
+            var queries = new[]
+            {
+                new SqlCommand($"DELETE FROM {GlobalSettings.VirtualPcTable} WHERE VirtualPcID = @VirtualPcID", Connection, transaction),
+                new SqlCommand($"DELETE FROM {GlobalSettings.CustomersVirtualPcTable} WHERE VirtualPcID = @VirtualPcID", Connection, transaction),
+                new SqlCommand($"DELETE FROM {GlobalSettings.AccountTable} WHERE VirtualPcID = @VirtualPcID", Connection, transaction)
+            };
 
-            var accountQuery = $"DELETE FROM {GlobalSettings.AccountTable} WHERE VirtualPcID = @VirtualPcID";
-            using var accountCommand = new SqlCommand(accountQuery, Connection);
-            accountCommand.Parameters.AddWithValue("@VirtualPcID", virtualPcId);
-            accountCommand.ExecuteNonQuery();
+            foreach (var command in queries)
+            {
+                command.Parameters.AddWithValue("@VirtualPcID", virtualPcId);
+                await command.ExecuteNonQueryAsync();
+            }
 
-            transaction.Commit();
+            await transaction.CommitAsync();
         }
         catch (Exception ex)
         {
-            transaction.Rollback();
-            await Application.Current!.Windows[0].Page!.DisplayAlert("Error", ex.Message, "OK");
+            await Application.Current!.Windows[0].Page!.DisplayAlert("Error", $"Error when deleting virtual PC: {ex.Message}", "OK");
         }
         finally
         {
-            Connection.Close();
+            await Connection.CloseAsync();
         }
     }
 
-
     public static async Task UpdateVirtualPc(Models.VirtualPC virtualPc)
     {
-        Connection.Open();
-        var transaction = Connection.BeginTransaction();
         try
         {
+            await Connection.OpenAsync();
+            await using var transaction = Connection.BeginTransaction();
+
             var query = $@"
             UPDATE {GlobalSettings.VirtualPcTable}
             SET VirtualPcName = @VirtualPcName, ServiceName = @ServiceName, OperatingSystem = @OperatingSystem, CPU_Cores = @CPU_Cores, RAM_Size_GB = @RAM_Size_GB, Disk_Size_GB = @Disk_Size_GB, Backupping = @Backupping, Administration = @Administration, IP_Address = @IP_Address, FQDN = @FQDN
             WHERE VirtualPcID = @VirtualPcID";
 
-            using var command = new SqlCommand(query, Connection);
+            using var command = new SqlCommand(query, Connection, transaction);
             command.Parameters.AddWithValue("@VirtualPcID", virtualPc.VirtualPcID);
             command.Parameters.AddWithValue("@VirtualPcName", virtualPc.VirtualPcName);
             command.Parameters.AddWithValue("@ServiceName", virtualPc.ServiceName);
@@ -145,17 +153,16 @@ public static class VirtualPcRepository
             command.Parameters.AddWithValue("@IP_Address", virtualPc.IP_Address ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@FQDN", virtualPc.FQDN ?? (object)DBNull.Value);
 
-            command.ExecuteNonQuery();
-            transaction.Commit();
+            await command.ExecuteNonQueryAsync();
+            await transaction.CommitAsync();
         }
         catch (Exception ex)
         {
-            transaction.Rollback();
-            await Application.Current!.Windows[0].Page!.DisplayAlert("Error", ex.Message, "OK");
+            await Application.Current!.Windows[0].Page!.DisplayAlert("Error", $"Error when updating virtual PC: {ex.Message}", "OK");
         }
         finally
         {
-            Connection.Close();
+            await Connection.CloseAsync();
         }
     }
 }

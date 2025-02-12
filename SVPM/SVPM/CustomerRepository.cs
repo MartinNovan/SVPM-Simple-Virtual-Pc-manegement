@@ -2,18 +2,20 @@
 using Microsoft.Data.SqlClient;
 
 namespace SVPM;
+
 public static class CustomerRepository
 {
-    private static readonly SqlConnection Connection = new(GlobalSettings.ConnectionString);
     public static ObservableCollection<Models.Customer> CustomersList { get; set; } = new();
+
     public static async Task GetAllCustomersAsync()
     {
         CustomersList.Clear();
-        await Connection.OpenAsync();
+        await using var connection = new SqlConnection(GlobalSettings.ConnectionString);
+        await connection.OpenAsync();
 
         var query = $"SELECT * FROM {GlobalSettings.CustomerTable}";
-        var command = new SqlCommand(query, Connection);
-        var reader = await command.ExecuteReaderAsync();
+        await using var command = new SqlCommand(query, connection);
+        await using var reader = await command.ExecuteReaderAsync();
 
         while (await reader.ReadAsync())
         {
@@ -28,27 +30,27 @@ public static class CustomerRepository
                 RecordState = Models.RecordStates.Loaded
             });
         }
-        await Connection.CloseAsync();
     }
+
     public static async Task AddCustomer(Models.Customer customer)
     {
+        await using var connection = new SqlConnection(GlobalSettings.ConnectionString);
+        await connection.OpenAsync();
         try
         {
-            Connection.Open();
-
             var query = $@"
-            INSERT INTO {GlobalSettings.CustomerTable} (FullName, CustomerTag, Email, Phone, CustomerNotes)
-            VALUES (@FullName, @CustomerTag, @Email, @Phone, @Notes)";
+            INSERT INTO {GlobalSettings.CustomerTable} (CustomerID ,FullName, CustomerTag, Email, Phone, CustomerNotes)
+            VALUES (@CustomerID, @FullName, @CustomerTag, @Email, @Phone, @Notes)";
 
-            await using var command = new SqlCommand(query, Connection);
+            await using var command = new SqlCommand(query, connection);
+            command.Parameters.AddWithValue("@CustomerID", customer.CustomerID);
             command.Parameters.AddWithValue("@FullName", customer.FullName ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@CustomerTag", customer.CustomerTag ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@Email", customer.Email ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@Phone", customer.Phone ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@Notes", customer.Notes ?? (object)DBNull.Value);
 
-            command.ExecuteNonQuery();
-            Connection.Close();
+            await command.ExecuteNonQueryAsync();
         }
         catch (Exception ex)
         {
@@ -58,38 +60,60 @@ public static class CustomerRepository
 
     public static async Task DeleteCustomer(Guid customerId)
     {
-        Connection.Open();
-        await using var transaction = Connection.BeginTransaction();
+        await using var connection = new SqlConnection(GlobalSettings.ConnectionString);
+        await connection.OpenAsync();
+        await using var transaction = await connection.BeginTransactionAsync();
+
         try
         {
+            var deleteQuery = $"DELETE FROM {GlobalSettings.CustomerTable} WHERE CustomerID = @CustomerID";
+            await using (var deleteCommand = new SqlCommand(deleteQuery, connection, transaction as SqlTransaction))
+            {
+                deleteCommand.Parameters.AddWithValue("@CustomerID", customerId);
+                await deleteCommand.ExecuteNonQueryAsync();
+            }
+
+            var checkQuery = $"SELECT COUNT(*) FROM {GlobalSettings.CustomersVirtualPcTable} WHERE CustomerID = @CustomerID";
+            await using (var checkCommand = new SqlCommand(checkQuery, connection, transaction as SqlTransaction))
+            {
+                checkCommand.Parameters.AddWithValue("@CustomerID", customerId);
+                var count = (int)await checkCommand.ExecuteScalarAsync();
+
+                if (count > 0)
+                {
+                    throw new Exception("Some linked records were not deleted properly.");
+                }
+            }
+/*
+            var query = $"DELETE FROM {GlobalSettings.CustomerTable} WHERE CustomerID = @CustomerID";
+            await using (var command = new SqlCommand(query, connection, transaction as SqlTransaction))
+            {
+                command.Parameters.AddWithValue("@CustomerID", customerId);
+                await command.ExecuteNonQueryAsync();
+            }
+
             var query1 = $"DELETE FROM {GlobalSettings.CustomersVirtualPcTable} WHERE CustomerID = @CustomerID";
-            await using var command1 = new SqlCommand(query1, Connection, transaction);
-            command1.Parameters.AddWithValue("@CustomerID", customerId);
-            command1.ExecuteNonQuery();
+            await using (var command1 = new SqlCommand(query1, connection, transaction as SqlTransaction))
+            {
+                command1.Parameters.AddWithValue("@CustomerID", customerId);
+                await command1.ExecuteNonQueryAsync();
+            }
 
-            var query2 = $"DELETE FROM {GlobalSettings.CustomerTable} WHERE CustomerID = @CustomerID";
-            await using var command2 = new SqlCommand(query2, Connection, transaction);
-            command2.Parameters.AddWithValue("@CustomerID", customerId);
-            command2.ExecuteNonQuery();
-
-            transaction.Commit();
+            await transaction.CommitAsync();*/
         }
         catch (Exception ex)
         {
-            transaction.Rollback();
+            await transaction.RollbackAsync();
             await Application.Current!.Windows[0].Page!.DisplayAlert("Error", $"Error when deleting customer: {ex.Message}", "OK");
-        }
-        finally
-        {
-            Connection.Close();
         }
     }
 
-
     public static async Task UpdateCustomer(Models.Customer customer)
     {
-        Connection.Open();
-        var transaction = Connection.BeginTransaction();
+        await using var connection = new SqlConnection(GlobalSettings.ConnectionString);
+        await connection.OpenAsync();
+        await using var transaction = await connection.BeginTransactionAsync();
+
         try
         {
             var query = $@"
@@ -97,7 +121,7 @@ public static class CustomerRepository
             SET FullName = @FullName, CustomerTag = @CustomerTag, Email = @Email, Phone = @Phone, CustomerNotes = @Notes
             WHERE CustomerID = @CustomerID";
 
-            await using var command = new SqlCommand(query, Connection);
+            await using var command = new SqlCommand(query, connection, transaction as SqlTransaction);
             command.Parameters.AddWithValue("@FullName", customer.FullName ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@CustomerTag", customer.CustomerTag ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@Email", customer.Email ?? (object)DBNull.Value);
@@ -105,17 +129,13 @@ public static class CustomerRepository
             command.Parameters.AddWithValue("@Notes", customer.Notes ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@CustomerID", customer.CustomerID);
 
-            command.ExecuteNonQuery();
-            transaction.Commit();
+            await command.ExecuteNonQueryAsync();
+            await transaction.CommitAsync();
         }
         catch (Exception ex)
         {
-            transaction.Rollback();
-            await Application.Current!.Windows[0].Page!.DisplayAlert("Error", $"Error when deleting customer: {ex.Message}", "OK");
-        }
-        finally
-        {
-            Connection.Close();
+            await transaction.RollbackAsync();
+            await Application.Current!.Windows[0].Page!.DisplayAlert("Error", $"Error when updating customer: {ex.Message}", "OK");
         }
     }
 }

@@ -26,6 +26,7 @@ public partial class CreateAccount
 
             var account = new Models.Account
             {
+                AccountID = Guid.NewGuid(),
                 Username = AccountUsernameEntry.Text,
                 Password = AccountPasswordEntry.Text,
                 IsAdmin = IsAdminCheckBox.IsChecked,

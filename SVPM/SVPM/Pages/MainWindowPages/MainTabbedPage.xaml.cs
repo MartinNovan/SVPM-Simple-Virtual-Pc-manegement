@@ -43,7 +43,7 @@ namespace SVPM.Pages.MainWindowPages
                 {
                     return;
                 }
-                await Navigation.PushAsync(new LoadingPage(false));
+                await Navigation.PushAsync(new LoadingPage(false, false));
             }
             catch (Exception ex)
             {
@@ -60,7 +60,7 @@ namespace SVPM.Pages.MainWindowPages
                 {
                     return;
                 }
-                await Navigation.PushAsync(new LoadingPage(true));
+                await Navigation.PushAsync(new LoadingPage(true, false));
             }
             catch (Exception ex)
             {

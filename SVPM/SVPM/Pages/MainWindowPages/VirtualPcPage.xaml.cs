@@ -22,19 +22,17 @@ public partial class VirtualPcPage
     }
     private void OnSearchBarTextChanged(object sender, TextChangedEventArgs e)
     {
-        string? searchText = e.NewTextValue?.ToLower();
-
-        if (string.IsNullOrWhiteSpace(searchText))
+        string searchText = e.NewTextValue?.ToLower() ?? "";
+        if (String.IsNullOrWhiteSpace(searchText))
         {
-            VirtualPCsListView.ItemsSource = VirtualPcRepository.VirtualPcsList.Where(vpc => vpc.RecordState != Models.RecordStates.Deleted).OrderBy(vpc => vpc.VirtualPcName);
+            return;
         }
-        else
+        var match = VirtualPcRepository.VirtualPcsList
+            .FirstOrDefault(vpc => (vpc.VirtualPcName?.ToLower().Contains(searchText) ?? false) &&
+                                 vpc.RecordState != Models.RecordStates.Deleted);
+        if (match != null)
         {
-            VirtualPCsListView.ItemsSource = VirtualPcRepository.VirtualPcsList
-                .Where(vpc => vpc is { VirtualPcName: not null } &&
-                            (vpc.VirtualPcName.ToLower().Contains(searchText) ||
-                             vpc.OwningCustomersNames.ToLower().Contains(searchText)) && vpc.RecordState != Models.RecordStates.Deleted)
-                .OrderBy(vpc => vpc.VirtualPcName);
+            VirtualPCsListView.ScrollTo(match, position: ScrollToPosition.Start, animated: true);
         }
     }
 
@@ -65,10 +63,6 @@ public partial class VirtualPcPage
         }
     }
 
-    private void ReloadButton_OnClicked(object? sender, EventArgs e)
-    {
-        VirtualPCsListView.ItemsSource = VirtualPcRepository.VirtualPcsList.Where(vpc => vpc.RecordState != Models.RecordStates.Deleted).OrderBy(vpc => vpc.VirtualPcName);
-    }
     private void EditConnection_Clicked(object? sender, EventArgs e)
     {
         Navigation.PushAsync(new CreateVirtualPc());

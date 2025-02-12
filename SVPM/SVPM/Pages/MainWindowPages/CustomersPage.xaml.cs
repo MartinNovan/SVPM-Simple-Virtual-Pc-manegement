@@ -23,20 +23,20 @@ namespace SVPM.Pages.MainWindowPages
 
         private void OnSearchBarTextChanged(object sender, TextChangedEventArgs e)
         {
-            string? searchText = e.NewTextValue?.ToLower();
-            if (string.IsNullOrWhiteSpace(searchText))
+            string searchText = e.NewTextValue?.ToLower() ?? "";
+            if (String.IsNullOrWhiteSpace(searchText))
             {
-                CustomersListView.ItemsSource = CustomerRepository.CustomersList.Where(customer => customer.RecordState != Models.RecordStates.Deleted).OrderBy(c => c.FullName);
+                return;
             }
-            else
+            var match = CustomerRepository.CustomersList
+            .FirstOrDefault(c => (c.FullName?.ToLower().Contains(searchText) ?? false) ||
+                         (c.CustomerTag?.ToLower().Contains(searchText) ?? false) ||
+                         (c.Email?.ToLower().Contains(searchText) ?? false) ||
+                         (c.Phone?.ToLower().Contains(searchText) ?? false) &&
+                         c.RecordState != Models.RecordStates.Deleted);
+            if (match != null)
             {
-                CustomersListView.ItemsSource = CustomerRepository.CustomersList
-                    .Where(c => c is { FullName: not null,CustomerTag:not null, Email: not null, Phone: not null } &&
-                                (c.FullName.ToLower().Contains(searchText) ||
-                                 c.CustomerTag.ToLower().Contains(searchText) ||
-                                 c.Email.ToLower().Contains(searchText) ||
-                                 c.Phone.ToLower().Contains(searchText)) && c.RecordState != Models.RecordStates.Deleted)
-                    .OrderBy(c => c.FullName);
+                CustomersListView.ScrollTo(match, position: ScrollToPosition.Start, animated: true);
             }
         }
 
@@ -65,11 +65,6 @@ namespace SVPM.Pages.MainWindowPages
             {
                 await DisplayAlert("Error", ex.Message, "OK");
             }
-        }
-
-        private void ReloadButton_OnClicked(object? sender, EventArgs e)
-        {
-            CustomersListView.ItemsSource = CustomerRepository.CustomersList.Where(customer => customer.RecordState != Models.RecordStates.Deleted).OrderBy(c => c.FullName);
         }
 
         private void EditConnection_Clicked(object? sender, EventArgs e)

@@ -76,7 +76,7 @@ namespace SVPM.Pages.ConnectionPages
 
                 GlobalSettings.ConnectionString = builder.ToString();
                 IsProcessing.IsVisible = false;
-                await Navigation.PushAsync(new LoadingPage(false));
+                await Navigation.PushAsync(new LoadingPage(false, true));
             }
             catch (Exception ex)
             {

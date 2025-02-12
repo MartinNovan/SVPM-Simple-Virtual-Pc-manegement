@@ -67,7 +67,7 @@ namespace SVPM.Pages.ConnectionPages
                     await SaveConnectionAsync();
                 }
                 IsProcessing.IsVisible = false;
-                await Navigation.PushAsync(new MainTabbedPage());
+                await Navigation.PushAsync(new LoadingPage(false, true));
             }
             catch (SqlException sqlEx)
             {

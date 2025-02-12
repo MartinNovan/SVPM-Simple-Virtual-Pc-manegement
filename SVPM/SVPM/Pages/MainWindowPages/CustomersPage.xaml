@@ -3,11 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="SVPM.Pages.MainWindowPages.CustomersPage">
     <StackLayout Padding="5">
-        <Grid ColumnDefinitions="auto, *, auto, auto" ColumnSpacing="5" Margin="5">
+        <Grid ColumnDefinitions="auto, *, auto" ColumnSpacing="5" Margin="5">
             <Label Grid.Column="0" Text="Customers:" FontSize="24" VerticalOptions="Center" />
             <SearchBar Grid.Column="1" Placeholder="Search for customers..."  TextChanged="OnSearchBarTextChanged"/>
             <Button Grid.Column="2" Text="+" Clicked="AddButton_OnClicked" VerticalOptions="End" FontSize="20" ToolTipProperties.Text="Add a new record." />
-            <Button Grid.Column="3" Text="⟳" Clicked="ReloadButton_OnClicked" VerticalOptions="End" FontSize="20" ToolTipProperties.Text="Refresh this list." />
         </Grid>
         <ListView x:Name="CustomersListView" ItemTapped="CustomersListView_ItemTapped" Loaded="CustomersListView_OnLoaded">
             <ListView.ItemTemplate>
