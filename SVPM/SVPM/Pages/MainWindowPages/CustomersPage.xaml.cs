@@ -67,9 +67,17 @@ namespace SVPM.Pages.MainWindowPages
             }
         }
 
-        private void EditConnection_Clicked(object? sender, EventArgs e)
+        private async void EditConnection_Clicked(object? sender, EventArgs e)
         {
-            Navigation.PushAsync(new CreateCustomer());
+            try
+            {
+                if (sender is not ImageButton button || button.BindingContext is not Models.Customer customer) return;
+                await Navigation.PushAsync(new CreateCustomer(customer));
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("Error", ex.Message, "OK");
+            }
         }
 
         private async void OnDeleteButtonClicked(object? sender, EventArgs e)
@@ -82,6 +90,21 @@ namespace SVPM.Pages.MainWindowPages
                 if (!confirm) return;
 
                 customer.RecordState = Models.RecordStates.Deleted;
+                foreach (var mapping in CustomersVirtualPCsRepository.MappingList)
+                {
+                    if (mapping.CustomerID == customer.CustomerID)
+                    {
+                        mapping.RecordState = Models.RecordStates.Deleted;
+                    }
+                }
+
+                foreach (var vitrualpc in VirtualPcRepository.VirtualPcsList)
+                {
+                    if (vitrualpc.OwningCustomers.Contains(customer))
+                    {
+                        vitrualpc.OwningCustomers.Remove(customer);
+                    }
+                }
                 CustomersListView.ItemsSource = CustomerRepository.CustomersList.Where(customer => customer.RecordState != Models.RecordStates.Deleted).OrderBy(c => c.FullName);
             }
             catch (Exception ex)

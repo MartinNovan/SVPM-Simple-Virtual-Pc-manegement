@@ -2,7 +2,6 @@
 
 public static class Models
 {
-    //TODO: Dodělat ověřování toho že se v databázi nezměnila hodnota zatímco uživatel pracoval s lokalní instancí (udělat kopii každé vlastnosti při načtení z databáze a porovnávat je při ukládání změn)
     public enum RecordStates
     {
         Loaded,
@@ -13,12 +12,30 @@ public static class Models
     public class Customer
     {
         public Guid CustomerID { get; init; }
-        public string? FullName { get; init; }
-        public string? CustomerTag { get; init; }
-        public string? Email { get; init; }
-        public string? Phone { get; init; }
+        public string? FullName { get; set; }
+        public string? CustomerTag { get; set; }
+        public string? Email { get; set; }
+        public string? Phone { get; set; }
         public string? Notes { get; set; }
         public RecordStates RecordState { get; set; }
+
+        public string? OriginalFullName { get; private set; }
+        public string? OriginalCustomerTag { get; private set; }
+        public string? OriginalEmail { get; private set; }
+        public string? OriginalPhone { get; private set; }
+        public string? OriginalNotes { get; private set; }
+        public bool inDatabase { get; set; }
+
+        public void InitializeOriginalValues()
+        {
+            if (RecordState != RecordStates.Loaded) return;
+            OriginalFullName = FullName;
+            OriginalCustomerTag = CustomerTag;
+            OriginalEmail = Email;
+            OriginalPhone = Phone;
+            OriginalNotes = Notes;
+        }
+
         public async Task SaveChanges()
         {
             try
@@ -31,7 +48,7 @@ public static class Models
                         await CustomerRepository.AddCustomer(this);
                         break;
                     case RecordStates.Deleted:
-                        await CustomerRepository.DeleteCustomer(CustomerID);
+                        await CustomerRepository.DeleteCustomer(this);
                         break;
                     case RecordStates.Updated:
                         await CustomerRepository.UpdateCustomer(this);
@@ -60,7 +77,7 @@ public static class Models
         public string? FQDN { get; set; }
         public string? Notes { get; set; }
         public List<Customer>? OwningCustomers { get; set; }
-        public string OwningCustomersNames => OwningCustomers != null && OwningCustomers.Count > 0 ? string.Join(", ", OwningCustomers.Select(c => c.FullName)) : "No customers";
+        public string OwningCustomersNames => OwningCustomers is { Count: > 0 } ? string.Join(", ", OwningCustomers.Select(c => c.FullName)) : "No customers";
         public RecordStates RecordState { get; set; }
         public async Task SaveChanges()
         {
@@ -132,6 +149,7 @@ public static class Models
         public Guid VirtualPcID { get; set; }
         public Guid CustomerID { get; set; }
         public RecordStates RecordState { get; set; }
+        public bool inDatabase { get; set; }
         public async Task SaveChanges()
         {
             try
@@ -144,7 +162,7 @@ public static class Models
                         await CustomersVirtualPCsRepository.AddMappingAsync(this);
                         break;
                     case RecordStates.Deleted:
-                        await CustomersVirtualPCsRepository.DeleteMappingAsync(CustomerID, VirtualPcID);
+                        await CustomersVirtualPCsRepository.DeleteMappingAsync(this);
                         break;
                 }
             }
@@ -157,9 +175,9 @@ public static class Models
 
     public class SqlConnections
     {
-        public string? Name { get; init; }
-        public string? ServerAddress { get; set; }
-        public string? DatabaseName { get; set; }
+        public string? Name { get; set; } = String.Empty;
+        public string? ServerAddress { get; set; } = String.Empty;
+        public string? DatabaseName { get; set; } = String.Empty;
         public bool UseWindowsAuth { get; set; }
         public string? Username { get; set; }
         public string? Password { get; set; }

@@ -5,7 +5,7 @@ namespace SVPM;
 
 public static class CustomerRepository
 {
-    public static ObservableCollection<Models.Customer> CustomersList { get; set; } = new();
+    public static ObservableCollection<Models.Customer> CustomersList { get; } = new();
 
     public static async Task GetAllCustomersAsync()
     {
@@ -27,8 +27,14 @@ public static class CustomerRepository
                 Email = reader.IsDBNull(reader.GetOrdinal("Email")) ? null : reader.GetString(reader.GetOrdinal("Email")),
                 Phone = reader.IsDBNull(reader.GetOrdinal("Phone")) ? null : reader.GetString(reader.GetOrdinal("Phone")),
                 Notes = reader.IsDBNull(reader.GetOrdinal("CustomerNotes")) ? null : reader.GetString(reader.GetOrdinal("CustomerNotes")),
-                RecordState = Models.RecordStates.Loaded
+                RecordState = Models.RecordStates.Loaded,
+                inDatabase = true
             });
+        }
+
+        foreach (var customer in CustomersList)
+        {
+            customer.InitializeOriginalValues();
         }
     }
 
@@ -51,6 +57,7 @@ public static class CustomerRepository
             command.Parameters.AddWithValue("@Notes", customer.Notes ?? (object)DBNull.Value);
 
             await command.ExecuteNonQueryAsync();
+            customer.inDatabase = true;
         }
         catch (Exception ex)
         {
@@ -58,48 +65,76 @@ public static class CustomerRepository
         }
     }
 
-    public static async Task DeleteCustomer(Guid customerId)
+    public static async Task DeleteCustomer(Models.Customer customer)
     {
+        if(!customer.inDatabase) return;
         await using var connection = new SqlConnection(GlobalSettings.ConnectionString);
         await connection.OpenAsync();
         await using var transaction = await connection.BeginTransactionAsync();
-
         try
         {
-            var deleteQuery = $"DELETE FROM {GlobalSettings.CustomerTable} WHERE CustomerID = @CustomerID";
-            await using (var deleteCommand = new SqlCommand(deleteQuery, connection, transaction as SqlTransaction))
+            var selectQuery = $@"
+            SELECT FullName, CustomerTag, Email, Phone, CustomerNotes
+            FROM {GlobalSettings.CustomerTable}
+            WHERE CustomerID = @CustomerID";
+
+            await using var selectCommand = new SqlCommand(selectQuery, connection, transaction as SqlTransaction);
+            selectCommand.Parameters.AddWithValue("@CustomerID", customer.CustomerID);
+
+            await using var reader = await selectCommand.ExecuteReaderAsync();
+            if (!reader.HasRows)
             {
-                deleteCommand.Parameters.AddWithValue("@CustomerID", customerId);
-                await deleteCommand.ExecuteNonQueryAsync();
+                await Application.Current!.Windows[0].Page!.DisplayAlert("Error", "Customer not found in the database.", "OK");
+                return;
+            }
+
+            await reader.ReadAsync();
+            var dbFullName = reader["FullName"] as string;
+            var dbCustomerTag = reader["CustomerTag"] as string;
+            var dbEmail = reader["Email"] as string;
+            var dbPhone = reader["Phone"] as string;
+            var dbNotes = reader["CustomerNotes"] as string;
+            reader.Close();
+
+            if ((dbFullName != customer.OriginalFullName) || (dbCustomerTag != customer.OriginalCustomerTag) ||
+                (dbEmail != customer.OriginalEmail) || (dbPhone != customer.OriginalPhone) ||
+                (dbNotes != customer.OriginalNotes))
+            {
+                bool confirm = await Application.Current!.Windows[0].Page!.DisplayAlert(
+                    "Conflict Detected",
+                    $"Database values have changed.\n\n"
+                    + $"Current values in DB:\n"
+                    + $"Full Name: {dbFullName}\nCustomer Tag: {dbCustomerTag}\nEmail: {dbEmail}\nPhone: {dbPhone}\nNotes: {dbNotes}\n\n"
+                    + $"Values you originally loaded:\n"
+                    + $"Full Name: {customer.OriginalFullName}\nCustomer Tag: {customer.OriginalCustomerTag}\nEmail: {customer.OriginalEmail}\nPhone: {customer.OriginalPhone}\nNotes: {customer.OriginalNotes}\n\n"
+                    + "Do you still want to delete this customer from the database?",
+                    "Yes", "No");
+
+                if (!confirm)
+                {
+                    return;
+                }
+            }
+
+            var deletequery = $"DELETE FROM {GlobalSettings.CustomerTable} WHERE CustomerID = @CustomerID";
+            await using (var deletecommand = new SqlCommand(deletequery, connection, transaction as SqlTransaction))
+            {
+                deletecommand.Parameters.AddWithValue("@CustomerID", customer.CustomerID);
+                await deletecommand.ExecuteNonQueryAsync();
             }
 
             var checkQuery = $"SELECT COUNT(*) FROM {GlobalSettings.CustomersVirtualPcTable} WHERE CustomerID = @CustomerID";
             await using (var checkCommand = new SqlCommand(checkQuery, connection, transaction as SqlTransaction))
             {
-                checkCommand.Parameters.AddWithValue("@CustomerID", customerId);
-                var count = (int)await checkCommand.ExecuteScalarAsync();
+                checkCommand.Parameters.AddWithValue("@CustomerID", customer.CustomerID);
+                var count = (int)(await checkCommand.ExecuteScalarAsync() ?? 0);
 
                 if (count > 0)
                 {
                     throw new Exception("Some linked records were not deleted properly.");
                 }
             }
-/*
-            var query = $"DELETE FROM {GlobalSettings.CustomerTable} WHERE CustomerID = @CustomerID";
-            await using (var command = new SqlCommand(query, connection, transaction as SqlTransaction))
-            {
-                command.Parameters.AddWithValue("@CustomerID", customerId);
-                await command.ExecuteNonQueryAsync();
-            }
-
-            var query1 = $"DELETE FROM {GlobalSettings.CustomersVirtualPcTable} WHERE CustomerID = @CustomerID";
-            await using (var command1 = new SqlCommand(query1, connection, transaction as SqlTransaction))
-            {
-                command1.Parameters.AddWithValue("@CustomerID", customerId);
-                await command1.ExecuteNonQueryAsync();
-            }
-
-            await transaction.CommitAsync();*/
+            await transaction.CommitAsync();
         }
         catch (Exception ex)
         {
@@ -110,26 +145,76 @@ public static class CustomerRepository
 
     public static async Task UpdateCustomer(Models.Customer customer)
     {
+        if (!customer.inDatabase)
+        {
+            await AddCustomer(customer);
+            return;
+        }
         await using var connection = new SqlConnection(GlobalSettings.ConnectionString);
         await connection.OpenAsync();
         await using var transaction = await connection.BeginTransactionAsync();
 
         try
         {
-            var query = $@"
+            var selectQuery = $@"
+            SELECT FullName, CustomerTag, Email, Phone, CustomerNotes
+            FROM {GlobalSettings.CustomerTable}
+            WHERE CustomerID = @CustomerID";
+
+            await using var selectCommand = new SqlCommand(selectQuery, connection, transaction as SqlTransaction);
+            selectCommand.Parameters.AddWithValue("@CustomerID", customer.CustomerID);
+
+            await using var reader = await selectCommand.ExecuteReaderAsync();
+            if (!reader.HasRows)
+            {
+                await Application.Current!.Windows[0].Page!.DisplayAlert("Error", "Customer not found in the database.", "OK");
+                return;
+            }
+
+            await reader.ReadAsync();
+            var dbFullName = reader["FullName"] as string;
+            var dbCustomerTag = reader["CustomerTag"] as string;
+            var dbEmail = reader["Email"] as string;
+            var dbPhone = reader["Phone"] as string;
+            var dbNotes = reader["CustomerNotes"] as string;
+            reader.Close();
+
+            if ((dbFullName != customer.OriginalFullName) || (dbCustomerTag != customer.OriginalCustomerTag) ||
+                (dbEmail != customer.OriginalEmail) || (dbPhone != customer.OriginalPhone) ||
+                (dbNotes != customer.OriginalNotes))
+            {
+                bool confirm = await Application.Current!.Windows[0].Page!.DisplayAlert(
+                    "Conflict Detected",
+                    $"Database values have changed.\n\n"
+                    + $"Current values in DB:\n"
+                    + $"Full Name: {dbFullName}\nCustomer Tag: {dbCustomerTag}\nEmail: {dbEmail}\nPhone: {dbPhone}\nNotes: {dbNotes}\n\n"
+                    + $"Values you originally loaded:\n"
+                    + $"Full Name: {customer.OriginalFullName}\nCustomer Tag: {customer.OriginalCustomerTag}\nEmail: {customer.OriginalEmail}\nPhone: {customer.OriginalPhone}\nNotes: {customer.OriginalNotes}\n\n"
+                    + $"Your new values to save:\n"
+                    + $"Full Name: {customer.FullName}\nCustomer Tag: {customer.CustomerTag}\nEmail: {customer.Email}\nPhone: {customer.Phone}\nNotes: {customer.Notes}\n\n"
+                    + "Do you want to overwrite these values in the database?",
+                    "Yes", "No");
+
+                if (!confirm)
+                {
+                    return;
+                }
+            }
+
+            var updateQuery = $@"
             UPDATE {GlobalSettings.CustomerTable}
             SET FullName = @FullName, CustomerTag = @CustomerTag, Email = @Email, Phone = @Phone, CustomerNotes = @Notes
             WHERE CustomerID = @CustomerID";
 
-            await using var command = new SqlCommand(query, connection, transaction as SqlTransaction);
-            command.Parameters.AddWithValue("@FullName", customer.FullName ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@CustomerTag", customer.CustomerTag ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@Email", customer.Email ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@Phone", customer.Phone ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@Notes", customer.Notes ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@CustomerID", customer.CustomerID);
+            await using var updateCommand = new SqlCommand(updateQuery, connection, transaction as SqlTransaction);
+            updateCommand.Parameters.AddWithValue("@FullName", customer.FullName ?? (object)DBNull.Value);
+            updateCommand.Parameters.AddWithValue("@CustomerTag", customer.CustomerTag ?? (object)DBNull.Value);
+            updateCommand.Parameters.AddWithValue("@Email", customer.Email ?? (object)DBNull.Value);
+            updateCommand.Parameters.AddWithValue("@Phone", customer.Phone ?? (object)DBNull.Value);
+            updateCommand.Parameters.AddWithValue("@Notes", customer.Notes ?? (object)DBNull.Value);
+            updateCommand.Parameters.AddWithValue("@CustomerID", customer.CustomerID);
 
-            await command.ExecuteNonQueryAsync();
+            await updateCommand.ExecuteNonQueryAsync();
             await transaction.CommitAsync();
         }
         catch (Exception ex)

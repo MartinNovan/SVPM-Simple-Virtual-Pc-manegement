@@ -24,7 +24,8 @@ public static class CustomersVirtualPCsRepository
                         MappingID = reader.GetGuid(0),
                         CustomerID = reader.GetGuid(1),
                         VirtualPcID = reader.GetGuid(2),
-                        RecordState = Models.RecordStates.Loaded
+                        RecordState = Models.RecordStates.Loaded,
+                        inDatabase = true
                     });
                 }
             }
@@ -44,10 +45,12 @@ public static class CustomersVirtualPCsRepository
         command.Parameters.AddWithValue("@CustomerID", mapping.CustomerID);
         command.Parameters.AddWithValue("@VirtualPcID", mapping.VirtualPcID);
         await command.ExecuteNonQueryAsync();
+        mapping.inDatabase = true;
     }
 
-    public static async Task DeleteMappingAsync(Guid customerID, Guid virtualPcID)
+    public static async Task DeleteMappingAsync(Models.Mapping mapping)
     {
+        if (!mapping.inDatabase) return;
         await using var connection = new SqlConnection(GlobalSettings.ConnectionString);
         await connection.OpenAsync();
         await using var transaction = await connection.BeginTransactionAsync();
@@ -59,8 +62,8 @@ public static class CustomersVirtualPCsRepository
 
             await using (var command = new SqlCommand(query, connection, transaction as SqlTransaction))
             {
-                command.Parameters.AddWithValue("@CustomerID", customerID);
-                command.Parameters.AddWithValue("@VirtualPcID", virtualPcID);
+                command.Parameters.AddWithValue("@CustomerID", mapping.CustomerID);
+                command.Parameters.AddWithValue("@VirtualPcID", mapping.VirtualPcID);
                 await command.ExecuteNonQueryAsync();
             }
 

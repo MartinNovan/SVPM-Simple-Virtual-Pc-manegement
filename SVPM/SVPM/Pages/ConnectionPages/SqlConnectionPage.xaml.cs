@@ -7,82 +7,15 @@ namespace SVPM.Pages.ConnectionPages
 {
     public partial class SqlConnectionPage
     {
-        public ObservableCollection<Models.SqlConnections> SqlConnections { get; } = new();
-        private readonly string? _connectionlist = GlobalSettings.ConnectionListPath;
-
         public SqlConnectionPage()
         {
             InitializeComponent();
+            BindingContext = this;
         }
 
-        private async void SqlConnectionsListOnLoaded(object? sender, EventArgs e)
+        private void SqlConnectionsListOnLoaded(object? sender, EventArgs eventArgs)
         {
-            await LoadSqlConnectionsAsync();
-            SqlConnectionListView.ItemsSource = SqlConnections;
-        }
-
-        private async Task LoadSqlConnectionsAsync()
-        {
-            try
-            {
-                FileHelpers.CreateJsonFileIfNotExists();
-                string json = await File.ReadAllTextAsync(_connectionlist!);
-                if (!string.IsNullOrEmpty(json))
-                {
-                    var connections = JsonSerializer.Deserialize<List<Models.SqlConnections>>(json) ?? new();
-                    SqlConnections.Clear();
-                    connections.ForEach(SqlConnections.Add);
-                }
-            }
-            catch (JsonException ex)
-            {
-                await DisplayAlert("Error", $"Invalid JSON format. A new file has been created.\nDetails: {ex.Message}", "OK");
-                FileHelpers.CreateJsonFileIfNotExists();
-            }
-            catch (Exception ex)
-            {
-                await DisplayAlert("Error", $"Failed to load connection: {ex.Message}", "OK");
-            }
-        }
-
-        private async void SqlConnection_ItemTapped(object sender, ItemTappedEventArgs e)
-        {
-            try
-            {
-                if (e.Item is not Models.SqlConnections connection) return;
-                var builder = new SqlConnectionStringBuilder
-                {
-                    DataSource = connection.ServerAddress,
-                    InitialCatalog = connection.DatabaseName,
-                    IntegratedSecurity = connection.UseWindowsAuth,
-                    TrustServerCertificate = !connection.UseCertificate
-                };
-
-                if (!connection.UseWindowsAuth)
-                {
-                    builder.UserID = connection.Username;
-                    builder.Password = connection.Password;
-                }
-
-                if (connection.UseCertificate && !string.IsNullOrWhiteSpace(connection.CertificatePath))
-                {
-                    builder.ServerCertificate = connection.CertificatePath;
-                }
-
-                IsProcessing.IsVisible = true;
-
-                await using var sqlConnection = new SqlConnection(builder.ToString());
-                await sqlConnection.OpenAsync();
-
-                GlobalSettings.ConnectionString = builder.ToString();
-                IsProcessing.IsVisible = false;
-                await Navigation.PushAsync(new LoadingPage(false, true));
-            }
-            catch (Exception ex)
-            {
-                IsProcessing.IsVisible = false;
-                await DisplayAlert("Error", $"Connection failed: {ex.Message}", "OK");
-            }
+            SqlConnectionListView.ItemsSource = AppShell.SqlConnections;
         }
 
         private async void CreateConnection_Clicked(object? sender, EventArgs e)
@@ -101,7 +34,7 @@ namespace SVPM.Pages.ConnectionPages
         {
             try
             {
-                await LoadSqlConnectionsAsync();
+                SqlConnectionListView.ItemsSource = AppShell.SqlConnections;
             }
             catch (Exception ex)
             {
@@ -125,7 +58,7 @@ namespace SVPM.Pages.ConnectionPages
         private async void OnDeleteButtonClicked(object sender, EventArgs e)
         {
             try
-            {
+            {/*
                 if (sender is not ImageButton button || button.BindingContext is not Models.SqlConnections connection) return;
 
                 bool confirm = await DisplayAlert("Warning!", "Do you really want to delete a saved connection?", "OK", "Cancel");
@@ -150,7 +83,8 @@ namespace SVPM.Pages.ConnectionPages
                 else
                 {
                     await DisplayAlert("Error", "The connections file was not found.", "OK");
-                }
+                }*/
+                return;
             }
             catch (Exception ex)
             {

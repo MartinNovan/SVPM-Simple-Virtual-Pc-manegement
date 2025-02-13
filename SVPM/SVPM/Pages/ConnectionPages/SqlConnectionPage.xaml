@@ -2,15 +2,18 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="SVPM.Pages.ConnectionPages.SqlConnectionPage"
-             NavigationPage.HasNavigationBar="False">
+             NavigationPage.HasNavigationBar="False"
+             Shell.TabBarIsVisible="False">
+    <Shell.TitleView>
+        <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="5" >
+            <Label Grid.Column="0" Text="Connections: " FontSize="24"/>
+            <Button Text="+" Grid.Column="2" Clicked="CreateConnection_Clicked" Height="15" FontSize="20" ToolTipProperties.Text="Create a new connection."/>
+            <Button Text="⟳" Grid.Column="3" Clicked="RefreshButton_Clicked" Height="15" FontSize="20" ToolTipProperties.Text="Refresh connections list."/>
+        </Grid>
+    </Shell.TitleView>
     <Grid>
         <StackLayout Padding="10">
-            <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="5" Margin="0,0,0,5">
-                <Label Grid.Column="0" Text="Connections: " FontSize="Large"/>
-                <Button Text="+" Grid.Column="2" Clicked="CreateConnection_Clicked" Height="15" FontSize="20" ToolTipProperties.Text="Create a new connection."/>
-                <Button Text="⟳" Grid.Column="3" Clicked="RefreshButton_Clicked" Height="15" FontSize="20" ToolTipProperties.Text="Refresh connections list."/>
-            </Grid>
-            <ListView x:Name="SqlConnectionListView" ItemTapped="SqlConnection_ItemTapped" Loaded="SqlConnectionsListOnLoaded">
+            <ListView x:Name="SqlConnectionListView" Loaded="SqlConnectionsListOnLoaded">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell>
@@ -18,10 +21,10 @@
                                 <Grid ColumnDefinitions="Auto,*,Auto">
                                     <Image Source="sql_connection.png" HeightRequest="40" WidthRequest="40" Margin="5" Grid.Column="0" />
                                     <StackLayout Grid.Column="1" Margin="10,0,0,0" VerticalOptions="Center">
-                                        <Label Text="{Binding Name}" FontSize="Medium" FontAttributes="Bold" />
+                                        <Label Text="{Binding Name}" FontSize="Medium" FontAttributes="Bold"/>
                                         <Grid ColumnDefinitions="auto, *" RowDefinitions="auto, auto" ColumnSpacing="5" Margin="15,0,0,0">
                                             <Label Text="Server: " Grid.Column="0" Grid.Row="0"/>
-                                            <Label Text="{Binding ServerAddress}" Grid.Column="1" Grid.Row="0" />
+                                            <Label Text="{Binding ServerAddress}" Grid.Column="1" Grid.Row="0"/>
                                             <Label Text="Database: " Grid.Column="0" Grid.Row="1"/>
                                             <Label Text="{Binding DatabaseName}" Grid.Column="1" Grid.Row="1"/>
                                         </Grid>
@@ -39,7 +42,10 @@
             </ListView>
         </StackLayout>
         <Grid x:Name="IsProcessing" BackgroundColor="Black" Opacity="0.5" IsVisible="False">
-            <ActivityIndicator IsRunning="True" HorizontalOptions="Center" VerticalOptions="Center" Color="White" />
+            <StackLayout HorizontalOptions="Center" VerticalOptions="Center">
+                <Label x:Name="Info" HorizontalOptions="Center" VerticalOptions="Center" Text="Trying to connect..." />
+                <ActivityIndicator IsRunning="True" HorizontalOptions="Center" VerticalOptions="Center" Color="White" />
+            </StackLayout>
         </Grid>
     </Grid>
 </ContentPage>

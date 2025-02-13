@@ -2,24 +2,24 @@
 
 public partial class LoadingPage
 {
-    public LoadingPage(bool isPushing, bool isFromConnectionPage)
+    private readonly bool _pushing;
+    public LoadingPage(bool pushing)
     {
         InitializeComponent();
-        Text.Text = "Loading...";
-        if (isPushing)
+        _pushing = pushing;
+    }
+    private void LoadingPage_OnLoaded(object? sender, EventArgs e)
+    {
+        if (_pushing)
         {
             PushingData();
         }
         else
         {
             LoadingData();
-            if (isFromConnectionPage)
-            {
-                Navigation.PushAsync(new MainTabbedPage());
-            }
         }
+        Navigation.PopAsync();
     }
-
     private async void LoadingData()
     {
         try
@@ -37,57 +37,46 @@ public partial class LoadingPage
             await AccountRepository.GetAllAccountsAsync();
             ProgressBar.Progress = 1;
             Text.Text = "Done!";
-            Navigation.RemovePage(this);
         }
         catch (Exception ex)
         {
             await Application.Current!.Windows[0].Page!.DisplayAlert("Error", $"Error while loading data from database: {ex.Message}", "OK");
         }
     }
+
     private async void PushingData()
     {
         try
         {
-            await UpdateTextAsync("Uploading customers changes...");
+            Text.Text = "Uploading customers changes...";
             foreach (var customer in CustomerRepository.CustomersList)
             {
                 await customer.SaveChanges();
             }
-            await UpdateProgressAsync(0.25);
-            await UpdateTextAsync("Uploading Virtual PCs changes...");
+            ProgressBar.Progress = 0.25;
+            Text.Text = "Uploading Virtual PCs changes...";
             foreach (var virtualPc in VirtualPcRepository.VirtualPcsList)
             {
                 await virtualPc.SaveChanges();
             }
-            await UpdateProgressAsync(0.5);
-            await UpdateTextAsync("Uploading mappings changes...");
+            ProgressBar.Progress = 0.5;
+            Text.Text = "Uploading mappings changes...";
             foreach (var mapping in CustomersVirtualPCsRepository.MappingList)
             {
                 await mapping.SaveChanges();
             }
-            await UpdateProgressAsync(0.75);
-            await UpdateTextAsync("Uploading accounts changes...");
+            ProgressBar.Progress = 0.75;
+            Text.Text = "Uploading accounts changes...";
             foreach (var account in AccountRepository.AccountsList)
             {
                 await account.SaveChanges();
             }
-            await UpdateProgressAsync(1);
-            await UpdateTextAsync("Done!");
-            Navigation.RemovePage(this);
+            ProgressBar.Progress = 1;
+            Text.Text = "Done!";
         }
         catch (Exception ex)
         {
             await Application.Current!.Windows[0].Page!.DisplayAlert("Error", $"Error while pushing data to database: {ex.Message}", "OK");
         }
-    }
-
-    private Task UpdateTextAsync(string text)
-    {
-        return Device.InvokeOnMainThreadAsync(() => Text.Text = text);
-    }
-
-    private Task UpdateProgressAsync(double progress)
-    {
-        return Device.InvokeOnMainThreadAsync(() => ProgressBar.Progress = progress);
     }
 }
