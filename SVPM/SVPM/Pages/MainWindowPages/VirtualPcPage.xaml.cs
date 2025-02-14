@@ -42,7 +42,7 @@ public partial class VirtualPcPage
     {
         try
         {
-            if (e.Item is Models.VirtualPC selectedVirtualPc)
+            if (e.Item is Models.VirtualPc selectedVirtualPc)
             {
                 await Navigation.PushAsync(new VirtualPcAccountsPage(selectedVirtualPc.VirtualPcID));
             }
@@ -69,7 +69,7 @@ public partial class VirtualPcPage
     {
         try
         {
-            if (sender is not ImageButton { BindingContext: Models.VirtualPC virtualPc }) return;
+            if (sender is not ImageButton { BindingContext: Models.VirtualPc virtualPc }) return;
             await Navigation.PushAsync(new CreateVirtualPc(virtualPc));
         }
         catch (Exception ex)
@@ -82,7 +82,7 @@ public partial class VirtualPcPage
     {
         try
         {
-            if (sender is not ImageButton button || button.BindingContext is not Models.VirtualPC virtualPc) return;
+            if (sender is not ImageButton button || button.BindingContext is not Models.VirtualPc virtualPc) return;
 
             bool confirm = await DisplayAlert("Warning!", "Do you really want to delete this virtual pc?", "OK", "Cancel");
             if (!confirm) return;

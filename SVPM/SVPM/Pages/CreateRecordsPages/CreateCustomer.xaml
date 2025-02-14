@@ -27,7 +27,7 @@
                         <CollectionView.ItemTemplate>
                             <DataTemplate>
                                 <StackLayout>
-                                    <Label Text="{Binding VirtualPcName}" x:DataType="models:VirtualPC" FontSize="20" Margin="10,5"/>
+                                    <Label Text="{Binding VirtualPcName}" x:DataType="models:VirtualPc" FontSize="20" Margin="10,5"/>
                                 </StackLayout>
                             </DataTemplate>
                         </CollectionView.ItemTemplate>

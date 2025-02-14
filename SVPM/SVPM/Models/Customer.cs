@@ -17,7 +17,7 @@ public class Customer
     public string? OriginalEmail { get; private set; }
     public string? OriginalPhone { get; private set; }
     public string? OriginalNotes { get; private set; }
-    public bool inDatabase { get; set; }
+    public bool InDatabase { get; set; }
 
     public void InitializeOriginalValues()
     {

@@ -34,7 +34,7 @@ public static class CustomerRepository
         }
         foreach (var customer in CustomersList)
         {
-            customer.inDatabase = true;
+            customer.InDatabase = true;
             customer.InitializeOriginalValues();
         }
     }
@@ -58,7 +58,7 @@ public static class CustomerRepository
             command.Parameters.AddWithValue("@Notes", customer.Notes ?? (object)DBNull.Value);
 
             await command.ExecuteNonQueryAsync();
-            customer.inDatabase = true;
+            customer.InDatabase = true;
             customer.RecordState = RecordStates.Loaded;
             customer.InitializeOriginalValues();
         }
@@ -70,7 +70,7 @@ public static class CustomerRepository
 
     public static async Task DeleteCustomer(Customer customer)
     {
-        if(!customer.inDatabase) return;
+        if(!customer.InDatabase) return;
         await using var connection = new SqlConnection(GlobalSettings.ConnectionString);
         await connection.OpenAsync();
         await using var transaction = await connection.BeginTransactionAsync();
@@ -149,7 +149,7 @@ public static class CustomerRepository
 
     public static async Task UpdateCustomer(Customer customer)
     {
-        if (!customer.inDatabase)
+        if (!customer.InDatabase)
         {
             await AddCustomer(customer);
             return;

@@ -34,7 +34,7 @@ public partial class CreateAccount
                 IsAdmin = IsAdminCheckBox.IsChecked,
                 LastUpdated = DateTime.Now,
                 OriginalPassword = AccountOriginalPasswordEntry.Text,
-                AssociatedVirtualPc = VirtualPcPicker.SelectedItem as Models.VirtualPC,
+                AssociatedVirtualPc = VirtualPcPicker.SelectedItem as Models.VirtualPc,
                 RecordState = Models.RecordStates.Created
             };
 

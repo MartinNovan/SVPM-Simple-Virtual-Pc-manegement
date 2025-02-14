@@ -113,7 +113,7 @@ public partial class CreateCustomer
                }
                foreach (var item in VpcCollectionView.SelectedItems)
                {
-                   if (item is Models.VirtualPC selectedVirtualPc)
+                   if (item is Models.VirtualPc selectedVirtualPc)
                    {
                        var customerVirtualPc = new Models.Mapping
                        {

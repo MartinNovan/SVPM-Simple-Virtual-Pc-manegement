@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:models="using:SVPM.Models"
              x:Class="SVPM.Pages.MainWindowPages.VirtualPcPage"
-             x:DataType="models:VirtualPC">
+             x:DataType="models:VirtualPc">
     <StackLayout Padding="5">
         <Grid ColumnDefinitions="auto, *, auto" ColumnSpacing="5" Margin="5">
             <Label Grid.Column="0" Text="Virtual PCs:" FontSize="24" VerticalOptions="Center"/>

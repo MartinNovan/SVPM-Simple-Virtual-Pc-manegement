@@ -33,7 +33,7 @@
             <Button x:Name="AddButton" Grid.Column="2" Text="+" Clicked="AddButton_OnClicked" VerticalOptions="End" FontSize="20" ToolTipProperties.Text="Add a new record." />
             <Button x:Name="RefreshButton" Grid.Column="3" Text="⟳" Clicked="ReloadButton_OnClicked" VerticalOptions="End" FontSize="20" ToolTipProperties.Text="Refresh this list from database."/>
         </Grid>
-        <ListView x:Name="VirtualPCsListView" ItemTapped="VirtualPcListView_ItemTapped" x:DataType="models:VirtualPC">
+        <ListView x:Name="VirtualPCsListView" ItemTapped="VirtualPcListView_ItemTapped" x:DataType="models:VirtualPc">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <ViewCell>

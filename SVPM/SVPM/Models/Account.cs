@@ -5,7 +5,7 @@ namespace SVPM.Models;
 public class Account
 {
     public Guid AccountID { get; set; }
-    public VirtualPC? AssociatedVirtualPc { get; set; }
+    public VirtualPc? AssociatedVirtualPc { get; set; }
     public string? Username { get; init; }
     public string? Password { get; set; }
     public bool IsAdmin { get; set; }

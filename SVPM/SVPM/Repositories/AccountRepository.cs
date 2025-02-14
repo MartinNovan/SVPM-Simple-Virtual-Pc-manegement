@@ -21,7 +21,7 @@ public static class AccountRepository
             AccountsList.Add(new Models.Account
             {
                 AccountID = reader.GetGuid(reader.GetOrdinal("AccountID")),
-                AssociatedVirtualPc = new Models.VirtualPC { VirtualPcID = reader.GetGuid(reader.GetOrdinal("VirtualPcID")) },
+                AssociatedVirtualPc = new Models.VirtualPc { VirtualPcID = reader.GetGuid(reader.GetOrdinal("VirtualPcID")) },
                 Username = reader.IsDBNull(reader.GetOrdinal("Username")) ? " " : reader.GetString(reader.GetOrdinal("Username")),
                 Password = reader.IsDBNull(reader.GetOrdinal("Password")) ? " " : reader.GetString(reader.GetOrdinal("Password")),
                 IsAdmin = reader.GetBoolean(reader.GetOrdinal("IsAdmin")),

@@ -9,7 +9,7 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <ScrollView Grid.Column="0">
-            <StackLayout Padding="10" x:DataType="models:VirtualPC">
+            <StackLayout Padding="10" x:DataType="models:VirtualPc">
                 <Image Source="server.png" HeightRequest="200" WidthRequest="500" />
                 <Label Text="Název:"/>
                 <Label Text="{Binding VirtualPcName}" FontSize="18" />

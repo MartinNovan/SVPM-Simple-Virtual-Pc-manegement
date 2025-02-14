@@ -4,8 +4,8 @@ using SVPM.Repositories;
 namespace SVPM.Pages.CreateRecordsPages;
 public partial class CreateVirtualPc
 {
-    private static Models.VirtualPC? _updatedVirtualPc;
-    public CreateVirtualPc(Models.VirtualPC? virtualPc = null)
+    private static VirtualPc? _updatedVirtualPc;
+    public CreateVirtualPc(VirtualPc? virtualPc = null)
     {
         InitializeComponent();
         _updatedVirtualPc = virtualPc;
@@ -19,7 +19,7 @@ public partial class CreateVirtualPc
         }
     }
 
-    private void PopulateFields(Models.VirtualPC? virtualPc)
+    private void PopulateFields(VirtualPc? virtualPc)
     {
         VirtualPcNameEntry.Text = virtualPc?.VirtualPcName ?? string.Empty;
         ServiceNameEntry.Text = virtualPc?.ServiceName ?? string.Empty;
@@ -28,11 +28,11 @@ public partial class CreateVirtualPc
         RamSizeEntry.Text = virtualPc?.RAM_Size_GB.ToString() ?? string.Empty;
         DriveSizeEntry.Text = virtualPc?.Disk_Size_GB.ToString() ?? string.Empty;
         BackuppingCheckBox.IsChecked = virtualPc!.Backupping;
-        AdministrationCheckBox.IsChecked = virtualPc!.Administration;
-        IpAddressEntry.Text = virtualPc?.IP_Address ?? string.Empty;
-        FqdnEntry.Text = virtualPc?.FQDN ?? string.Empty;
-        NotesEntry.Text = virtualPc?.Notes ?? string.Empty;
-        if (virtualPc?.OwningCustomers != null)
+        AdministrationCheckBox.IsChecked = virtualPc.Administration;
+        IpAddressEntry.Text = virtualPc.IP_Address ?? string.Empty;
+        FqdnEntry.Text = virtualPc.FQDN ?? string.Empty;
+        NotesEntry.Text = virtualPc.Notes ?? string.Empty;
+        if (virtualPc.OwningCustomers != null)
         {
             foreach (var owningCustomer in virtualPc.OwningCustomers)
             {
@@ -46,7 +46,7 @@ public partial class CreateVirtualPc
         string searchText = e.NewTextValue?.ToLower() ?? "";
 
         var match = CustomerRepository.CustomersList
-            .FirstOrDefault(c => c.FullName != null && c.FullName.ToLower().Contains(searchText) && c.RecordState != Models.RecordStates.Deleted);
+            .FirstOrDefault(c => c.FullName != null && c.FullName.ToLower().Contains(searchText) && c.RecordState != RecordStates.Deleted);
 
         if (match != null)
         {
@@ -88,18 +88,18 @@ public partial class CreateVirtualPc
                         {
                             if (!CustomerCollectionView.SelectedItems.Contains(customer) && existingVirtualPc.OwningCustomers.Contains(customer))
                             {
-                                var deletemapping = CustomersVirtualPCsRepository.MappingList.FirstOrDefault(m =>
-                                    m.CustomerID == customer.CustomerID && m.VirtualPcID == existingVirtualPc.VirtualPcID && m.RecordState != Models.RecordStates.Deleted);
-                                if (deletemapping != null) deletemapping.RecordState = Models.RecordStates.Deleted;
+                                var deleteMapping = CustomersVirtualPCsRepository.MappingList.FirstOrDefault(m =>
+                                    m.CustomerID == customer.CustomerID && m.VirtualPcID == existingVirtualPc.VirtualPcID && m.RecordState != RecordStates.Deleted);
+                                if (deleteMapping != null) deleteMapping.RecordState = RecordStates.Deleted;
                                 existingVirtualPc.OwningCustomers.Remove(customer);
                             }
                             else if (CustomerCollectionView.SelectedItems.Contains(customer) && !existingVirtualPc.OwningCustomers.Contains(customer))
                             {
-                                var customerVirtualPc = new Models.Mapping
+                                var customerVirtualPc = new Mapping
                                 {
                                     CustomerID = customer.CustomerID,
                                     VirtualPcID = existingVirtualPc.VirtualPcID,
-                                    RecordState = Models.RecordStates.Created
+                                    RecordState = RecordStates.Created
                                 };
                                 CustomersVirtualPCsRepository.MappingList.Add(customerVirtualPc);
                                 existingVirtualPc.OwningCustomers.Add(customer);
@@ -108,8 +108,9 @@ public partial class CreateVirtualPc
                     }
                     else
                     {
-                        var virtualPc = new Models.VirtualPC()
+                        var virtualPc = new VirtualPc
                         {
+                            VirtualPcID = Guid.NewGuid(),
                             VirtualPcName = VirtualPcNameEntry.Text,
                             ServiceName = ServiceNameEntry.Text,
                             OperatingSystem = OperatingSystemEntry.Text,
@@ -121,7 +122,7 @@ public partial class CreateVirtualPc
                             IP_Address = IpAddressEntry.Text,
                             FQDN = FqdnEntry.Text,
                             Notes = NotesEntry.Text,
-                            RecordState = Models.RecordStates.Created
+                            RecordState = RecordStates.Created
                         };
                         if (CustomerCollectionView.SelectedItems.Count != 0)
                         {
@@ -129,11 +130,11 @@ public partial class CreateVirtualPc
                             {
                                 if (selectedCustomer is not null)
                                 {
-                                    var customerVirtualPc = new Models.Mapping
+                                    var customerVirtualPc = new Mapping
                                     {
                                         CustomerID = selectedCustomer.CustomerID,
                                         VirtualPcID = virtualPc.VirtualPcID,
-                                        RecordState = Models.RecordStates.Created
+                                        RecordState = RecordStates.Created
                                     };
                                     CustomersVirtualPCsRepository.MappingList.Add(customerVirtualPc);
                                     virtualPc.OwningCustomers?.Add(selectedCustomer);

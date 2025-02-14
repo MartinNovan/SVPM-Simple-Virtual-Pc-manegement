@@ -47,7 +47,7 @@ namespace SVPM.Pages.SubWindowPages
         {
             try
             {
-                if (e.Item is Models.VirtualPC selectedVirtualPc)
+                if (e.Item is Models.VirtualPc selectedVirtualPc)
                 {
                     await Navigation.PushAsync(new VirtualPcAccountsPage(selectedVirtualPc.VirtualPcID));
                 }
