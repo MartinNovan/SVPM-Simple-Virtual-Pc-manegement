@@ -46,7 +46,7 @@ namespace SVPM.Pages.ConnectionPages
         {
             try
             {
-                if (sender is not ImageButton button || button.BindingContext is not Models.SqlConnections connection) return;
+                if (sender is not ImageButton button || button.BindingContext is not Models.SqlConnection connection) return;
                 await Navigation.PushAsync(new SqlCreateConnectionPage(connection));
             }
             catch (Exception ex)

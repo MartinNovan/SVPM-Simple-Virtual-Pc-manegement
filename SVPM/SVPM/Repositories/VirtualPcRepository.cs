@@ -1,11 +1,11 @@
 using System.Collections.ObjectModel;
 using Microsoft.Data.SqlClient;
 
-namespace SVPM;
+namespace SVPM.Repositories;
 public static class VirtualPcRepository
 {
     private static readonly SqlConnection Connection = new(GlobalSettings.ConnectionString);
-    public static ObservableCollection<Models.VirtualPC> VirtualPcsList { get; set; } = new();
+    public static ObservableCollection<Models.VirtualPC> VirtualPcsList { get; set; } = [];
 
     public static async Task GetAllVirtualPCsAsync()
     {

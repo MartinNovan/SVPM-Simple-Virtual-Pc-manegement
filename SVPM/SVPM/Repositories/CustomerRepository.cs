@@ -1,11 +1,13 @@
 ﻿using System.Collections.ObjectModel;
 using Microsoft.Data.SqlClient;
+using SVPM.Models;
+using SqlConnection = Microsoft.Data.SqlClient.SqlConnection;
 
-namespace SVPM;
+namespace SVPM.Repositories;
 
 public static class CustomerRepository
 {
-    public static ObservableCollection<Models.Customer> CustomersList { get; } = new();
+    public static ObservableCollection<Customer> CustomersList { get; } = [];
 
     public static async Task GetAllCustomersAsync()
     {
@@ -19,7 +21,7 @@ public static class CustomerRepository
 
         while (await reader.ReadAsync())
         {
-            CustomersList.Add(new Models.Customer
+            CustomersList.Add(new Customer
             {
                 CustomerID = reader.GetGuid(reader.GetOrdinal("CustomerID")),
                 FullName = reader.GetString(reader.GetOrdinal("FullName")),
@@ -27,18 +29,17 @@ public static class CustomerRepository
                 Email = reader.IsDBNull(reader.GetOrdinal("Email")) ? null : reader.GetString(reader.GetOrdinal("Email")),
                 Phone = reader.IsDBNull(reader.GetOrdinal("Phone")) ? null : reader.GetString(reader.GetOrdinal("Phone")),
                 Notes = reader.IsDBNull(reader.GetOrdinal("CustomerNotes")) ? null : reader.GetString(reader.GetOrdinal("CustomerNotes")),
-                RecordState = Models.RecordStates.Loaded,
-                inDatabase = true
+                RecordState = RecordStates.Loaded,
             });
         }
-
         foreach (var customer in CustomersList)
         {
+            customer.inDatabase = true;
             customer.InitializeOriginalValues();
         }
     }
 
-    public static async Task AddCustomer(Models.Customer customer)
+    public static async Task AddCustomer(Customer customer)
     {
         await using var connection = new SqlConnection(GlobalSettings.ConnectionString);
         await connection.OpenAsync();
@@ -58,6 +59,8 @@ public static class CustomerRepository
 
             await command.ExecuteNonQueryAsync();
             customer.inDatabase = true;
+            customer.RecordState = RecordStates.Loaded;
+            customer.InitializeOriginalValues();
         }
         catch (Exception ex)
         {
@@ -65,7 +68,7 @@ public static class CustomerRepository
         }
     }
 
-    public static async Task DeleteCustomer(Models.Customer customer)
+    public static async Task DeleteCustomer(Customer customer)
     {
         if(!customer.inDatabase) return;
         await using var connection = new SqlConnection(GlobalSettings.ConnectionString);
@@ -116,11 +119,11 @@ public static class CustomerRepository
                 }
             }
 
-            var deletequery = $"DELETE FROM {GlobalSettings.CustomerTable} WHERE CustomerID = @CustomerID";
-            await using (var deletecommand = new SqlCommand(deletequery, connection, transaction as SqlTransaction))
+            var deleteQuery = $"DELETE FROM {GlobalSettings.CustomerTable} WHERE CustomerID = @CustomerID";
+            await using (var deleteCommand = new SqlCommand(deleteQuery, connection, transaction as SqlTransaction))
             {
-                deletecommand.Parameters.AddWithValue("@CustomerID", customer.CustomerID);
-                await deletecommand.ExecuteNonQueryAsync();
+                deleteCommand.Parameters.AddWithValue("@CustomerID", customer.CustomerID);
+                await deleteCommand.ExecuteNonQueryAsync();
             }
 
             var checkQuery = $"SELECT COUNT(*) FROM {GlobalSettings.CustomersVirtualPcTable} WHERE CustomerID = @CustomerID";
@@ -135,6 +138,7 @@ public static class CustomerRepository
                 }
             }
             await transaction.CommitAsync();
+            CustomersList.Remove(customer);
         }
         catch (Exception ex)
         {
@@ -143,7 +147,7 @@ public static class CustomerRepository
         }
     }
 
-    public static async Task UpdateCustomer(Models.Customer customer)
+    public static async Task UpdateCustomer(Customer customer)
     {
         if (!customer.inDatabase)
         {
@@ -199,6 +203,23 @@ public static class CustomerRepository
                 {
                     return;
                 }
+                var conflictUpdateQuery = $@"
+                UPDATE {GlobalSettings.CustomerTable}
+                SET FullName = @FullName, CustomerTag = @CustomerTag, Email = @Email, Phone = @Phone, CustomerNotes = @Notes
+                WHERE CustomerID = @CustomerID";
+
+                await using var conflictUpdateCommand = new SqlCommand(conflictUpdateQuery, connection, transaction as SqlTransaction);
+                conflictUpdateCommand.Parameters.AddWithValue("@FullName", customer.FullName ?? (object)DBNull.Value);
+                conflictUpdateCommand.Parameters.AddWithValue("@CustomerTag", customer.CustomerTag ?? (object)DBNull.Value);
+                conflictUpdateCommand.Parameters.AddWithValue("@Email", customer.Email ?? (object)DBNull.Value);
+                conflictUpdateCommand.Parameters.AddWithValue("@Phone", customer.Phone ?? (object)DBNull.Value);
+                conflictUpdateCommand.Parameters.AddWithValue("@Notes", customer.Notes ?? (object)DBNull.Value);
+                conflictUpdateCommand.Parameters.AddWithValue("@CustomerID", customer.CustomerID);
+
+                await conflictUpdateCommand.ExecuteNonQueryAsync();
+                await transaction.CommitAsync();
+                customer.RecordState = RecordStates.Loaded;
+                customer.InitializeOriginalValues();
             }
 
             var updateQuery = $@"
@@ -216,6 +237,8 @@ public static class CustomerRepository
 
             await updateCommand.ExecuteNonQueryAsync();
             await transaction.CommitAsync();
+            customer.RecordState = RecordStates.Loaded;
+            customer.InitializeOriginalValues();
         }
         catch (Exception ex)
         {

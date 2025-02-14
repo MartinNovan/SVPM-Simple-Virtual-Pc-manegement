@@ -1,5 +1,6 @@
 ﻿using SVPM.Pages.CreateRecordsPages;
 using SVPM.Pages.SubWindowPages;
+using SVPM.Repositories;
 
 namespace SVPM.Pages.MainWindowPages
 {
@@ -23,8 +24,8 @@ namespace SVPM.Pages.MainWindowPages
 
         private void OnSearchBarTextChanged(object sender, TextChangedEventArgs e)
         {
-            string searchText = e.NewTextValue?.ToLower() ?? "";
-            if (String.IsNullOrWhiteSpace(searchText))
+            var searchText = e.NewTextValue?.ToLower() ?? "";
+            if (string.IsNullOrWhiteSpace(searchText))
             {
                 return;
             }
@@ -37,6 +38,18 @@ namespace SVPM.Pages.MainWindowPages
             if (match != null)
             {
                 CustomersListView.ScrollTo(match, position: ScrollToPosition.Start, animated: true);
+            }
+        }
+
+        private async void AddButton_OnClicked(object? sender, EventArgs e)
+        {
+            try
+            {
+                await Navigation.PushAsync(new CreateCustomer());
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("Error", ex.Message, "OK");
             }
         }
 
@@ -55,23 +68,11 @@ namespace SVPM.Pages.MainWindowPages
             }
         }
 
-        private async void AddButton_OnClicked(object? sender, EventArgs e)
-        {
-            try
-            {
-                await Navigation.PushAsync(new CreateCustomer());
-            }
-            catch (Exception ex)
-            {
-                await DisplayAlert("Error", ex.Message, "OK");
-            }
-        }
-
         private async void EditConnection_Clicked(object? sender, EventArgs e)
         {
             try
             {
-                if (sender is not ImageButton button || button.BindingContext is not Models.Customer customer) return;
+                if (sender is not ImageButton { BindingContext: Models.Customer customer }) return;
                 await Navigation.PushAsync(new CreateCustomer(customer));
             }
             catch (Exception ex)
@@ -84,28 +85,22 @@ namespace SVPM.Pages.MainWindowPages
         {
             try
             {
-                if (sender is not ImageButton button || button.BindingContext is not Models.Customer customer) return;
+                if (sender is not ImageButton { BindingContext: Models.Customer customer }) return;
 
-                bool confirm = await DisplayAlert("Warning!", "Do you really want to delete this customer?", "OK", "Cancel");
+                var confirm = await DisplayAlert("Warning!", "Do you really want to delete this customer?", "OK", "Cancel");
                 if (!confirm) return;
 
                 customer.RecordState = Models.RecordStates.Deleted;
-                foreach (var mapping in CustomersVirtualPCsRepository.MappingList)
+                foreach (var mapping in CustomersVirtualPCsRepository.MappingList.Where(m => m.CustomerID == customer.CustomerID))
                 {
-                    if (mapping.CustomerID == customer.CustomerID)
-                    {
-                        mapping.RecordState = Models.RecordStates.Deleted;
-                    }
+                    mapping.RecordState = Models.RecordStates.Deleted;
                 }
 
-                foreach (var vitrualpc in VirtualPcRepository.VirtualPcsList)
+                foreach (var vpc in VirtualPcRepository.VirtualPcsList.Where(vpc => vpc.OwningCustomers != null && vpc.OwningCustomers.Contains(customer)))
                 {
-                    if (vitrualpc.OwningCustomers.Contains(customer))
-                    {
-                        vitrualpc.OwningCustomers.Remove(customer);
-                    }
+                    if (vpc.OwningCustomers != null) vpc.OwningCustomers.Remove(customer);
                 }
-                CustomersListView.ItemsSource = CustomerRepository.CustomersList.Where(customer => customer.RecordState != Models.RecordStates.Deleted).OrderBy(c => c.FullName);
+                CustomersListView.ItemsSource = CustomerRepository.CustomersList.Where(c => c.RecordState != Models.RecordStates.Deleted).OrderBy(c => c.FullName);
             }
             catch (Exception ex)
             {

@@ -3,7 +3,7 @@
 namespace SVPM;
 public static class FileHelpers
 {
-    private const string BaseFolderName = "Starlit\\SVPM-Starlit-Virtual-Pc-Management\\";
+    private const string baseFolderName = "Starlit\\SVPM-Starlit-Virtual-Pc-Management\\";
 
     public static string GetUserProfilePath()
     {
@@ -26,7 +26,7 @@ public static class FileHelpers
             throw new PlatformNotSupportedException("Supported platforms are: Windows, Android, and iOS.");
         }
 
-        return Path.Combine(basePath, BaseFolderName);
+        return Path.Combine(basePath, baseFolderName);
     }
 
     private static void EnsureDirectoryExists(string? subFolder = null)
@@ -48,7 +48,7 @@ public static class FileHelpers
             try
             {
                 EnsureDirectoryExists();
-                var emptyConnections = new List<Models.SqlConnections>();
+                var emptyConnections = new List<Models.SqlConnection>();
                 string emptyJson = JsonSerializer.Serialize(emptyConnections,
                     new JsonSerializerOptions { WriteIndented = true });
                 File.WriteAllText(GlobalSettings.ConnectionListPath, emptyJson);

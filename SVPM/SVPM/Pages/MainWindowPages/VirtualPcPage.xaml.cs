@@ -1,5 +1,7 @@
-﻿using SVPM.Pages.CreateRecordsPages;
+﻿using SVPM.Models;
+using SVPM.Pages.CreateRecordsPages;
 using SVPM.Pages.SubWindowPages;
+using SVPM.Repositories;
 
 namespace SVPM.Pages.MainWindowPages;
 
@@ -63,9 +65,17 @@ public partial class VirtualPcPage
         }
     }
 
-    private void EditConnection_Clicked(object? sender, EventArgs e)
+    private async void EditConnection_Clicked(object? sender, EventArgs e)
     {
-        Navigation.PushAsync(new CreateVirtualPc());
+        try
+        {
+            if (sender is not ImageButton { BindingContext: Models.VirtualPC virtualPc }) return;
+            await Navigation.PushAsync(new CreateVirtualPc(virtualPc));
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Error", ex.Message, "OK");
+        }
     }
 
     private async void OnDeleteButtonClicked(object? sender, EventArgs e)
@@ -78,6 +88,10 @@ public partial class VirtualPcPage
             if (!confirm) return;
 
             virtualPc.RecordState = Models.RecordStates.Deleted;
+            foreach (var mapping in CustomersVirtualPCsRepository.MappingList.Where(m => m.VirtualPcID == virtualPc.VirtualPcID && m.RecordState != RecordStates.Deleted))
+            {
+                mapping.RecordState = RecordStates.Deleted;
+            }
             VirtualPCsListView.ItemsSource = VirtualPcRepository.VirtualPcsList.Where(vpc => vpc.RecordState != Models.RecordStates.Deleted).OrderBy(vpc => vpc.VirtualPcName);
         }
         catch (Exception ex)

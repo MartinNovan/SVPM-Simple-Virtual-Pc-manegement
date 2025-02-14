@@ -1,7 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="SVPM.Pages.MainWindowPages.AccountsPage">
+             xmlns:models="using:SVPM.Models"
+             x:Class="SVPM.Pages.MainWindowPages.AccountsPage"
+             x:DataType="models:Account">
     <StackLayout Padding="5">
         <Grid ColumnDefinitions="auto, *, auto" ColumnSpacing="5" Margin="5">
             <Label Grid.Column="0" Text="Accounts:" FontSize="24" VerticalOptions="Center"/>

@@ -1,6 +1,7 @@
 ﻿<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="SVPM.Pages.SubWindowPages.VirtualPcAccountsPage"
+             xmlns:models="using:SVPM.Models"
              NavigationPage.HasNavigationBar="False">
     <Grid>
         <Grid.ColumnDefinitions>
@@ -8,7 +9,7 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <ScrollView Grid.Column="0">
-            <StackLayout Padding="10" Grid.Column="0">
+            <StackLayout Padding="10" x:DataType="models:VirtualPC">
                 <Image Source="server.png" HeightRequest="200" WidthRequest="500" />
                 <Label Text="Název:"/>
                 <Label Text="{Binding VirtualPcName}" FontSize="18" />
@@ -49,7 +50,7 @@
         </ScrollView>
         <StackLayout Padding="10" Grid.Column="1">
             <Label Text="Účty na počítači:" FontSize="24" />
-            <ListView x:Name="AccountsListView">
+            <ListView x:Name="AccountsListView" x:DataType="models:Account">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell>

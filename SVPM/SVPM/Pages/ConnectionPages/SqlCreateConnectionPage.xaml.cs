@@ -8,7 +8,7 @@ namespace SVPM.Pages.ConnectionPages
     {
         private readonly string _connectionlist = GlobalSettings.ConnectionListPath;
 
-        public SqlCreateConnectionPage(Models.SqlConnections? connection = null)
+        public SqlCreateConnectionPage(Models.SqlConnection? connection = null)
         {
             InitializeComponent();
             if (connection != null)
@@ -22,18 +22,22 @@ namespace SVPM.Pages.ConnectionPages
             }
         }
 
-        private void PopulateFields(Models.SqlConnections connection)
+        private void PopulateFields(Models.SqlConnection? connection)
         {
-            NameEntry.Text = connection.Name ?? string.Empty;
-            ServerEntry.Text = connection.ServerAddress ?? string.Empty;
-            DatabaseEntry.Text = connection.DatabaseName ?? string.Empty;
+            if (connection != null)
+            {
+                NameEntry.Text = connection.Name ?? string.Empty;
+                ServerEntry.Text = connection.ServerAddress ?? string.Empty;
+                DatabaseEntry.Text = connection.DatabaseName ?? string.Empty;
 
-            WindowsAuthSwitch.IsToggled = connection.UseWindowsAuth;
-            SetVisibility(!connection.UseWindowsAuth);
-            UsernameEntry.Text = connection.Username ?? string.Empty;
-            PasswordEntry.Text = connection.Password ?? string.Empty;
+                WindowsAuthSwitch.IsToggled = connection.UseWindowsAuth;
+                SetVisibility(!connection.UseWindowsAuth);
+                UsernameEntry.Text = connection.Username ?? string.Empty;
+                PasswordEntry.Text = connection.Password ?? string.Empty;
 
-            CertificateSwitch.IsToggled = connection.UseCertificate;
+                CertificateSwitch.IsToggled = connection.UseCertificate;
+            }
+
             SaveForLater.IsChecked = true;
         }
 
@@ -111,7 +115,7 @@ namespace SVPM.Pages.ConnectionPages
         {
             try
             {
-                List<Models.SqlConnections> connections = await LoadConnectionsAsync();
+                List<Models.SqlConnection> connections = await LoadConnectionsAsync();
                 var existingConnection = connections.FirstOrDefault(c => c.Name == NameEntry.Text);
 
                 if (existingConnection != null)
@@ -134,7 +138,7 @@ namespace SVPM.Pages.ConnectionPages
             }
         }
 
-        private void UpdateExistingConnection(Models.SqlConnections existingConnection)
+        private void UpdateExistingConnection(Models.SqlConnection existingConnection)
         {
             existingConnection.ServerAddress = ServerEntry.Text;
             existingConnection.DatabaseName = DatabaseEntry.Text;
@@ -145,9 +149,9 @@ namespace SVPM.Pages.ConnectionPages
             existingConnection.CertificatePath = CertificatePathEntry.Text;
         }
 
-        private Models.SqlConnections CreateNewConnection()
+        private Models.SqlConnection CreateNewConnection()
         {
-            return new Models.SqlConnections
+            return new Models.SqlConnection
             {
                 Name = NameEntry.Text,
                 ServerAddress = ServerEntry.Text,
@@ -160,17 +164,17 @@ namespace SVPM.Pages.ConnectionPages
             };
         }
 
-        private async Task<List<Models.SqlConnections>> LoadConnectionsAsync()
+        private async Task<List<Models.SqlConnection>> LoadConnectionsAsync()
         {
             if (File.Exists(_connectionlist))
             {
                 string json = await File.ReadAllTextAsync(_connectionlist);
-                return JsonSerializer.Deserialize<List<Models.SqlConnections>>(json) ?? new List<Models.SqlConnections>();
+                return JsonSerializer.Deserialize<List<Models.SqlConnection>>(json) ?? new List<Models.SqlConnection>();
             }
-            return new List<Models.SqlConnections>();
+            return new List<Models.SqlConnection>();
         }
 
-        private async Task SaveConnectionsToFileAsync(List<Models.SqlConnections> connections)
+        private async Task SaveConnectionsToFileAsync(List<Models.SqlConnection> connections)
         {
             var options = new JsonSerializerOptions { WriteIndented = true };
             string jsonString = JsonSerializer.Serialize(connections, options);

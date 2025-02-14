@@ -1,11 +1,11 @@
 using System.Collections.ObjectModel;
 using Microsoft.Data.SqlClient;
 
-namespace SVPM;
+namespace SVPM.Repositories;
 
 public static class AccountRepository
 {
-     public static ObservableCollection<Models.Account> AccountsList { get; set; } = new();
+     public static ObservableCollection<Models.Account> AccountsList { get; set; } = [];
     public static async Task GetAllAccountsAsync()
     {
         AccountsList.Clear();
@@ -48,7 +48,8 @@ public static class AccountRepository
 
             await using var command = new SqlCommand(query, connection);
             command.Parameters.AddWithValue("@AccountID", account.AccountID);
-            command.Parameters.AddWithValue("@VirtualPcID", account.AssociatedVirtualPc.VirtualPcID);
+            if (account.AssociatedVirtualPc != null)
+                command.Parameters.AddWithValue("@VirtualPcID", account.AssociatedVirtualPc.VirtualPcID);
             command.Parameters.AddWithValue("@Username", account.Username ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@Password", account.Password ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@IsAdmin", account.IsAdmin);
@@ -101,7 +102,8 @@ public static class AccountRepository
             WHERE AccountID = @AccountID";
 
             await using var command = new SqlCommand(query, connection, transaction as SqlTransaction);
-            command.Parameters.AddWithValue("@VirtualPcID", account.AssociatedVirtualPc.VirtualPcID);
+            if (account.AssociatedVirtualPc != null)
+                command.Parameters.AddWithValue("@VirtualPcID", account.AssociatedVirtualPc.VirtualPcID);
             command.Parameters.AddWithValue("@Username", account.Username ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@Password", account.Password ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@IsAdmin", account.IsAdmin);

@@ -1,4 +1,6 @@
-﻿namespace SVPM.Pages.MainWindowPages;
+﻿using SVPM.Repositories;
+
+namespace SVPM.Pages.MainWindowPages;
 
 public partial class LoadingPage
 {

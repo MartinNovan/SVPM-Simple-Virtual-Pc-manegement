@@ -6,7 +6,7 @@ namespace SVPM.Pages.MainWindowPages;
 
 public partial class AppShell
 {
-    public static ObservableCollection<Models.SqlConnections> SqlConnections { get; } = new();
+    public static ObservableCollection<Models.SqlConnection> SqlConnections { get; } = new();
     private static readonly string? Connectionlist = GlobalSettings.ConnectionListPath;
     private int _lastlySelectedItem = -1;
     public AppShell()
@@ -22,7 +22,7 @@ public partial class AppShell
             string json = await File.ReadAllTextAsync(Connectionlist!);
             if (!string.IsNullOrEmpty(json))
             {
-                var connections = JsonSerializer.Deserialize<List<Models.SqlConnections>>(json) ?? new();
+                var connections = JsonSerializer.Deserialize<List<Models.SqlConnection>>(json) ?? new();
                 SqlConnections.Clear();
                 connections.ForEach(SqlConnections.Add);
             }
@@ -43,7 +43,7 @@ public partial class AppShell
         try
         {
             if (SqlPicker.SelectedItem == null) return;
-            if (SqlPicker.SelectedItem is not Models.SqlConnections connection) return;
+            if (SqlPicker.SelectedItem is not Models.SqlConnection connection) return;
             var builder = new SqlConnectionStringBuilder
             {
                 DataSource = connection.ServerAddress,
@@ -70,6 +70,7 @@ public partial class AppShell
         }
         catch (Exception ex)
         {
+            SqlPicker.SelectedIndex = -1;
             await DisplayAlert("Error", $"Connection failed: {ex.Message}", "OK");
         }
     }
@@ -78,7 +79,7 @@ public partial class AppShell
     {
         await LoadSqlConnectionsAsync();
         SqlPicker.ItemsSource = SqlConnections;
-        if(_lastlySelectedItem != -1 && _lastlySelectedItem != null)  SqlPicker.SelectedIndex = _lastlySelectedItem;
+        if(_lastlySelectedItem != -1)  SqlPicker.SelectedIndex = _lastlySelectedItem;
     }
 
     private async void PullFromDatabase(object? sender, EventArgs e)
@@ -92,5 +93,18 @@ public partial class AppShell
         if(GlobalSettings.ConnectionString == null) return;
         await Navigation.PushAsync(new LoadingPage(true));
 
+    }
+
+    private async void CheckBox_OnCheckedChanged(object? sender, CheckedChangedEventArgs e)
+    {
+        if (UploadAllCheckBox.IsChecked)
+        {
+            await DisplayAlert("Warning", "With this setting 'ON' all your local data will be pushed to database regardless if they weren't changed!", "OK" );
+            Console.WriteLine("Turning on this mode.");
+        }
+        else
+        {
+            Console.WriteLine("Turning it off");
+        }
     }
 }

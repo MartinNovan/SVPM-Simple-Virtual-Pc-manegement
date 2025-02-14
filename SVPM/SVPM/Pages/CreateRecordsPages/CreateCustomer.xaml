@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="using:SVPM.Models"
              x:Class="SVPM.Pages.CreateRecordsPages.CreateCustomer"
              NavigationPage.HasNavigationBar="False">
     <ContentPage.Content>
@@ -21,18 +22,18 @@
                 </StackLayout>
                 <StackLayout Grid.Row="1">
                     <Label Text="Virtual PCs:" Margin="5" />
-                    <Entry TextChanged="OnSearchTextChanged" Placeholder="Search for virtual PC..."/>
-                    <CollectionView x:Name="VpcCollectionView" SelectionMode="Multiple" MaximumHeightRequest="200" >
+                    <Entry Placeholder="Search for virtual PC..." TextChanged="OnSearchTextChanged" />
+                    <CollectionView x:Name="VpcCollectionView" SelectionMode="Multiple" MaximumHeightRequest="200" Loaded="VpcCollectionView_OnLoaded">
                         <CollectionView.ItemTemplate>
                             <DataTemplate>
                                 <StackLayout>
-                                    <Label Text="{Binding VirtualPcName}" FontSize="20" Margin="10,5"/>
+                                    <Label Text="{Binding VirtualPcName}" x:DataType="models:VirtualPC" FontSize="20" Margin="10,5"/>
                                 </StackLayout>
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
                     </CollectionView>
                 </StackLayout>
-                <Button Grid.Row="2" Text="Confirm" Clicked="CustomerConfirmClicked"/>
+                <Button Grid.Row="2" Text="Confirm" Clicked="CustomerConfirmClicked" Margin="5"/>
             </Grid>
         </ScrollView>
     </ContentPage.Content>

@@ -1,14 +1,16 @@
 ﻿using Microsoft.Data.SqlClient;
+using SVPM.Models;
+using SqlConnection = Microsoft.Data.SqlClient.SqlConnection;
 
-namespace SVPM;
+namespace SVPM.Repositories;
 
 public static class CustomersVirtualPCsRepository
 {
-    public static List<Models.Mapping> MappingList { get; set; } = new();
+    public static List<Mapping> MappingList { get; set; } = [];
 
     public static async Task GetAllMappingAsync()
     {
-        var mappings = new List<Models.Mapping>();
+        var mappings = new List<Mapping>();
         await using (var connection = new SqlConnection(GlobalSettings.ConnectionString))
         {
             await connection.OpenAsync();
@@ -19,12 +21,12 @@ public static class CustomersVirtualPCsRepository
             {
                 while (await reader.ReadAsync())
                 {
-                    mappings.Add(new Models.Mapping
+                    mappings.Add(new Mapping
                     {
                         MappingID = reader.GetGuid(0),
                         CustomerID = reader.GetGuid(1),
                         VirtualPcID = reader.GetGuid(2),
-                        RecordState = Models.RecordStates.Loaded,
+                        RecordState = RecordStates.Loaded,
                         inDatabase = true
                     });
                 }
@@ -33,7 +35,7 @@ public static class CustomersVirtualPCsRepository
         MappingList = mappings;
     }
 
-    public static async Task AddMappingAsync(Models.Mapping mapping)
+    public static async Task AddMappingAsync(Mapping mapping)
     {
         await using var connection = new SqlConnection(GlobalSettings.ConnectionString);
         await connection.OpenAsync();
@@ -48,7 +50,7 @@ public static class CustomersVirtualPCsRepository
         mapping.inDatabase = true;
     }
 
-    public static async Task DeleteMappingAsync(Models.Mapping mapping)
+    public static async Task DeleteMappingAsync(Mapping mapping)
     {
         if (!mapping.inDatabase) return;
         await using var connection = new SqlConnection(GlobalSettings.ConnectionString);

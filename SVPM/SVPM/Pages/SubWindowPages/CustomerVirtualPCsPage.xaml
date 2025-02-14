@@ -2,8 +2,9 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="SVPM.Pages.SubWindowPages.CustomerVirtualPCsPage"
+             xmlns:models="using:SVPM.Models"
              NavigationPage.HasNavigationBar="False">
-    <Grid ColumnDefinitions="Auto, *">
+    <Grid ColumnDefinitions="Auto, *" x:DataType="models:Customer">
         <StackLayout Grid.Column="0" MaximumWidthRequest="300">
             <ScrollView HorizontalScrollBarVisibility="Always">
                 <StackLayout Padding="10">
@@ -32,7 +33,7 @@
             <Button x:Name="AddButton" Grid.Column="2" Text="+" Clicked="AddButton_OnClicked" VerticalOptions="End" FontSize="20" ToolTipProperties.Text="Add a new record." />
             <Button x:Name="RefreshButton" Grid.Column="3" Text="⟳" Clicked="ReloadButton_OnClicked" VerticalOptions="End" FontSize="20" ToolTipProperties.Text="Refresh this list from database."/>
         </Grid>
-        <ListView x:Name="VirtualPCsListView" ItemTapped="VirtualPcListView_ItemTapped">
+        <ListView x:Name="VirtualPCsListView" ItemTapped="VirtualPcListView_ItemTapped" x:DataType="models:VirtualPC">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <ViewCell>
