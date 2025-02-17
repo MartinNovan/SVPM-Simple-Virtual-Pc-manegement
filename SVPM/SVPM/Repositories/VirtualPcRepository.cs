@@ -1,16 +1,17 @@
 using System.Collections.ObjectModel;
 using Microsoft.Data.SqlClient;
 using SVPM.Models;
+using static SVPM.Repositories.CustomerRepository;
+using static SVPM.Repositories.CustomersVirtualPCsRepository;
 using SqlConnection = Microsoft.Data.SqlClient.SqlConnection;
 
 namespace SVPM.Repositories;
 public static class VirtualPcRepository
 {
-    public static ObservableCollection<VirtualPc> VirtualPcsList { get; set; } = [];
-
+    public static ObservableCollection<VirtualPc> VirtualPCs { get; set; } = [];
     public static async Task GetAllVirtualPCsAsync()
     {
-        VirtualPcsList.Clear();
+        VirtualPCs.Clear();
         await using var connection = new SqlConnection(GlobalSettings.ConnectionString);
         await connection.OpenAsync();
 
@@ -20,7 +21,7 @@ public static class VirtualPcRepository
 
         while (await reader.ReadAsync())
         {
-            VirtualPcsList.Add(new VirtualPc
+            VirtualPCs.Add(new VirtualPc
             {
                 VirtualPcID = reader.GetGuid(0),
                 VirtualPcName = reader.GetString(1),
@@ -37,14 +38,14 @@ public static class VirtualPcRepository
                 RecordState = RecordStates.Loaded
             });
         }
-        foreach (var virtualPc in VirtualPcsList)
+        foreach (var virtualPc in VirtualPCs)
         {
             virtualPc.OwningCustomers = new List<Customer>();
-            foreach (var mapping in CustomersVirtualPCsRepository.MappingList.Where(m =>
+            foreach (var mapping in Mappings.Where(m =>
                          m.VirtualPcID == virtualPc.VirtualPcID))
             {
                 virtualPc.OwningCustomers.Add(
-                    CustomerRepository.CustomersList.First(c => c.CustomerID == mapping.CustomerID));
+                    Customers.First(c => c.CustomerID == mapping.CustomerID));
             }
             virtualPc.InDatabase = true;
             virtualPc.InitializeOriginalValues();
@@ -178,7 +179,7 @@ public static class VirtualPcRepository
                 }
             }
             await transaction.CommitAsync();
-            VirtualPcsList.Remove(virtualPc);
+            VirtualPCs.Remove(virtualPc);
         }
         catch (Exception ex)
         {

@@ -1,6 +1,9 @@
-﻿using SVPM.Repositories;
+﻿using SVPM.Models;
+using SVPM.Repositories;
+using static SVPM.Repositories.AccountRepository;
+using static SVPM.Repositories.VirtualPcRepository;
 
-namespace SVPM.Pages.CreateRecordsPages;
+namespace SVPM.Views.CreateRecordsPages;
 
 public partial class CreateAccount
 {
@@ -8,7 +11,7 @@ public partial class CreateAccount
     {
         InitializeComponent();
         VirtualPcPicker.ItemDisplayBinding = new Binding("VirtualPcName");
-        VirtualPcPicker.ItemsSource = VirtualPcRepository.VirtualPcsList.Where(vpc => vpc.RecordState != Models.RecordStates.Deleted).ToList();
+        VirtualPcPicker.ItemsSource = VirtualPCs.Where(vpc => vpc.RecordState != RecordStates.Deleted).ToList();
     }
     
     private async void AccountConfirmClicked(object sender, EventArgs e)
@@ -26,7 +29,7 @@ public partial class CreateAccount
                 return;
             }
 
-            var account = new Models.Account
+            var account = new Account
             {
                 AccountID = Guid.NewGuid(),
                 Username = AccountUsernameEntry.Text,
@@ -34,11 +37,11 @@ public partial class CreateAccount
                 IsAdmin = IsAdminCheckBox.IsChecked,
                 LastUpdated = DateTime.Now,
                 OriginalPassword = AccountOriginalPasswordEntry.Text,
-                AssociatedVirtualPc = VirtualPcPicker.SelectedItem as Models.VirtualPc,
-                RecordState = Models.RecordStates.Created
+                AssociatedVirtualPc = VirtualPcPicker.SelectedItem as VirtualPc,
+                RecordState = RecordStates.Created
             };
 
-            AccountRepository.AccountsList.Add(account);
+            AccountsList.Add(account);
             await DisplayAlert("Success", "Account successfully added/edited.", "OK");
             await Navigation.PopAsync();
         }

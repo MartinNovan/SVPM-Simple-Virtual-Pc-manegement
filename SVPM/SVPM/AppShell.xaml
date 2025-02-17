@@ -2,9 +2,9 @@
 <Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
        xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
        xmlns:models="using:SVPM.Models"
-       xmlns:mainWindowPages="using:SVPM.Pages.MainWindowPages"
-       xmlns:connectionWindowPages="clr-namespace:SVPM.Pages.ConnectionPages"
-       x:Class="SVPM.Pages.MainWindowPages.AppShell"
+       xmlns:mainWindowPages1="clr-namespace:SVPM.Views.MainWindowPages"
+       xmlns:connectionPages="clr-namespace:SVPM.Views.ConnectionPages"
+       x:Class="SVPM.AppShell"
        FlyoutBehavior="Flyout"
        Title="SVPM"
        x:DataType="models:SqlConnection">
@@ -23,17 +23,17 @@
        <FlyoutItem FlyoutDisplayOptions="AsMultipleItems">
               <ShellContent
                      Title="Customers"
-                     ContentTemplate="{DataTemplate mainWindowPages:CustomersPage}"
+                     ContentTemplate="{DataTemplate mainWindowPages1:CustomersPage}"
                      Route="CustomersPage"/>
               <ShellContent
                      Title="VirtualPcs"
-                     ContentTemplate="{DataTemplate mainWindowPages:VirtualPcPage}"
+                     ContentTemplate="{DataTemplate mainWindowPages1:VirtualPcPage}"
                      Route="VirtualPcPage"/>
               <ShellContent
                      Title="Accounts"
-                     ContentTemplate="{DataTemplate mainWindowPages:AccountsPage}"
+                     ContentTemplate="{DataTemplate mainWindowPages1:AccountsPage}"
                      Route="AccountsPage"/>
        </FlyoutItem>
-       <ShellContent Title="Manage connections" ContentTemplate="{DataTemplate connectionWindowPages:SqlConnectionPage}"/>
+       <ShellContent Title="Manage connections" ContentTemplate="{DataTemplate connectionPages:SqlConnectionPage}"/>
        <ShellContent Title="Settings"/>
 </Shell>

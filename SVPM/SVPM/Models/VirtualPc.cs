@@ -1,28 +1,205 @@
-﻿using SVPM.Repositories;
+﻿using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using SVPM.Repositories;
 
 namespace SVPM.Models;
 
-public class VirtualPc
+public class VirtualPc : INotifyPropertyChanged
 {
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    private void NotifyPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
     public Guid VirtualPcID { get; init; }
-    public string? VirtualPcName { get; set; }
-    public string? ServiceName { get; set; }
-    public string? OperatingSystem { get; set; }
-    public int CPU_Cores { get; set; }
-    public int RAM_Size_GB { get; set; }
-    public int Disk_Size_GB { get; set; }
-    public bool Backupping { get; set; }
-    public bool Administration { get; set; }
-    public string? IP_Address { get; set; }
-    public string? FQDN { get; set; }
-    public string? Notes { get; set; }
-    public List<Customer>? OwningCustomers { get; set; }
+
+    private string? _virtualPcName;
+    public string? VirtualPcName
+    {
+        get => _virtualPcName;
+        set
+        {
+            if (_virtualPcName != value)
+            {
+                _virtualPcName = value;
+                NotifyPropertyChanged();
+            }
+        }
+    }
+
+    private string? _serviceName;
+    public string? ServiceName
+    {
+        get => _serviceName;
+        set
+        {
+            if (_serviceName != value)
+            {
+                _serviceName = value;
+                NotifyPropertyChanged();
+            }
+        }
+    }
+
+    private string? _operatingSystem;
+    public string? OperatingSystem
+    {
+        get => _operatingSystem;
+        set
+        {
+            if (_operatingSystem != value)
+            {
+                _operatingSystem = value;
+                NotifyPropertyChanged();
+            }
+        }
+    }
+
+    private int _cpuCores;
+    public int CPU_Cores
+    {
+        get => _cpuCores;
+        set
+        {
+            if (_cpuCores != value)
+            {
+                _cpuCores = value;
+                NotifyPropertyChanged();
+            }
+        }
+    }
+
+    private int _ramSizeGb;
+    public int RAM_Size_GB
+    {
+        get => _ramSizeGb;
+        set
+        {
+            if (_ramSizeGb != value)
+            {
+                _ramSizeGb = value;
+                NotifyPropertyChanged();
+            }
+        }
+    }
+
+    private int _diskSizeGb;
+    public int Disk_Size_GB
+    {
+        get => _diskSizeGb;
+        set
+        {
+            if (_diskSizeGb != value)
+            {
+                _diskSizeGb = value;
+                NotifyPropertyChanged();
+            }
+        }
+    }
+
+    private bool _backupping;
+    public bool Backupping
+    {
+        get => _backupping;
+        set
+        {
+            if (_backupping != value)
+            {
+                _backupping = value;
+                NotifyPropertyChanged();
+            }
+        }
+    }
+
+    private bool _administration;
+    public bool Administration
+    {
+        get => _administration;
+        set
+        {
+            if (_administration != value)
+            {
+                _administration = value;
+                NotifyPropertyChanged();
+            }
+        }
+    }
+
+    private string? _ipAddress;
+    public string? IP_Address
+    {
+        get => _ipAddress;
+        set
+        {
+            if (_ipAddress != value)
+            {
+                _ipAddress = value;
+                NotifyPropertyChanged();
+            }
+        }
+    }
+
+    private string? _fqdn;
+    public string? FQDN
+    {
+        get => _fqdn;
+        set
+        {
+            if (_fqdn != value)
+            {
+                _fqdn = value;
+                NotifyPropertyChanged();
+            }
+        }
+    }
+
+    private string? _notes;
+    public string? Notes
+    {
+        get => _notes;
+        set
+        {
+            if (_notes != value)
+            {
+                _notes = value;
+                NotifyPropertyChanged();
+            }
+        }
+    }
+
+    private List<Customer>? _owningCustomers;
+    public List<Customer>? OwningCustomers
+    {
+        get => _owningCustomers;
+        set
+        {
+            if (_owningCustomers != value)
+            {
+                _owningCustomers = value;
+                NotifyPropertyChanged();
+            }
+        }
+    }
 
     public string OwningCustomersNames => OwningCustomers is { Count: > 0 }
         ? string.Join(", ", OwningCustomers.Select(c => c.FullName))
         : "No customers";
 
-    public RecordStates RecordState { get; set; }
+    private RecordStates _recordState;
+    public RecordStates RecordState
+    {
+        get => _recordState;
+        set
+        {
+            if (_recordState != value)
+            {
+                _recordState = value;
+                NotifyPropertyChanged();
+            }
+        }
+    }
 
     public string? OriginalVirtualPcName { get; private set; }
     public string? OriginalServiceName { get; private set; }
@@ -35,8 +212,7 @@ public class VirtualPc
     public string? OriginalIP_Address { get; private set; }
     public string? OriginalFQDN { get; private set; }
     public string? OriginalNotes { get; private set; }
-    public List<Customer>? OriginalOwningCustomers { get; set; }
-
+    public List<Customer>? OriginalOwningCustomers { get; private set; }
 
     public bool InDatabase { get; set; }
 
@@ -57,7 +233,7 @@ public class VirtualPc
         OriginalOwningCustomers = OwningCustomers;
     }
 
-public async Task SaveChanges()
+    public async Task SaveChanges()
     {
         try
         {

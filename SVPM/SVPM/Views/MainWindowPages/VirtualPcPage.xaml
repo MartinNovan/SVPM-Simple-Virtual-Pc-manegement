@@ -2,17 +2,16 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:models="using:SVPM.Models"
-             x:Class="SVPM.Pages.MainWindowPages.VirtualPcPage"
-             x:DataType="models:VirtualPc">
+             x:Class="SVPM.Views.MainWindowPages.VirtualPcPage">
     <StackLayout Padding="5">
         <Grid ColumnDefinitions="auto, *, auto" ColumnSpacing="5" Margin="5">
             <Label Grid.Column="0" Text="Virtual PCs:" FontSize="24" VerticalOptions="Center"/>
             <SearchBar Grid.Column="1" Placeholder="Search for virtual PCs..." TextChanged="OnSearchBarTextChanged" />
             <Button Grid.Column="2" Text="+" Clicked="AddButton_OnClicked" VerticalOptions="End" FontSize="20" ToolTipProperties.Text="Add a new record." />
         </Grid>
-        <ListView x:Name="VirtualPCsListView" ItemTapped="VirtualPcListView_ItemTapped" Loaded="VirtualPCsListView_OnLoaded">
+        <ListView x:Name="VirtualPCsListView" ItemTapped="VirtualPcListView_ItemTapped">
             <ListView.ItemTemplate>
-                <DataTemplate>
+                <DataTemplate x:DataType="models:VirtualPc">
                     <ViewCell>
                         <StackLayout>
                             <Grid ColumnDefinitions="auto, *, auto">
@@ -26,13 +25,14 @@
                                             <Label Text="{Binding CPU_Cores, StringFormat='CPU: {0} cores'}" />
                                             <Label Text="{Binding RAM_Size_GB, StringFormat='RAM: {0} GB'}" />
                                             <Label Text="{Binding Disk_Size_GB, StringFormat='Drive: {0} GB'}" />
+                                            <Label Text="{Binding Backupping, StringFormat='Backupping: {0}'}" />
                                         </StackLayout>
                                         <StackLayout Grid.Column="1">
-                                            <Label Text="{Binding Backupping, StringFormat='Backupping: {0}'}" />
                                             <Label Text="{Binding Administration, StringFormat='Administration: {0}'}" />
                                             <Label Text="{Binding IP_Address, StringFormat='IP: {0}'}" />
                                             <Label Text="{Binding FQDN, StringFormat='FQDN: {0}'}" />
                                             <Label Text="{Binding OwningCustomersNames, StringFormat='Customer: {0}'}" />
+                                            <Label Text="{Binding RecordState, StringFormat='State: {0}'}" />
                                         </StackLayout>
                                     </Grid>
                                 </StackLayout>

@@ -1,7 +1,4 @@
-﻿using SVPM.Pages.ConnectionPages;
-using SVPM.Pages.MainWindowPages;
-
-namespace SVPM;
+﻿namespace SVPM;
 
 public partial class App
 {

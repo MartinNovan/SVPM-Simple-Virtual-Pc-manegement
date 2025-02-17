@@ -1,6 +1,9 @@
-﻿using SVPM.Repositories;
+﻿using static SVPM.Repositories.CustomerRepository;
+using static SVPM.Repositories.CustomersVirtualPCsRepository;
+using static SVPM.Repositories.VirtualPcRepository;
+using static SVPM.Repositories.AccountRepository;
 
-namespace SVPM.Pages.MainWindowPages;
+namespace SVPM.Views.MainWindowPages;
 
 public partial class LoadingPage
 {
@@ -27,16 +30,16 @@ public partial class LoadingPage
         try
         {
             Text.Text = "Loading Customers...";
-            await CustomerRepository.GetAllCustomersAsync();
+            await GetAllCustomersAsync();
             ProgressBar.Progress = 0.25;
             Text.Text = "Loading Mappings...";
-            await CustomersVirtualPCsRepository.GetAllMappingAsync();
+            await GetAllMappingAsync();
             ProgressBar.Progress = 0.5;
             Text.Text = "Loading Virtual PCs...";
-            await VirtualPcRepository.GetAllVirtualPCsAsync();
+            await GetAllVirtualPCsAsync();
             ProgressBar.Progress = 0.75;
             Text.Text = "Loading Accounts...";
-            await AccountRepository.GetAllAccountsAsync();
+            await GetAllAccountsAsync();
             ProgressBar.Progress = 1;
             Text.Text = "Done!";
         }
@@ -51,25 +54,25 @@ public partial class LoadingPage
         try
         {
             Text.Text = "Uploading customers changes...";
-            foreach (var customer in CustomerRepository.CustomersList)
+            foreach (var customer in Customers)
             {
                 await customer.SaveChanges();
             }
             ProgressBar.Progress = 0.25;
             Text.Text = "Uploading Virtual PCs changes...";
-            foreach (var virtualPc in VirtualPcRepository.VirtualPcsList)
+            foreach (var virtualPc in VirtualPCs)
             {
                 await virtualPc.SaveChanges();
             }
             ProgressBar.Progress = 0.5;
             Text.Text = "Uploading mappings changes...";
-            foreach (var mapping in CustomersVirtualPCsRepository.MappingList)
+            foreach (var mapping in Mappings)
             {
                 await mapping.SaveChanges();
             }
             ProgressBar.Progress = 0.75;
             Text.Text = "Uploading accounts changes...";
-            foreach (var account in AccountRepository.AccountsList)
+            foreach (var account in AccountsList)
             {
                 await account.SaveChanges();
             }

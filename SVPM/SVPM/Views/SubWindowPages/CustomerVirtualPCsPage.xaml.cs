@@ -1,12 +1,13 @@
-﻿using SVPM.Pages.CreateRecordsPages;
-using SVPM.Repositories;
-
-namespace SVPM.Pages.SubWindowPages
+﻿using SVPM.Models;
+using SVPM.Views.CreateRecordsPages;
+using static SVPM.Repositories.VirtualPcRepository;
+//TODO: Change list view to collection view
+namespace SVPM.Views.SubWindowPages
 {
     public partial class CustomerVirtualPCsPage
     {
-        private readonly Models.Customer _customer;
-        public CustomerVirtualPCsPage(Models.Customer customer)
+        private readonly Customer _customer;
+        public CustomerVirtualPCsPage(Customer customer)
         {
             _customer = customer;
             InitializeComponent();
@@ -17,7 +18,7 @@ namespace SVPM.Pages.SubWindowPages
         {
             try
             {
-                VirtualPCsListView.ItemsSource = VirtualPcRepository.VirtualPcsList.Where(a => a.OwningCustomersNames != null && a.OwningCustomersNames.Contains(_customer.FullName!)).ToList();
+                VirtualPCsListView.ItemsSource = VirtualPCs.Where(a => a.OwningCustomersNames != null && a.OwningCustomersNames.Contains(_customer.FullName!)).ToList();
             }
             catch (Exception ex)
             {
@@ -30,13 +31,13 @@ namespace SVPM.Pages.SubWindowPages
 
             if (string.IsNullOrWhiteSpace(searchText))
             {
-                VirtualPCsListView.ItemsSource = VirtualPcRepository.VirtualPcsList;
+                VirtualPCsListView.ItemsSource = VirtualPCs;
             }
             else
             {
-                if (VirtualPcRepository.VirtualPcsList != null)
-                    VirtualPCsListView.ItemsSource = VirtualPcRepository.VirtualPcsList
-                        .Where(a => a is { OwningCustomersNames: not null, VirtualPcName: not null } &&
+                if (VirtualPCs != null)
+                    VirtualPCsListView.ItemsSource = VirtualPCs
+                        .Where(a => a is { VirtualPcName: not null } &&
                                     (a.VirtualPcName.ToLower().Contains(searchText) ||
                                     a.OwningCustomersNames.Contains(_customer.FullName!)))
                         .ToList();
@@ -47,7 +48,7 @@ namespace SVPM.Pages.SubWindowPages
         {
             try
             {
-                if (e.Item is Models.VirtualPc selectedVirtualPc)
+                if (e.Item is VirtualPc selectedVirtualPc)
                 {
                     await Navigation.PushAsync(new VirtualPcAccountsPage(selectedVirtualPc.VirtualPcID));
                 }

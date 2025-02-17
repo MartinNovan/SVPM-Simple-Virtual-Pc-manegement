@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using SVPM.Models;
 
 namespace SVPM;
 public static class FileHelpers
@@ -48,7 +49,7 @@ public static class FileHelpers
             try
             {
                 EnsureDirectoryExists();
-                var emptyConnections = new List<Models.SqlConnection>();
+                var emptyConnections = new List<SqlConnection>();
                 string emptyJson = JsonSerializer.Serialize(emptyConnections,
                     new JsonSerializerOptions { WriteIndented = true });
                 File.WriteAllText(GlobalSettings.ConnectionListPath, emptyJson);

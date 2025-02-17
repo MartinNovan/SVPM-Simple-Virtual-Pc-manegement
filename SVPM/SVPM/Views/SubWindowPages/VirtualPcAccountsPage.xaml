@@ -1,6 +1,6 @@
 ﻿<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="SVPM.Pages.SubWindowPages.VirtualPcAccountsPage"
+             x:Class="SVPM.Views.SubWindowPages.VirtualPcAccountsPage"
              xmlns:models="using:SVPM.Models"
              NavigationPage.HasNavigationBar="False">
     <Grid>
@@ -50,9 +50,9 @@
         </ScrollView>
         <StackLayout Padding="10" Grid.Column="1">
             <Label Text="Účty na počítači:" FontSize="24" />
-            <ListView x:Name="AccountsListView" x:DataType="models:Account">
+            <ListView x:Name="AccountsListView" >
                 <ListView.ItemTemplate>
-                    <DataTemplate>
+                    <DataTemplate x:DataType="models:Account">
                         <ViewCell>
                             <StackLayout Padding="5" Margin="5">
                                 <StackLayout Orientation="Horizontal">

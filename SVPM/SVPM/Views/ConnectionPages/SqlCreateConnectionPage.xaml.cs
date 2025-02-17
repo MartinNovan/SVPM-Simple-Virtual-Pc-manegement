@@ -1,14 +1,15 @@
 ﻿using System.Text.Json;
 using Microsoft.Data.SqlClient;
-using SVPM.Pages.MainWindowPages;
+using SVPM.Views.MainWindowPages;
+using SqlConnection = SVPM.Models.SqlConnection;
 
-namespace SVPM.Pages.ConnectionPages
+namespace SVPM.Views.ConnectionPages
 {
     public partial class SqlCreateConnectionPage
     {
         private readonly string _connectionlist = GlobalSettings.ConnectionListPath;
 
-        public SqlCreateConnectionPage(Models.SqlConnection? connection = null)
+        public SqlCreateConnectionPage(SqlConnection? connection = null)
         {
             InitializeComponent();
             if (connection != null)
@@ -22,7 +23,7 @@ namespace SVPM.Pages.ConnectionPages
             }
         }
 
-        private void PopulateFields(Models.SqlConnection? connection)
+        private void PopulateFields(SqlConnection? connection)
         {
             if (connection != null)
             {
@@ -59,7 +60,7 @@ namespace SVPM.Pages.ConnectionPages
 
             var connectionString = BuildConnectionString();
 
-            await using SqlConnection connection = new(connectionString);
+            await using Microsoft.Data.SqlClient.SqlConnection connection = new(connectionString);
             try
             {
                 IsProcessing.IsVisible = true;
@@ -115,7 +116,7 @@ namespace SVPM.Pages.ConnectionPages
         {
             try
             {
-                List<Models.SqlConnection> connections = await LoadConnectionsAsync();
+                List<SqlConnection> connections = await LoadConnectionsAsync();
                 var existingConnection = connections.FirstOrDefault(c => c.Name == NameEntry.Text);
 
                 if (existingConnection != null)
@@ -138,7 +139,7 @@ namespace SVPM.Pages.ConnectionPages
             }
         }
 
-        private void UpdateExistingConnection(Models.SqlConnection existingConnection)
+        private void UpdateExistingConnection(SqlConnection existingConnection)
         {
             existingConnection.ServerAddress = ServerEntry.Text;
             existingConnection.DatabaseName = DatabaseEntry.Text;
@@ -149,9 +150,9 @@ namespace SVPM.Pages.ConnectionPages
             existingConnection.CertificatePath = CertificatePathEntry.Text;
         }
 
-        private Models.SqlConnection CreateNewConnection()
+        private SqlConnection CreateNewConnection()
         {
-            return new Models.SqlConnection
+            return new SqlConnection
             {
                 Name = NameEntry.Text,
                 ServerAddress = ServerEntry.Text,
@@ -164,17 +165,17 @@ namespace SVPM.Pages.ConnectionPages
             };
         }
 
-        private async Task<List<Models.SqlConnection>> LoadConnectionsAsync()
+        private async Task<List<SqlConnection>> LoadConnectionsAsync()
         {
             if (File.Exists(_connectionlist))
             {
                 string json = await File.ReadAllTextAsync(_connectionlist);
-                return JsonSerializer.Deserialize<List<Models.SqlConnection>>(json) ?? new List<Models.SqlConnection>();
+                return JsonSerializer.Deserialize<List<SqlConnection>>(json) ?? new List<SqlConnection>();
             }
-            return new List<Models.SqlConnection>();
+            return new List<SqlConnection>();
         }
 
-        private async Task SaveConnectionsToFileAsync(List<Models.SqlConnection> connections)
+        private async Task SaveConnectionsToFileAsync(List<SqlConnection> connections)
         {
             var options = new JsonSerializerOptions { WriteIndented = true };
             string jsonString = JsonSerializer.Serialize(connections, options);

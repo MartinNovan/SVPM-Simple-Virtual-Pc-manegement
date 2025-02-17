@@ -6,8 +6,7 @@ namespace SVPM.Repositories;
 
 public static class CustomersVirtualPCsRepository
 {
-    public static List<Mapping> MappingList { get; set; } = [];
-
+    public static List<Mapping> Mappings { get; set; } = [];
     public static async Task GetAllMappingAsync()
     {
         var mappings = new List<Mapping>();
@@ -32,7 +31,7 @@ public static class CustomersVirtualPCsRepository
                 }
             }
         }
-        MappingList = mappings;
+        Mappings = mappings;
     }
 
     public static async Task AddMappingAsync(Mapping mapping)

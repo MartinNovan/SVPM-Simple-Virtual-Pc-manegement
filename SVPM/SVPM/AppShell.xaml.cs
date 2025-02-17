@@ -1,12 +1,14 @@
 ﻿using System.Collections.ObjectModel;
 using System.Text.Json;
 using Microsoft.Data.SqlClient;
+using SVPM.Views.MainWindowPages;
+using SqlConnection = SVPM.Models.SqlConnection;
 
-namespace SVPM.Pages.MainWindowPages;
+namespace SVPM;
 
 public partial class AppShell
 {
-    public static ObservableCollection<Models.SqlConnection> SqlConnections { get; } = new();
+    public static ObservableCollection<SqlConnection> SqlConnections { get; } = new();
     private static readonly string? Connectionlist = GlobalSettings.ConnectionListPath;
     private int _lastlySelectedItem = -1;
     public AppShell()
@@ -22,7 +24,7 @@ public partial class AppShell
             string json = await File.ReadAllTextAsync(Connectionlist!);
             if (!string.IsNullOrEmpty(json))
             {
-                var connections = JsonSerializer.Deserialize<List<Models.SqlConnection>>(json) ?? new();
+                var connections = JsonSerializer.Deserialize<List<SqlConnection>>(json) ?? new();
                 SqlConnections.Clear();
                 connections.ForEach(SqlConnections.Add);
             }
@@ -43,7 +45,7 @@ public partial class AppShell
         try
         {
             if (SqlPicker.SelectedItem == null) return;
-            if (SqlPicker.SelectedItem is not Models.SqlConnection connection) return;
+            if (SqlPicker.SelectedItem is not SqlConnection connection) return;
             var builder = new SqlConnectionStringBuilder
             {
                 DataSource = connection.ServerAddress,
@@ -63,7 +65,7 @@ public partial class AppShell
                 builder.ServerCertificate = connection.CertificatePath;
             }
 
-            await using var sqlConnection = new SqlConnection(builder.ToString());
+            await using var sqlConnection = new Microsoft.Data.SqlClient.SqlConnection(builder.ToString());
             await sqlConnection.OpenAsync();
             GlobalSettings.ConnectionString = builder.ToString();
             _lastlySelectedItem = SqlPicker.SelectedIndex;
@@ -92,7 +94,6 @@ public partial class AppShell
     {
         if(GlobalSettings.ConnectionString == null) return;
         await Navigation.PushAsync(new LoadingPage(true));
-
     }
 
     private async void CheckBox_OnCheckedChanged(object? sender, CheckedChangedEventArgs e)

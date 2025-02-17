@@ -1,7 +1,9 @@
 ﻿using SVPM.Models;
-using SVPM.Repositories;
+using static SVPM.Repositories.CustomerRepository;
+using static SVPM.Repositories.CustomersVirtualPCsRepository;
+using static SVPM.Repositories.VirtualPcRepository;
 
-namespace SVPM.Pages.CreateRecordsPages;
+namespace SVPM.Views.CreateRecordsPages;
 public partial class CreateVirtualPc
 {
     private static VirtualPc? _updatedVirtualPc;
@@ -12,7 +14,7 @@ public partial class CreateVirtualPc
     }
     private void CustomerCollectionView_OnLoaded(object? sender, EventArgs e)
     {
-        CustomerCollectionView.ItemsSource = CustomerRepository.CustomersList.Where(c => c.RecordState != RecordStates.Deleted).OrderBy(c => c.FullName);
+        CustomerCollectionView.ItemsSource = Customers.Where(c => c.RecordState != RecordStates.Deleted).OrderBy(c => c.FullName);
         if (_updatedVirtualPc != null)
         {
             PopulateFields(_updatedVirtualPc);
@@ -45,7 +47,7 @@ public partial class CreateVirtualPc
     {
         string searchText = e.NewTextValue?.ToLower() ?? "";
 
-        var match = CustomerRepository.CustomersList
+        var match = Customers
             .FirstOrDefault(c => c.FullName != null && c.FullName.ToLower().Contains(searchText) && c.RecordState != RecordStates.Deleted);
 
         if (match != null)
@@ -65,7 +67,7 @@ public partial class CreateVirtualPc
 
             if (_updatedVirtualPc != null)
             {
-                var existingVirtualPc = VirtualPcRepository.VirtualPcsList
+                var existingVirtualPc = VirtualPCs
                     .FirstOrDefault(vpc => vpc.VirtualPcID == _updatedVirtualPc.VirtualPcID);
                 if (existingVirtualPc != null)
                 {
@@ -84,11 +86,11 @@ public partial class CreateVirtualPc
 
                     if (existingVirtualPc.OwningCustomers != null)
                     {
-                        foreach (var customer in CustomerRepository.CustomersList)
+                        foreach (var customer in Customers)
                         {
                             if (!CustomerCollectionView.SelectedItems.Contains(customer) && existingVirtualPc.OwningCustomers.Contains(customer))
                             {
-                                var deleteMapping = CustomersVirtualPCsRepository.MappingList.FirstOrDefault(m =>
+                                var deleteMapping = Mappings.FirstOrDefault(m =>
                                     m.CustomerID == customer.CustomerID && m.VirtualPcID == existingVirtualPc.VirtualPcID && m.RecordState != RecordStates.Deleted);
                                 if (deleteMapping != null) deleteMapping.RecordState = RecordStates.Deleted;
                                 existingVirtualPc.OwningCustomers.Remove(customer);
@@ -101,7 +103,7 @@ public partial class CreateVirtualPc
                                     VirtualPcID = existingVirtualPc.VirtualPcID,
                                     RecordState = RecordStates.Created
                                 };
-                                CustomersVirtualPCsRepository.MappingList.Add(customerVirtualPc);
+                                Mappings.Add(customerVirtualPc);
                                 existingVirtualPc.OwningCustomers.Add(customer);
                             }
                         }
@@ -136,7 +138,7 @@ public partial class CreateVirtualPc
                                         VirtualPcID = virtualPc.VirtualPcID,
                                         RecordState = RecordStates.Created
                                     };
-                                    CustomersVirtualPCsRepository.MappingList.Add(customerVirtualPc);
+                                    Mappings.Add(customerVirtualPc);
                                     virtualPc.OwningCustomers?.Add(selectedCustomer);
                                 }
                             }

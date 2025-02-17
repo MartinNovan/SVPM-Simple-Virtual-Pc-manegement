@@ -1,18 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:models="using:SVPM.Models"
-             x:Class="SVPM.Pages.MainWindowPages.AccountsPage"
-             x:DataType="models:Account">
+             xmlns:models="clr-namespace:SVPM.Models"
+             x:Class="SVPM.Views.MainWindowPages.AccountsPage">
     <StackLayout Padding="5">
         <Grid ColumnDefinitions="auto, *, auto" ColumnSpacing="5" Margin="5">
             <Label Grid.Column="0" Text="Accounts:" FontSize="24" VerticalOptions="Center"/>
             <SearchBar Grid.Column="1" Placeholder="Search for accounts..." TextChanged="OnSearchBarTextChanged" />
             <Button Grid.Column="2" Text="+" Clicked="AddButton_OnClicked" VerticalOptions="End" FontSize="20" ToolTipProperties.Text="Add a new record." />
         </Grid>
-        <ListView x:Name="AccountsListView" Loaded="AccountsListView_OnLoaded">
+        <ListView x:Name="AccountsListView">
             <ListView.ItemTemplate>
-                <DataTemplate>
+                <DataTemplate x:DataType="models:Account">
                     <ViewCell>
                         <StackLayout>
                             <Grid ColumnDefinitions="auto, *, auto">
@@ -25,6 +24,7 @@
                                         <Label Text="{Binding LastUpdated, StringFormat='   Updated: {0}'}" />
                                         <Label Text="{Binding VirtualPcName, StringFormat='   Associated PC: {0}'}" />
                                         <Label Text="{Binding OriginalPassword, StringFormat='   Original password: {0}'}" />
+                                        <Label Text="{Binding RecordState, StringFormat='   State: {0}'}" />
                                     </StackLayout>
                                 </StackLayout>
                                 <StackLayout Grid.Column="2" HorizontalOptions="Center" VerticalOptions="Center">

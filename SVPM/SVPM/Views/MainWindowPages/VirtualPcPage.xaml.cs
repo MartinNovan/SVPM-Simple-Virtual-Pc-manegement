@@ -1,26 +1,17 @@
 ﻿using SVPM.Models;
-using SVPM.Pages.CreateRecordsPages;
-using SVPM.Pages.SubWindowPages;
-using SVPM.Repositories;
+using SVPM.Views.CreateRecordsPages;
+using SVPM.Views.SubWindowPages;
+using static SVPM.Repositories.CustomersVirtualPCsRepository;
+using static SVPM.Repositories.VirtualPcRepository;
 
-namespace SVPM.Pages.MainWindowPages;
-
+namespace SVPM.Views.MainWindowPages;
+//TODO: Change list view to collection view
 public partial class VirtualPcPage
 {
     public VirtualPcPage()
     {
         InitializeComponent();
-    }
-
-    private void VirtualPCsListView_OnLoaded(object? sender, EventArgs e)
-    {
-        VirtualPCsListView.ItemsSource = VirtualPcRepository.VirtualPcsList.Where(vpc => vpc.RecordState != Models.RecordStates.Deleted).OrderBy(vpc => vpc.VirtualPcName);
-    }
-
-    protected override void OnDisappearing()
-    {
-        base.OnDisappearing();
-        VirtualPCsListView.ItemsSource = null;
+        VirtualPCsListView.ItemsSource = VirtualPCs;
     }
     private void OnSearchBarTextChanged(object sender, TextChangedEventArgs e)
     {
@@ -29,9 +20,9 @@ public partial class VirtualPcPage
         {
             return;
         }
-        var match = VirtualPcRepository.VirtualPcsList
+        var match = VirtualPCs
             .FirstOrDefault(vpc => (vpc.VirtualPcName?.ToLower().Contains(searchText) ?? false) &&
-                                 vpc.RecordState != Models.RecordStates.Deleted);
+                                 vpc.RecordState != RecordStates.Deleted);
         if (match != null)
         {
             VirtualPCsListView.ScrollTo(match, position: ScrollToPosition.Start, animated: true);
@@ -42,7 +33,7 @@ public partial class VirtualPcPage
     {
         try
         {
-            if (e.Item is Models.VirtualPc selectedVirtualPc)
+            if (e.Item is VirtualPc selectedVirtualPc)
             {
                 await Navigation.PushAsync(new VirtualPcAccountsPage(selectedVirtualPc.VirtualPcID));
             }
@@ -69,7 +60,7 @@ public partial class VirtualPcPage
     {
         try
         {
-            if (sender is not ImageButton { BindingContext: Models.VirtualPc virtualPc }) return;
+            if (sender is not ImageButton { BindingContext: VirtualPc virtualPc }) return;
             await Navigation.PushAsync(new CreateVirtualPc(virtualPc));
         }
         catch (Exception ex)
@@ -82,17 +73,16 @@ public partial class VirtualPcPage
     {
         try
         {
-            if (sender is not ImageButton button || button.BindingContext is not Models.VirtualPc virtualPc) return;
+            if (sender is not ImageButton button || button.BindingContext is not VirtualPc virtualPc) return;
 
             bool confirm = await DisplayAlert("Warning!", "Do you really want to delete this virtual pc?", "OK", "Cancel");
             if (!confirm) return;
 
-            virtualPc.RecordState = Models.RecordStates.Deleted;
-            foreach (var mapping in CustomersVirtualPCsRepository.MappingList.Where(m => m.VirtualPcID == virtualPc.VirtualPcID && m.RecordState != RecordStates.Deleted))
+            virtualPc.RecordState = RecordStates.Deleted;
+            foreach (var mapping in Mappings.Where(m => m.VirtualPcID == virtualPc.VirtualPcID && m.RecordState != RecordStates.Deleted))
             {
                 mapping.RecordState = RecordStates.Deleted;
             }
-            VirtualPCsListView.ItemsSource = VirtualPcRepository.VirtualPcsList.Where(vpc => vpc.RecordState != Models.RecordStates.Deleted).OrderBy(vpc => vpc.VirtualPcName);
         }
         catch (Exception ex)
         {

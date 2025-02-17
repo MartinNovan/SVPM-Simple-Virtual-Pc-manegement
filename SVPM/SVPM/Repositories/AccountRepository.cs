@@ -1,11 +1,14 @@
 using System.Collections.ObjectModel;
 using Microsoft.Data.SqlClient;
+using SVPM.Models;
+using SqlConnection = Microsoft.Data.SqlClient.SqlConnection;
+using static SVPM.Repositories.VirtualPcRepository;
 
 namespace SVPM.Repositories;
 
 public static class AccountRepository
 {
-     public static ObservableCollection<Models.Account> AccountsList { get; set; } = [];
+    public static ObservableCollection<Account> AccountsList { get; set; } = [];
     public static async Task GetAllAccountsAsync()
     {
         AccountsList.Clear();
@@ -18,25 +21,25 @@ public static class AccountRepository
 
         while (await reader.ReadAsync())
         {
-            AccountsList.Add(new Models.Account
+            AccountsList.Add(new Account
             {
                 AccountID = reader.GetGuid(reader.GetOrdinal("AccountID")),
-                AssociatedVirtualPc = new Models.VirtualPc { VirtualPcID = reader.GetGuid(reader.GetOrdinal("VirtualPcID")) },
+                AssociatedVirtualPc = new VirtualPc { VirtualPcID = reader.GetGuid(reader.GetOrdinal("VirtualPcID")) },
                 Username = reader.IsDBNull(reader.GetOrdinal("Username")) ? " " : reader.GetString(reader.GetOrdinal("Username")),
                 Password = reader.IsDBNull(reader.GetOrdinal("Password")) ? " " : reader.GetString(reader.GetOrdinal("Password")),
                 IsAdmin = reader.GetBoolean(reader.GetOrdinal("IsAdmin")),
                 LastUpdated = reader.GetDateTime(reader.GetOrdinal("LastUpdated")),
                 OriginalPassword = reader.IsDBNull(reader.GetOrdinal("OriginalPassword")) ? " " : reader.GetString(reader.GetOrdinal("OriginalPassword")),
-                RecordState = Models.RecordStates.Loaded
+                RecordState = RecordStates.Loaded
             });
         }
         foreach (var account in AccountsList)
         {
-            account.AssociatedVirtualPc = VirtualPcRepository.VirtualPcsList.FirstOrDefault(vpc => vpc.VirtualPcID == account.AssociatedVirtualPc!.VirtualPcID);
+            account.AssociatedVirtualPc = VirtualPCs.FirstOrDefault(vpc => vpc.VirtualPcID == account.AssociatedVirtualPc!.VirtualPcID);
         }
     }
 
-    public static async Task AddAccount(Models.Account account)
+    public static async Task AddAccount(Account account)
     {
         await using var connection = new SqlConnection(GlobalSettings.ConnectionString);
         await connection.OpenAsync();
@@ -88,7 +91,7 @@ public static class AccountRepository
         }
     }
 
-    public static async Task UpdateAccount(Models.Account account)
+    public static async Task UpdateAccount(Account account)
     {
         await using var connection = new SqlConnection(GlobalSettings.ConnectionString);
         await connection.OpenAsync();

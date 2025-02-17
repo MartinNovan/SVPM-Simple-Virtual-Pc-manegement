@@ -1,9 +1,6 @@
-﻿using System.Collections.ObjectModel;
-using System.Text.Json;
-using Microsoft.Data.SqlClient;
-using SVPM.Pages.MainWindowPages;
-
-namespace SVPM.Pages.ConnectionPages
+﻿using SVPM.Models;
+//TODO: Change list view to collection view
+namespace SVPM.Views.ConnectionPages
 {
     public partial class SqlConnectionPage
     {
@@ -46,7 +43,7 @@ namespace SVPM.Pages.ConnectionPages
         {
             try
             {
-                if (sender is not ImageButton button || button.BindingContext is not Models.SqlConnection connection) return;
+                if (sender is not ImageButton button || button.BindingContext is not SqlConnection connection) return;
                 await Navigation.PushAsync(new SqlCreateConnectionPage(connection));
             }
             catch (Exception ex)
@@ -84,7 +81,6 @@ namespace SVPM.Pages.ConnectionPages
                 {
                     await DisplayAlert("Error", "The connections file was not found.", "OK");
                 }*/
-                return;
             }
             catch (Exception ex)
             {

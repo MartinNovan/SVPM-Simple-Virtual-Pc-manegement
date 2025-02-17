@@ -2,8 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:models="using:SVPM.Models"
-             x:Class="SVPM.Pages.ConnectionPages.SqlConnectionPage"
-             x:DataType="models:SqlConnection"
+             x:Class="SVPM.Views.ConnectionPages.SqlConnectionPage"
              NavigationPage.HasNavigationBar="False"
              Shell.TabBarIsVisible="False">
     <Shell.TitleView>
@@ -17,7 +16,7 @@
         <StackLayout Padding="10">
             <ListView x:Name="SqlConnectionListView" Loaded="SqlConnectionsListOnLoaded">
                 <ListView.ItemTemplate>
-                    <DataTemplate>
+                    <DataTemplate x:DataType="models:SqlConnection">
                         <ViewCell>
                             <StackLayout>
                                 <Grid ColumnDefinitions="Auto,*,Auto">
