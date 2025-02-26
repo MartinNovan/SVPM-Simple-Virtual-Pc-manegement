@@ -3,7 +3,6 @@ using System.Runtime.CompilerServices;
 using SVPM.Repositories;
 
 namespace SVPM.Models;
-
 public sealed class Customer : INotifyPropertyChanged
 {
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -13,7 +12,7 @@ public sealed class Customer : INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
-    public Guid CustomerID { get; init; }
+    public Guid CustomerId { get; init; }
 
     private string? _fullName;
     public string? FullName
@@ -84,6 +83,20 @@ public sealed class Customer : INotifyPropertyChanged
             }
         }
     }
+    private DateTime _updated;
+    public DateTime Updated
+    {
+        get => _updated;
+        set
+        {
+            if (_updated != value)
+            {
+                _updated = value;
+                NotifyPropertyChanged();
+            }
+        }
+    }
+    public string? VerifyHash { get; set; }
 
     private RecordStates _recordState;
     public RecordStates RecordState
@@ -99,19 +112,13 @@ public sealed class Customer : INotifyPropertyChanged
         }
     }
 
-    public string? OriginalFullName { get; private set; }
     public string? OriginalCustomerTag { get; private set; }
-    public string? OriginalEmail { get; private set; }
-    public string? OriginalPhone { get; private set; }
-    public string? OriginalNotes { get; private set; }
+    public string? OriginalVerifyHash { get; private set; }
     public RecordStates OriginalRecordState { get; private set; }
     public void InitializeOriginalValues()
     {
-        OriginalFullName = FullName;
         OriginalCustomerTag = CustomerTag;
-        OriginalEmail = Email;
-        OriginalPhone = Phone;
-        OriginalNotes = Notes;
+        OriginalVerifyHash = VerifyHash;
         OriginalRecordState = RecordState;
     }
 

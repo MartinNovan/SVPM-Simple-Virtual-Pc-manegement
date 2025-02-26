@@ -9,7 +9,6 @@ public partial class App
 
     protected override Window CreateWindow(IActivationState? activationState)
     {
-        //return new Window(new NavigationPage(new SqlConnectionPage()));
         return new Window(new AppShell());
     }
 }

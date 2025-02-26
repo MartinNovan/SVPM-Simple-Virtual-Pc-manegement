@@ -3,7 +3,7 @@ using SVPM.Repositories;
 using static SVPM.Repositories.AccountRepository;
 using static SVPM.Repositories.VirtualPcRepository;
 
-namespace SVPM.Views.CreateRecordsPages;
+namespace SVPM.Views.CreatingPages;
 
 public partial class CreateAccount
 {
@@ -31,17 +31,18 @@ public partial class CreateAccount
 
             var account = new Account
             {
-                AccountID = Guid.NewGuid(),
+                AccountId = Guid.NewGuid(),
                 Username = AccountUsernameEntry.Text,
                 Password = AccountPasswordEntry.Text,
-                IsAdmin = IsAdminCheckBox.IsChecked,
-                LastUpdated = DateTime.Now,
-                OriginalPassword = AccountOriginalPasswordEntry.Text,
+                Admin = IsAdminCheckBox.IsChecked,
+                Updated = DateTime.Now,
+                BackupPassword = AccountOriginalPasswordEntry.Text,
                 AssociatedVirtualPc = VirtualPcPicker.SelectedItem as VirtualPc,
                 RecordState = RecordStates.Created
             };
-
-            AccountsList.Add(account);
+            account.VerifyHash = CalculateHash.CalculateVerifyHash(null, null, account);
+            account.InitializeOriginalValues();
+            AccountRepository.Accounts.Add(account);
             await DisplayAlert("Success", "Account successfully added/edited.", "OK");
             await Navigation.PopAsync();
         }

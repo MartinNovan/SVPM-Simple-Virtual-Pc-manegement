@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using SVPM.Repositories;
 
@@ -13,7 +14,7 @@ public class VirtualPc : INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
-    public Guid VirtualPcID { get; init; }
+    public Guid VirtualPcId { get; init; }
 
     private string? _virtualPcName;
     public string? VirtualPcName
@@ -29,15 +30,15 @@ public class VirtualPc : INotifyPropertyChanged
         }
     }
 
-    private string? _serviceName;
-    public string? ServiceName
+    private string? _service;
+    public string? Service
     {
-        get => _serviceName;
+        get => _service;
         set
         {
-            if (_serviceName != value)
+            if (_service != value)
             {
-                _serviceName = value;
+                _service = value;
                 NotifyPropertyChanged();
             }
         }
@@ -57,8 +58,8 @@ public class VirtualPc : INotifyPropertyChanged
         }
     }
 
-    private int _cpuCores;
-    public int CPU_Cores
+    private string? _cpuCores;
+    public string? CpuCores
     {
         get => _cpuCores;
         set
@@ -71,29 +72,29 @@ public class VirtualPc : INotifyPropertyChanged
         }
     }
 
-    private int _ramSizeGb;
-    public int RAM_Size_GB
+    private string? _ramSize;
+    public string? RamSize
     {
-        get => _ramSizeGb;
+        get => _ramSize;
         set
         {
-            if (_ramSizeGb != value)
+            if (_ramSize != value)
             {
-                _ramSizeGb = value;
+                _ramSize = value;
                 NotifyPropertyChanged();
             }
         }
     }
 
-    private int _diskSizeGb;
-    public int Disk_Size_GB
+    private string? _diskSize;
+    public string? DiskSize
     {
-        get => _diskSizeGb;
+        get => _diskSize;
         set
         {
-            if (_diskSizeGb != value)
+            if (_diskSize != value)
             {
-                _diskSizeGb = value;
+                _diskSize = value;
                 NotifyPropertyChanged();
             }
         }
@@ -128,7 +129,7 @@ public class VirtualPc : INotifyPropertyChanged
     }
 
     private string? _ipAddress;
-    public string? IP_Address
+    public string? IpAddress
     {
         get => _ipAddress;
         set
@@ -142,7 +143,7 @@ public class VirtualPc : INotifyPropertyChanged
     }
 
     private string? _fqdn;
-    public string? FQDN
+    public string? Fqdn
     {
         get => _fqdn;
         set
@@ -168,25 +169,20 @@ public class VirtualPc : INotifyPropertyChanged
             }
         }
     }
-
-    private List<Customer>? _owningCustomers;
-    public List<Customer>? OwningCustomers
+    private DateTime _updated;
+    public DateTime Updated
     {
-        get => _owningCustomers;
+        get => _updated;
         set
         {
-            if (_owningCustomers != value)
+            if (_updated != value)
             {
-                _owningCustomers = value;
+                _updated = value;
                 NotifyPropertyChanged();
             }
         }
     }
-
-    public string OwningCustomersNames => OwningCustomers is { Count: > 0 }
-        ? string.Join(", ", OwningCustomers.Select(c => c.FullName))
-        : "No customers";
-
+    public string? VerifyHash { get; set; }
     private RecordStates _recordState;
     public RecordStates RecordState
     {
@@ -201,36 +197,50 @@ public class VirtualPc : INotifyPropertyChanged
         }
     }
 
-    public string? OriginalVirtualPcName { get; private set; }
-    public string? OriginalServiceName { get; private set; }
-    public string? OriginalOperatingSystem { get; private set; }
-    public int OriginalCPU_Cores { get; private set; }
-    public int OriginalRAM_Size_GB { get; private set; }
-    public int OriginalDisk_Size_GB { get; private set; }
-    public bool OriginalBackupping { get; private set; }
-    public bool OriginalAdministration { get; private set; }
-    public string? OriginalIP_Address { get; private set; }
-    public string? OriginalFQDN { get; private set; }
-    public string? OriginalNotes { get; private set; }
-    public List<Customer>? OriginalOwningCustomers { get; private set; }
+    private ObservableCollection<Customer>? _owningCustomers;
+    public ObservableCollection<Customer>? OwningCustomers
+    {
+        get => _owningCustomers;
+        set
+        {
+            if (_owningCustomers != value)
+            {
+                _owningCustomers = value;
+                SetOwningCustomersNames();
+                NotifyPropertyChanged();
+            }
+        }
+    }
+    public void SetOwningCustomersNames()
+    {
+        OwningCustomersNames = OwningCustomers is { Count: > 0 }
+            ? string.Join(", ", OwningCustomers.Select(c => c.FullName))
+            : "No customers";
+    }
+    private string? _owningCustomersNames;
 
-    public bool InDatabase { get; set; }
+    public string? OwningCustomersNames
+    {
+        get => _owningCustomersNames;
+        set
+        {
+            if (_owningCustomersNames != value)
+            {
+                _owningCustomersNames = value;
+                NotifyPropertyChanged();
+            }
+        }
+    }
+
+    public string? OriginalVirtualPcName { get; private set; }
+    public string? OriginalVerifyHash { get; private set; }
+    public RecordStates OriginalRecordState { get; private set; }
 
     public void InitializeOriginalValues()
     {
-        if (RecordState != RecordStates.Loaded) return;
         OriginalVirtualPcName = VirtualPcName;
-        OriginalServiceName = ServiceName;
-        OriginalOperatingSystem = OperatingSystem;
-        OriginalCPU_Cores = CPU_Cores;
-        OriginalRAM_Size_GB = RAM_Size_GB;
-        OriginalDisk_Size_GB = Disk_Size_GB;
-        OriginalBackupping = Backupping;
-        OriginalAdministration = Administration;
-        OriginalIP_Address = IP_Address;
-        OriginalFQDN = FQDN;
-        OriginalNotes = Notes;
-        OriginalOwningCustomers = OwningCustomers;
+        OriginalVerifyHash = VerifyHash;
+        OriginalRecordState = RecordState;
     }
 
     public async Task SaveChanges()

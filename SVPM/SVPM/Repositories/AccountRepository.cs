@@ -8,10 +8,10 @@ namespace SVPM.Repositories;
 
 public static class AccountRepository
 {
-    public static ObservableCollection<Account> AccountsList { get; set; } = [];
+    public static ObservableCollection<Account> Accounts { get; } = [];
     public static async Task GetAllAccountsAsync()
     {
-        AccountsList.Clear();
+        Accounts.Clear();
         await using var connection = new SqlConnection(GlobalSettings.ConnectionString);
         await connection.OpenAsync();
 
@@ -21,21 +21,23 @@ public static class AccountRepository
 
         while (await reader.ReadAsync())
         {
-            AccountsList.Add(new Account
+            Accounts.Add(new Account
             {
-                AccountID = reader.GetGuid(reader.GetOrdinal("AccountID")),
-                AssociatedVirtualPc = new VirtualPc { VirtualPcID = reader.GetGuid(reader.GetOrdinal("VirtualPcID")) },
-                Username = reader.IsDBNull(reader.GetOrdinal("Username")) ? " " : reader.GetString(reader.GetOrdinal("Username")),
-                Password = reader.IsDBNull(reader.GetOrdinal("Password")) ? " " : reader.GetString(reader.GetOrdinal("Password")),
-                IsAdmin = reader.GetBoolean(reader.GetOrdinal("IsAdmin")),
-                LastUpdated = reader.GetDateTime(reader.GetOrdinal("LastUpdated")),
-                OriginalPassword = reader.IsDBNull(reader.GetOrdinal("OriginalPassword")) ? " " : reader.GetString(reader.GetOrdinal("OriginalPassword")),
+                AccountId = reader.GetGuid(reader.GetOrdinal("AccountId")),
+                AssociatedVirtualPc = new VirtualPc { VirtualPcId = reader.GetGuid(reader.GetOrdinal("VirtualPcId")) },
+                Username = reader.GetString(reader.GetOrdinal("Username")),
+                Password = reader.GetString(reader.GetOrdinal("Password")),
+                BackupPassword = reader.IsDBNull(reader.GetOrdinal("BackupPassword")) ? " " : reader.GetString(reader.GetOrdinal("BackupPassword")),
+                Admin = reader.GetBoolean(reader.GetOrdinal("Admin")),
+                Updated = reader.GetDateTime(reader.GetOrdinal("Updated")),
+                VerifyHash = reader.GetString(reader.GetOrdinal("VerifyHash")),
                 RecordState = RecordStates.Loaded
             });
         }
-        foreach (var account in AccountsList)
+        foreach (var account in Accounts)
         {
-            account.AssociatedVirtualPc = VirtualPCs.FirstOrDefault(vpc => vpc.VirtualPcID == account.AssociatedVirtualPc!.VirtualPcID);
+            account.AssociatedVirtualPc = VirtualPCs.FirstOrDefault(vpc => vpc.VirtualPcId == account.AssociatedVirtualPc!.VirtualPcId);
+            account.InitializeOriginalValues();
         }
     }
 
@@ -46,20 +48,23 @@ public static class AccountRepository
         try
         {
             var query = $@"
-            INSERT INTO {GlobalSettings.AccountTable} (AccountID , VirtualPcID, Username, Password, IsAdmin, LastUpdated, OriginalPassword)
-            VALUES (@AccountID, @VirtualPcID, @Username, @Password, @IsAdmin, @LastUpdated, @OriginalPassword)";
+            INSERT INTO {GlobalSettings.AccountTable} (AccountId , VirtualPcId, Username, Password, BackupPassword, Admin, Updated, VerifyHash)
+            VALUES (@AccountId, @VirtualPcId, @Username, @Password, @BackupPassword, @Admin, @Updated, @VerifyHash)";
 
             await using var command = new SqlCommand(query, connection);
-            command.Parameters.AddWithValue("@AccountID", account.AccountID);
+            command.Parameters.AddWithValue("@AccountId", account.AccountId);
             if (account.AssociatedVirtualPc != null)
-                command.Parameters.AddWithValue("@VirtualPcID", account.AssociatedVirtualPc.VirtualPcID);
+                command.Parameters.AddWithValue("@VirtualPcId", account.AssociatedVirtualPc.VirtualPcId);
             command.Parameters.AddWithValue("@Username", account.Username ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@Password", account.Password ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@IsAdmin", account.IsAdmin);
-            command.Parameters.AddWithValue("@LastUpdated", account.LastUpdated);
-            command.Parameters.AddWithValue("@OriginalPassword", account.OriginalPassword ?? (object)DBNull.Value);
+            command.Parameters.AddWithValue("@BackupPassword", account.BackupPassword ?? (object)DBNull.Value);
+            command.Parameters.AddWithValue("@Admin", account.Admin);
+            command.Parameters.AddWithValue("@Updated", account.Updated);
+            command.Parameters.AddWithValue("@VerifyHash", account.VerifyHash);
 
             await command.ExecuteNonQueryAsync();
+            account.RecordState = RecordStates.Loaded;
+            account.InitializeOriginalValues();
         }
         catch (Exception ex)
         {
@@ -67,22 +72,27 @@ public static class AccountRepository
         }
     }
 
-    public static async Task DeleteAccount(Guid accountId)
+    public static async Task DeleteAccount(Account account)
     {
+        if(account.OriginalRecordState != RecordStates.Loaded) {Accounts.Remove(account); return;}
         await using var connection = new SqlConnection(GlobalSettings.ConnectionString);
         await connection.OpenAsync();
         await using var transaction = await connection.BeginTransactionAsync();
 
+        var isChange = await LookForChange(account, connection, transaction as SqlTransaction);
+        if (isChange) return;
+
         try
         {
-            var query = $"DELETE FROM {GlobalSettings.AccountTable} WHERE AccountID = @AccountID";
+            var query = $"DELETE FROM {GlobalSettings.AccountTable} WHERE AccountId = @AccountId";
             await using (var command = new SqlCommand(query, connection, transaction as SqlTransaction))
             {
-                command.Parameters.AddWithValue("@AccountID", accountId);
+                command.Parameters.AddWithValue("@AccountId", account.AccountId);
                 await command.ExecuteNonQueryAsync();
             }
 
             await transaction.CommitAsync();
+            Accounts.Remove(account);
         }
         catch (Exception ex)
         {
@@ -93,34 +103,102 @@ public static class AccountRepository
 
     public static async Task UpdateAccount(Account account)
     {
+        if (account.OriginalRecordState != RecordStates.Loaded)
+        {
+            await AddAccount(account);
+            return;
+        }
         await using var connection = new SqlConnection(GlobalSettings.ConnectionString);
         await connection.OpenAsync();
         await using var transaction = await connection.BeginTransactionAsync();
+
+        var isChange = await LookForChange(account, connection, transaction as SqlTransaction);
+        if (isChange) return;
 
         try
         {
             var query = $@"
             UPDATE {GlobalSettings.AccountTable}
-            SET VirtualPcID = @VirtualPcID, Username = @Username, Password = @Password, IsAdmin = @IsAdmin, LastUpdated = @LastUpdated, OriginalPassword = @OriginalPassword
-            WHERE AccountID = @AccountID";
+            SET VirtualPcId = @VirtualPcId, Username = @Username, Password = @Password, BackupPassword = @BackupPassword, Admin = @Admin, Updated = @Updated, VerifyHash = @VerifyHash
+            WHERE AccountId = @AccountId";
 
             await using var command = new SqlCommand(query, connection, transaction as SqlTransaction);
             if (account.AssociatedVirtualPc != null)
-                command.Parameters.AddWithValue("@VirtualPcID", account.AssociatedVirtualPc.VirtualPcID);
-            command.Parameters.AddWithValue("@Username", account.Username ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@Password", account.Password ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@IsAdmin", account.IsAdmin);
-            command.Parameters.AddWithValue("@LastUpdated", account.LastUpdated);
-            command.Parameters.AddWithValue("@OriginalPassword", account.OriginalPassword);
-            command.Parameters.AddWithValue("@AccountID", account.AccountID);
+                command.Parameters.AddWithValue("@VirtualPcId", account.AssociatedVirtualPc.VirtualPcId);
+            command.Parameters.AddWithValue("@Username", account.Username);
+            command.Parameters.AddWithValue("@Password", account.Password);
+            command.Parameters.AddWithValue("@BackupPassword", account.BackupPassword);
+            command.Parameters.AddWithValue("@Admin", account.Admin);
+            command.Parameters.AddWithValue("@Updated", account.Updated);
+            command.Parameters.AddWithValue("@VerifyHash", account.VerifyHash);
+            command.Parameters.AddWithValue("@AccountId", account.AccountId);
 
             await command.ExecuteNonQueryAsync();
             await transaction.CommitAsync();
+            account.RecordState = RecordStates.Loaded;
+            account.InitializeOriginalValues();
         }
         catch (Exception ex)
         {
             await transaction.RollbackAsync();
             await Application.Current!.Windows[0].Page!.DisplayAlert("Error", $"Error when updating account: {ex.Message}", "OK");
+        }
+    }
+    private static async Task<bool> LookForChange(Account account, SqlConnection connection, SqlTransaction? transaction = null)
+    {
+        try
+        {
+            var selectQuery = $"SELECT VerifyHash FROM {GlobalSettings.AccountTable} WHERE AccountId = @AccountId";
+
+            await using var selectCommand = new SqlCommand(selectQuery, connection, transaction);
+            selectCommand.Parameters.AddWithValue("@AccountId", account.AccountId);
+
+            await using var reader = await selectCommand.ExecuteReaderAsync();
+            if (!reader.HasRows)
+            {
+                await Application.Current!.Windows[0].Page!.DisplayAlert("Error", "Account not found in the database.", "OK");
+                return true;
+            }
+
+            await reader.ReadAsync();
+            var dbVerifyHash = reader.GetString(reader.GetOrdinal("VerifyHash"));
+            reader.Close();
+
+            if (dbVerifyHash != account.OriginalVerifyHash)
+            {
+                var selectQuery2 = $"Select * FROM {GlobalSettings.AccountTable} WHERE AccountId = @AccountId";
+                await using var selectCommand2 = new SqlCommand(selectQuery2, connection, transaction);
+                selectCommand2.Parameters.AddWithValue("@AccountId", account.AccountId);
+                await using var reader2 = await selectCommand2.ExecuteReaderAsync();
+
+                await reader2.ReadAsync();
+                var dbUsername = reader2.GetString(reader2.GetOrdinal("Username"));
+                var dbPassword = reader2.GetString(reader2.GetOrdinal("Password"));
+                var dbBackupPassword = reader2.GetString(reader2.GetOrdinal("BackupPassword"));
+                var dbAdmin = reader2.GetBoolean(reader2.GetOrdinal("Admin"));
+                await reader2.CloseAsync();
+
+                bool confirm = await Application.Current!.Windows[0].Page!.DisplayAlert(
+                    "Conflict Detected",
+                    $"Database values have changed.\n\n"
+                    + $"Current values in DB:\n"
+                    + $"Username: {dbUsername}\nPassword: {dbPassword}\nBackup Password: {dbBackupPassword}\nAdmin: {dbAdmin}\n\n"
+                    + $"Your current values:\n"
+                    + $"Username: {account.Username}\nPassword: {account.Password}\nBackup Password: {account.BackupPassword}\nAdmin: {account.Admin}\n\n"
+                    + "Do you want to proceed?",
+                    "Yes", "No");
+
+                if (!confirm)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        catch (Exception ex)
+        {
+            await Application.Current!.Windows[0].Page!.DisplayAlert("Error", $"Error when looking for change:{ex.Message}","OK");
+            return true;
         }
     }
 }

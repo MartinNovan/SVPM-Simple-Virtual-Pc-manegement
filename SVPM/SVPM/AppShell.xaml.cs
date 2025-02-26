@@ -1,11 +1,11 @@
 ﻿using System.Collections.ObjectModel;
 using System.Text.Json;
 using Microsoft.Data.SqlClient;
-using SVPM.Views.MainWindowPages;
+using SVPM.Views.MainPages;
 using SqlConnection = SVPM.Models.SqlConnection;
 
 namespace SVPM;
-
+//TODO Dodělat setting page, ukládat neuložené hodnoty například to TEMP souboru, možnost automaticky (např. 5min intervali) ukládat do databáze a kontrolovat změny v databázi a dodělat setting JSON soubor
 public partial class AppShell
 {
     public static ObservableCollection<SqlConnection> SqlConnections { get; } = new();
@@ -100,7 +100,7 @@ public partial class AppShell
     {
         if (UploadAllCheckBox.IsChecked)
         {
-            await DisplayAlert("Warning", "With this setting 'ON' all your local data will be pushed to database regardless if they weren't changed!", "OK" );
+            await DisplayAlert("Warning", "With this setting 'ON' all your local data will be pushed to database regardless if they were or weren't changed!", "OK" );
             Console.WriteLine("Turning on this mode.");
         }
         else

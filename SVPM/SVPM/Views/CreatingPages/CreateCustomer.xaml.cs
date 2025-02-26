@@ -3,7 +3,7 @@ using static SVPM.Repositories.CustomerRepository;
 using static SVPM.Repositories.CustomersVirtualPCsRepository;
 using static SVPM.Repositories.VirtualPcRepository;
 
-namespace SVPM.Views.CreateRecordsPages;
+namespace SVPM.Views.CreatingPages;
 public partial class CreateCustomer
 {
     private static Customer? _updatedCustomer;
@@ -60,7 +60,7 @@ public partial class CreateCustomer
            if (_updatedCustomer != null)
            {
                var existingCustomer = Customers
-                   .FirstOrDefault(c => c.CustomerID == _updatedCustomer.CustomerID);
+                   .FirstOrDefault(c => c.CustomerId == _updatedCustomer.CustomerId);
 
                if (existingCustomer != null)
                {
@@ -69,6 +69,8 @@ public partial class CreateCustomer
                    existingCustomer.Email = CustomerEmailEntry.Text;
                    existingCustomer.Phone = CustomerPhoneEntry.Text;
                    existingCustomer.Notes = CustomerNotesEntry.Text;
+                   existingCustomer.VerifyHash = CalculateHash.CalculateVerifyHash(existingCustomer);
+                   existingCustomer.Updated = DateTime.Now;
                    existingCustomer.RecordState = RecordStates.Updated;
 
                    foreach (var vpc in VirtualPCs)
@@ -77,8 +79,8 @@ public partial class CreateCustomer
                        {
                            var customerVirtualPc = new Mapping
                            {
-                               CustomerID = existingCustomer.CustomerID,
-                               VirtualPcID = vpc.VirtualPcID,
+                               CustomerId = existingCustomer.CustomerId,
+                               VirtualPcId = vpc.VirtualPcId,
                                RecordState = RecordStates.Created
                            };
 
@@ -88,7 +90,7 @@ public partial class CreateCustomer
                        else if (!VpcCollectionView.SelectedItems.Contains(vpc) && vpc.OwningCustomers != null && vpc.OwningCustomers.Contains(existingCustomer))
                        {
                            var deleteMapping = Mappings.FirstOrDefault(m =>
-                               m.CustomerID == existingCustomer.CustomerID && m.VirtualPcID == vpc.VirtualPcID && m.RecordState != RecordStates.Deleted);
+                               m.CustomerId == existingCustomer.CustomerId && m.VirtualPcId == vpc.VirtualPcId && m.RecordState != RecordStates.Deleted);
                            if (deleteMapping != null) deleteMapping.RecordState = RecordStates.Deleted;
                            vpc.OwningCustomers.Remove(existingCustomer);
                        }
@@ -99,14 +101,17 @@ public partial class CreateCustomer
            {
                var customer = new Customer
                {
-                   CustomerID = Guid.NewGuid(),
+                   CustomerId = Guid.NewGuid(),
                    FullName = CustomerFullNameEntry.Text,
                    CustomerTag = CustomerTagEntry.Text,
                    Email = CustomerEmailEntry.Text,
                    Phone = CustomerPhoneEntry.Text,
                    Notes = CustomerNotesEntry.Text,
+                   Updated = DateTime.Now,
                    RecordState = RecordStates.Created
                };
+               customer.VerifyHash = CalculateHash.CalculateVerifyHash(customer);
+               customer.InitializeOriginalValues();
                Customers.Add(customer);
                if (VpcCollectionView.SelectedItems.Count == 0)
                {
@@ -120,8 +125,8 @@ public partial class CreateCustomer
                    {
                        var customerVirtualPc = new Mapping
                        {
-                           CustomerID = customer.CustomerID,
-                           VirtualPcID = selectedVirtualPc.VirtualPcID,
+                           CustomerId = customer.CustomerId,
+                           VirtualPcId = selectedVirtualPc.VirtualPcId,
                            RecordState = RecordStates.Created
                        };
 

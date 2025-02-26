@@ -1,0 +1,170 @@
+﻿using System.Collections.ObjectModel;
+using SVPM.Models;
+using static SVPM.Repositories.CustomerRepository;
+using static SVPM.Repositories.CustomersVirtualPCsRepository;
+using static SVPM.Repositories.VirtualPcRepository;
+
+namespace SVPM.Views.CreatingPages;
+public partial class CreateVirtualPc
+{
+    private static VirtualPc? _updatedVirtualPc;
+    public CreateVirtualPc(VirtualPc? virtualPc = null)
+    {
+        InitializeComponent();
+        _updatedVirtualPc = virtualPc;
+    }
+    private void CustomerCollectionView_OnLoaded(object? sender, EventArgs e)
+    {
+        CustomerCollectionView.ItemsSource = Customers.Where(c => c.RecordState != RecordStates.Deleted).OrderBy(c => c.FullName);
+        if (_updatedVirtualPc != null)
+        {
+            PopulateFields(_updatedVirtualPc);
+        }
+    }
+
+    private void PopulateFields(VirtualPc? virtualPc)
+    {
+        VirtualPcNameEntry.Text = virtualPc?.VirtualPcName ?? string.Empty;
+        ServiceNameEntry.Text = virtualPc?.Service ?? string.Empty;
+        OperatingSystemEntry.Text = virtualPc?.OperatingSystem ?? string.Empty;
+        CpuCoresEntry.Text = virtualPc?.CpuCores ?? string.Empty;
+        RamSizeEntry.Text = virtualPc?.RamSize ?? string.Empty;
+        DiskSizeEntry.Text = virtualPc?.DiskSize ?? string.Empty;
+        BackuppingCheckBox.IsChecked = virtualPc!.Backupping;
+        AdministrationCheckBox.IsChecked = virtualPc.Administration;
+        IpAddressEntry.Text = virtualPc.IpAddress ?? string.Empty;
+        FqdnEntry.Text = virtualPc.Fqdn ?? string.Empty;
+        NotesEntry.Text = virtualPc.Notes ?? string.Empty;
+        if (virtualPc.OwningCustomers != null)
+        {
+            foreach (var owningCustomer in virtualPc.OwningCustomers)
+            {
+                CustomerCollectionView.SelectedItems.Add(owningCustomer);
+            }
+        }
+    }
+
+    private void OnSearchTextChanged(object? sender, TextChangedEventArgs e)
+    {
+        string searchText = e.NewTextValue?.ToLower() ?? "";
+
+        var match = Customers
+            .FirstOrDefault(c => c.FullName != null && c.FullName.ToLower().Contains(searchText) && c.RecordState != RecordStates.Deleted);
+
+        if (match != null)
+        {
+            CustomerCollectionView.ScrollTo(match, position: ScrollToPosition.Start, animate: true);
+        }
+    }
+    private async void VirtualPcConfirmClicked(object sender, EventArgs e)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(VirtualPcNameEntry.Text))
+            {
+                await DisplayAlert("Error", "Virtual PC name is required.", "OK");
+                return;
+            }
+
+            if (_updatedVirtualPc != null)
+            {
+                var existingVirtualPc = VirtualPCs
+                    .FirstOrDefault(vpc => vpc.VirtualPcId == _updatedVirtualPc.VirtualPcId);
+                if (existingVirtualPc != null)
+                {
+                    existingVirtualPc.VirtualPcName = VirtualPcNameEntry.Text;
+                    existingVirtualPc.Service = ServiceNameEntry.Text;
+                    existingVirtualPc.OperatingSystem = OperatingSystemEntry.Text;
+                    existingVirtualPc.CpuCores = CpuCoresEntry.Text;
+                    existingVirtualPc.RamSize = RamSizeEntry.Text;
+                    existingVirtualPc.DiskSize = DiskSizeEntry.Text;
+                    existingVirtualPc.Backupping = BackuppingCheckBox.IsChecked;
+                    existingVirtualPc.Administration = AdministrationCheckBox.IsChecked;
+                    existingVirtualPc.IpAddress = IpAddressEntry.Text;
+                    existingVirtualPc.Fqdn = FqdnEntry.Text;
+                    existingVirtualPc.Notes = NotesEntry.Text;
+                    existingVirtualPc.Updated = DateTime.Now;
+                    existingVirtualPc.RecordState = RecordStates.Updated;
+
+                    foreach (var customer in Customers)
+                    {
+                        if (!CustomerCollectionView.SelectedItems.Contains(customer) &&
+                            existingVirtualPc.OwningCustomers!.Contains(customer))
+                        {
+                            var deleteMapping = Mappings.FirstOrDefault(m =>
+                                m.CustomerId == customer.CustomerId &&
+                                m.VirtualPcId == existingVirtualPc.VirtualPcId &&
+                                m.RecordState != RecordStates.Deleted);
+                            if (deleteMapping != null) deleteMapping.RecordState = RecordStates.Deleted;
+                            existingVirtualPc.OwningCustomers.Remove(customer);
+                        }
+                        else if (CustomerCollectionView.SelectedItems.Contains(customer) &&
+                                 !existingVirtualPc.OwningCustomers!.Contains(customer))
+                        {
+                            var customerVirtualPc = new Mapping
+                            {
+                                CustomerId = customer.CustomerId,
+                                VirtualPcId = existingVirtualPc.VirtualPcId,
+                                RecordState = RecordStates.Created
+                            };
+                            Mappings.Add(customerVirtualPc);
+                            existingVirtualPc.OwningCustomers.Add(customer);
+                        }
+                    }
+                    existingVirtualPc.VerifyHash = CalculateHash.CalculateVerifyHash(null, existingVirtualPc);
+                    existingVirtualPc.SetOwningCustomersNames();
+                }
+            }
+            else
+            {
+                var virtualPc = new VirtualPc
+                {
+                    VirtualPcId = Guid.NewGuid(),
+                    VirtualPcName = VirtualPcNameEntry.Text,
+                    Service = ServiceNameEntry.Text,
+                    OperatingSystem = OperatingSystemEntry.Text,
+                    CpuCores = CpuCoresEntry.Text,
+                    RamSize = RamSizeEntry.Text,
+                    DiskSize = DiskSizeEntry.Text,
+                    Backupping = BackuppingCheckBox.IsChecked,
+                    Administration = AdministrationCheckBox.IsChecked,
+                    IpAddress = IpAddressEntry.Text,
+                    Fqdn = FqdnEntry.Text,
+                    Notes = NotesEntry.Text,
+                    Updated = DateTime.Now,
+                    RecordState = RecordStates.Created,
+                    OwningCustomers = new ObservableCollection<Customer>()
+                };
+                if (CustomerCollectionView.SelectedItems.Count != 0)
+                {
+                    foreach (Customer selectedCustomer in CustomerCollectionView.SelectedItems)
+                    {
+                        if (selectedCustomer is not null)
+                        {
+                            var customerVirtualPc = new Mapping
+                            {
+                                CustomerId = selectedCustomer.CustomerId,
+                                VirtualPcId = virtualPc.VirtualPcId,
+                                RecordState = RecordStates.Created
+                            };
+                            Mappings.Add(customerVirtualPc);
+                            virtualPc.OwningCustomers?.Add(selectedCustomer);
+                        }
+                    }
+                    virtualPc.VerifyHash = CalculateHash.CalculateVerifyHash(null, virtualPc);
+                    virtualPc.SetOwningCustomersNames();
+                }
+                virtualPc.InitializeOriginalValues();
+                VirtualPCs.Add(virtualPc);
+            }
+            await DisplayAlert("Success", "Virtual PC successfully added/edited.", "OK");
+            CustomerCollectionView.ItemsSource = null;
+            CustomerCollectionView.SelectedItems = null;
+            await Navigation.PopAsync();
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Error", ex.Message, "OK");
+        }
+    }
+}

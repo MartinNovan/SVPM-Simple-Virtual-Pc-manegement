@@ -1,8 +1,8 @@
 ﻿using SVPM.Models;
-using SVPM.Views.CreateRecordsPages;
+using SVPM.Views.CreatingPages;
 using static SVPM.Repositories.VirtualPcRepository;
 //TODO: Change list view to collection view
-namespace SVPM.Views.SubWindowPages
+namespace SVPM.Views.SubPages
 {
     public partial class CustomerVirtualPCsPage
     {
@@ -50,7 +50,7 @@ namespace SVPM.Views.SubWindowPages
             {
                 if (e.Item is VirtualPc selectedVirtualPc)
                 {
-                    await Navigation.PushAsync(new VirtualPcAccountsPage(selectedVirtualPc.VirtualPcID));
+                    await Navigation.PushAsync(new VirtualPcAccountsPage(selectedVirtualPc));
                 }
             }
             catch (Exception ex)

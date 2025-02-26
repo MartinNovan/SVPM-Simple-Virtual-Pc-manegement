@@ -3,7 +3,6 @@ using System.Runtime.CompilerServices;
 using SVPM.Repositories;
 
 namespace SVPM.Models;
-
 public class Account : INotifyPropertyChanged
 {
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -12,9 +11,7 @@ public class Account : INotifyPropertyChanged
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
-
-    public Guid AccountID { get; set; }
-
+    public Guid AccountId { get; set; }
     private VirtualPc? _associatedVirtualPc;
     public VirtualPc? AssociatedVirtualPc
     {
@@ -29,7 +26,6 @@ public class Account : INotifyPropertyChanged
             }
         }
     }
-
     private string? _username;
     public string? Username
     {
@@ -43,7 +39,6 @@ public class Account : INotifyPropertyChanged
             }
         }
     }
-
     private string? _password;
     public string? Password
     {
@@ -57,51 +52,49 @@ public class Account : INotifyPropertyChanged
             }
         }
     }
-
-    private bool _isAdmin;
-    public bool IsAdmin
+    private string? _backupPassword;
+    public string? BackupPassword
     {
-        get => _isAdmin;
+        get => _backupPassword;
         set
         {
-            if (_isAdmin != value)
+            if (_backupPassword != value)
             {
-                _isAdmin = value;
+                _backupPassword = value;
+                NotifyPropertyChanged();
+            }
+        }
+    }
+    private bool _admin;
+    public bool Admin
+    {
+        get => _admin;
+        set
+        {
+            if (_admin != value)
+            {
+                _admin = value;
                 NotifyPropertyChanged();
             }
         }
     }
 
-    private DateTime? _lastUpdated;
-    public DateTime? LastUpdated
+    private DateTime? _updated;
+    public DateTime? Updated
     {
-        get => _lastUpdated;
+        get => _updated;
         set
         {
-            if (_lastUpdated != value)
+            if (_updated != value)
             {
-                _lastUpdated = value;
+                _updated = value;
                 NotifyPropertyChanged();
             }
         }
     }
-
-    private string? _originalPassword;
-    public string? OriginalPassword
-    {
-        get => _originalPassword;
-        set
-        {
-            if (_originalPassword != value)
-            {
-                _originalPassword = value;
-                NotifyPropertyChanged();
-            }
-        }
-    }
+    public string? VerifyHash { get; set; }
 
     public string? VirtualPcName => AssociatedVirtualPc?.VirtualPcName;
-
     private RecordStates _recordState;
     public RecordStates RecordState
     {
@@ -115,7 +108,13 @@ public class Account : INotifyPropertyChanged
             }
         }
     }
-
+    public string? OriginalVerifyHash { get; private set; }
+    public RecordStates OriginalRecordState { get; private set; }
+    public void InitializeOriginalValues()
+    {
+        OriginalVerifyHash = VerifyHash;
+        OriginalRecordState = RecordState;
+    }
     public async Task SaveChanges()
     {
         try
@@ -128,7 +127,7 @@ public class Account : INotifyPropertyChanged
                     await AccountRepository.AddAccount(this);
                     break;
                 case RecordStates.Deleted:
-                    await AccountRepository.DeleteAccount(AccountID);
+                    await AccountRepository.DeleteAccount(this);
                     break;
                 case RecordStates.Updated:
                     await AccountRepository.UpdateAccount(this);

@@ -22,12 +22,14 @@ public static class CustomerRepository
         {
             Customers.Add(new Customer
             {
-                CustomerID = reader.GetGuid(reader.GetOrdinal("CustomerID")),
+                CustomerId = reader.GetGuid(reader.GetOrdinal("CustomerId")),
                 FullName = reader.GetString(reader.GetOrdinal("FullName")),
                 CustomerTag = reader.GetString(reader.GetOrdinal("CustomerTag")),
-                Email = reader.IsDBNull(reader.GetOrdinal("Email")) ? null : reader.GetString(reader.GetOrdinal("Email")),
-                Phone = reader.IsDBNull(reader.GetOrdinal("Phone")) ? null : reader.GetString(reader.GetOrdinal("Phone")),
-                Notes = reader.IsDBNull(reader.GetOrdinal("CustomerNotes")) ? null : reader.GetString(reader.GetOrdinal("CustomerNotes")),
+                Email = reader.GetString(reader.GetOrdinal("Email")),
+                Phone = reader.GetString(reader.GetOrdinal("Phone")),
+                Notes = reader.GetString(reader.GetOrdinal("Notes")),
+                VerifyHash = reader.GetString(reader.GetOrdinal("VerifyHash")),
+                Updated = reader.GetDateTime(reader.GetOrdinal("Updated")),
                 RecordState = RecordStates.Loaded,
             });
         }
@@ -46,16 +48,18 @@ public static class CustomerRepository
             var conflict = await LookForConflict(customer, connection);
             if (conflict) return;
             var query = $@"
-            INSERT INTO {GlobalSettings.CustomerTable} (CustomerID ,FullName, CustomerTag, Email, Phone, CustomerNotes)
-            VALUES (@CustomerID, @FullName, @CustomerTag, @Email, @Phone, @Notes)";
+            INSERT INTO {GlobalSettings.CustomerTable} (CustomerId ,FullName, CustomerTag, Email, Phone, Notes, VerifyHash, Updated)
+            VALUES (@CustomerId, @FullName, @CustomerTag, @Email, @Phone, @Notes, @VerifyHash, @Updated)";
 
             await using var command = new SqlCommand(query, connection);
-            command.Parameters.AddWithValue("@CustomerID", customer.CustomerID);
+            command.Parameters.AddWithValue("@CustomerId", customer.CustomerId);
             command.Parameters.AddWithValue("@FullName", customer.FullName ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@CustomerTag", customer.CustomerTag ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@Email", customer.Email ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@Phone", customer.Phone ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@Notes", customer.Notes ?? (object)DBNull.Value);
+            command.Parameters.AddWithValue("@VerifyHash", customer.VerifyHash);
+            command.Parameters.AddWithValue("@Updated", customer.Updated);
 
             await command.ExecuteNonQueryAsync();
 
@@ -70,7 +74,7 @@ public static class CustomerRepository
 
     public static async Task DeleteCustomer(Customer customer)
     {
-        if(customer.OriginalRecordState != RecordStates.Loaded) return;
+        if (customer.OriginalRecordState != RecordStates.Loaded){ Customers.Remove(customer); return;}
         await using var connection = new SqlConnection(GlobalSettings.ConnectionString);
         await connection.OpenAsync();
         await using var transaction = await connection.BeginTransactionAsync();
@@ -79,22 +83,22 @@ public static class CustomerRepository
             var isChange = await LookForChange(customer, connection, transaction as SqlTransaction);
             if (isChange) return;
 
-            var deleteQuery = $"DELETE FROM {GlobalSettings.CustomerTable} WHERE CustomerID = @CustomerID";
+            var deleteQuery = $"DELETE FROM {GlobalSettings.CustomerTable} WHERE CustomerId = @CustomerId";
             await using (var deleteCommand = new SqlCommand(deleteQuery, connection, transaction as SqlTransaction))
             {
-                deleteCommand.Parameters.AddWithValue("@CustomerID", customer.CustomerID);
+                deleteCommand.Parameters.AddWithValue("@CustomerId", customer.CustomerId);
                 await deleteCommand.ExecuteNonQueryAsync();
             }
 
-            var checkQuery = $"SELECT COUNT(*) FROM {GlobalSettings.CustomersVirtualPcTable} WHERE CustomerID = @CustomerID";
+            var checkQuery = $"SELECT COUNT(*) FROM {GlobalSettings.CustomersVirtualPcTable} WHERE CustomerId = @CustomerId";
             await using (var checkCommand = new SqlCommand(checkQuery, connection, transaction as SqlTransaction))
             {
-                checkCommand.Parameters.AddWithValue("@CustomerID", customer.CustomerID);
+                checkCommand.Parameters.AddWithValue("@CustomerId", customer.CustomerId);
                 var count = (int)(await checkCommand.ExecuteScalarAsync() ?? 0);
 
                 if (count > 0)
                 {
-                    throw new Exception("Some linked records were not deleted properly.");
+                    await Application.Current?.Windows[0].Page?.DisplayAlert("Error", "Some mappings weren't properly deleted!", "OK")!;
                 }
             }
             await transaction.CommitAsync();
@@ -126,10 +130,9 @@ public static class CustomerRepository
             var conflict = await LookForConflict(customer, connection);
             if (conflict) return;
 
-            var updateQuery = $@"
-            UPDATE {GlobalSettings.CustomerTable}
-            SET FullName = @FullName, CustomerTag = @CustomerTag, Email = @Email, Phone = @Phone, CustomerNotes = @Notes
-            WHERE CustomerID = @CustomerID";
+            var updateQuery = $@"UPDATE {GlobalSettings.CustomerTable}
+            SET FullName = @FullName, CustomerTag = @CustomerTag, Email = @Email, Phone = @Phone, Notes = @Notes, VerifyHash = @VerifyHash, Updated = @Updated
+            WHERE CustomerId = @CustomerId";
 
             await using var updateCommand = new SqlCommand(updateQuery, connection, transaction as SqlTransaction);
             updateCommand.Parameters.AddWithValue("@FullName", customer.FullName ?? (object)DBNull.Value);
@@ -137,7 +140,9 @@ public static class CustomerRepository
             updateCommand.Parameters.AddWithValue("@Email", customer.Email ?? (object)DBNull.Value);
             updateCommand.Parameters.AddWithValue("@Phone", customer.Phone ?? (object)DBNull.Value);
             updateCommand.Parameters.AddWithValue("@Notes", customer.Notes ?? (object)DBNull.Value);
-            updateCommand.Parameters.AddWithValue("@CustomerID", customer.CustomerID);
+            updateCommand.Parameters.AddWithValue("@VerifyHash", customer.VerifyHash);
+            updateCommand.Parameters.AddWithValue("@Updated", customer.Updated);
+            updateCommand.Parameters.AddWithValue("@CustomerId", customer.CustomerId);
 
             await updateCommand.ExecuteNonQueryAsync();
             await transaction.CommitAsync();
@@ -155,13 +160,10 @@ public static class CustomerRepository
     {
         try
         {
-            var selectQuery = $@"
-            SELECT FullName, CustomerTag, Email, Phone, CustomerNotes
-            FROM {GlobalSettings.CustomerTable}
-            WHERE CustomerID = @CustomerID";
+            var selectQuery = $"SELECT VerifyHash FROM {GlobalSettings.CustomerTable} WHERE CustomerId = @CustomerId";
 
             await using var selectCommand = new SqlCommand(selectQuery, connection, transaction);
-            selectCommand.Parameters.AddWithValue("@CustomerID", customer.CustomerID);
+            selectCommand.Parameters.AddWithValue("@CustomerId", customer.CustomerId);
 
             await using var reader = await selectCommand.ExecuteReaderAsync();
             if (!reader.HasRows)
@@ -171,25 +173,30 @@ public static class CustomerRepository
             }
 
             await reader.ReadAsync();
-            var dbFullName = reader["FullName"] as string;
-            var dbCustomerTag = reader["CustomerTag"] as string;
-            var dbEmail = reader["Email"] as string;
-            var dbPhone = reader["Phone"] as string;
-            var dbNotes = reader["CustomerNotes"] as string;
+            var dbVerifyHash = reader.GetString(reader.GetOrdinal("VerifyHash"));
             reader.Close();
 
-            if ((dbFullName != customer.OriginalFullName) || (dbCustomerTag != customer.OriginalCustomerTag) ||
-                (dbEmail != customer.OriginalEmail) || (dbPhone != customer.OriginalPhone) ||
-                (dbNotes != customer.OriginalNotes))
+            if (dbVerifyHash != customer.OriginalVerifyHash)
             {
+                var selectQuery2 = $"Select * FROM {GlobalSettings.CustomerTable} WHERE CustomerId = @CustomerId";
+                await using var selectCommand2 = new SqlCommand(selectQuery2, connection, transaction);
+                selectCommand2.Parameters.AddWithValue("@CustomerId", customer.CustomerId);
+                await using var reader2 = await selectCommand2.ExecuteReaderAsync();
+
+                await reader.ReadAsync();
+                var dbFullName = reader2.GetString(reader2.GetOrdinal("FullName"));
+                var dbCustomerTag = reader2.GetString(reader2.GetOrdinal("CustomerTag"));
+                var dbEmail = reader2.IsDBNull(reader2.GetOrdinal("Email")) ? null : reader2.GetString(reader2.GetOrdinal("Email"));
+                var dbPhone = reader2.IsDBNull(reader2.GetOrdinal("Phone")) ? null : reader2.GetString(reader2.GetOrdinal("Phone"));
+                var dbNotes = reader2.IsDBNull(reader2.GetOrdinal("CustomerNotes")) ? null : reader2.GetString(reader2.GetOrdinal("CustomerNotes"));
+                await reader.CloseAsync();
+
                 bool confirm = await Application.Current!.Windows[0].Page!.DisplayAlert(
                     "Conflict Detected",
                     $"Database values have changed.\n\n"
                     + $"Current values in DB:\n"
                     + $"Full Name: {dbFullName}\nCustomer Tag: {dbCustomerTag}\nEmail: {dbEmail}\nPhone: {dbPhone}\nNotes: {dbNotes}\n\n"
-                    + $"Values you originally loaded:\n"
-                    + $"Full Name: {customer.OriginalFullName}\nCustomer Tag: {customer.OriginalCustomerTag}\nEmail: {customer.OriginalEmail}\nPhone: {customer.OriginalPhone}\nNotes: {customer.OriginalNotes}\n\n"
-                    + $"Your new values to save:\n"
+                    + $"Your current values:\n"
                     + $"Full Name: {customer.FullName}\nCustomer Tag: {customer.CustomerTag}\nEmail: {customer.Email}\nPhone: {customer.Phone}\nNotes: {customer.Notes}\n\n"
                     + "Do you want to proceed?",
                     "Yes", "No");
@@ -198,28 +205,27 @@ public static class CustomerRepository
                 {
                     return true;
                 }
-                return false;
             }
+            return false;
         }
         catch (Exception ex)
         {
             await Application.Current!.Windows[0].Page!.DisplayAlert("Error", $"Error when looking for change:{ex.Message}","OK");
             return true;
         }
-        return true;
     }
 
-private static async Task<bool> LookForConflict(Customer customer, SqlConnection connection)
-{
-    try
+    private static async Task<bool> LookForConflict(Customer customer, SqlConnection connection, SqlTransaction? transaction = null)
+    {
+        try
         {
             var selectQuery = $"SELECT * FROM {GlobalSettings.CustomerTable} WHERE CustomerTag = @CustomerTag";
 
-            await using var selectCommand = new SqlCommand(selectQuery, connection);
+            await using var selectCommand = new SqlCommand(selectQuery, connection, transaction);
             selectCommand.Parameters.AddWithValue("@CustomerTag", customer.CustomerTag);
 
             await using var reader = await selectCommand.ExecuteReaderAsync();
-            if (reader.HasRows)
+            if (reader.HasRows && customer.CustomerTag != customer.OriginalCustomerTag)
             {
                 await Application.Current!.Windows[0].Page!.DisplayAlert("Error", "Customer with this tag was already added to database.", "OK");
                 return true;
