@@ -424,4 +424,20 @@
         <Setter Property="SelectedTabColor" Value="{AppThemeBinding Light={StaticResource Gray950}, Dark={StaticResource Gray200}}" />
     </Style>
 
+    <Style TargetType="Image" x:Key="AccountsImage" >
+        <Setter Property="Source" Value="{AppThemeBinding Light='user_accounts_black.png', Dark='user_accounts_white.png' }"></Setter>
+    </Style>
+
+    <Style TargetType="ImageButton" x:Key="DeleteButton" >
+        <Setter Property="Source" Value="{AppThemeBinding Light='ttrash_black.png', Dark='trash_white.png' }"/>
+    </Style>
+
+    <Style TargetType="ImageButton" x:Key="EditImage" >
+        <Setter Property="Source" Value="{AppThemeBinding Light='rewrite_black.png', Dark='rewrite_white.png' }"></Setter>
+    </Style>
+
+    <Style TargetType="Image" x:Key="CustomerImage" >
+    <Setter Property="Source" Value="{AppThemeBinding Light='user_black.png', Dark='user_white.png' }"></Setter>
+    </Style>
+    
 </ResourceDictionary>
