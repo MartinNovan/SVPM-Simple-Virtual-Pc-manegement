@@ -15,7 +15,7 @@
                     <ViewCell>
                         <StackLayout>
                             <Grid ColumnDefinitions="auto, *, auto">
-                                <Image Grid.Column="0" Source="account.png" HeightRequest="50" WidthRequest="50" Margin="5" />
+                                <Image Grid.Column="0" Style="{DynamicResource Key=AccountsImage}" HeightRequest="50" WidthRequest="50" Margin="5" />
                                 <StackLayout Grid.Column="1" Margin="10">
                                     <Label Text="{Binding Username}" FontSize="Medium" />
                                     <StackLayout Orientation="Vertical">
@@ -28,8 +28,8 @@
                                     </StackLayout>
                                 </StackLayout>
                                 <StackLayout Grid.Column="2" HorizontalOptions="Center" VerticalOptions="Center">
-                                    <ImageButton Source="pencil_icon.png" Scale="0.7" CornerRadius="3" HeightRequest="10" WidthRequest="10" VerticalOptions="Center" BackgroundColor="Gray" Clicked="EditConnection_Clicked" ToolTipProperties.Text="Click to edit this connection." />
-                                    <ImageButton Source="trash_icon.png"  Scale="0.7" CornerRadius="3" HeightRequest="10" WidthRequest="10" VerticalOptions="Center" BackgroundColor="Gray" Clicked="OnDeleteButtonClicked" ToolTipProperties.Text="Click to remove this connection." Margin="0,0,3,0"/>
+                                    <ImageButton Style="{DynamicResource Key=DeleteButton}" Scale="0.7" CornerRadius="3" HeightRequest="10" WidthRequest="10" VerticalOptions="Center" BackgroundColor="Transparent" Clicked="EditConnection_Clicked" ToolTipProperties.Text="Click to edit this connection." />
+                                    <ImageButton Style="{DynamicResource Key=EditImage}"  Scale="0.7" CornerRadius="3" HeightRequest="10" WidthRequest="10" VerticalOptions="Center" BackgroundColor="Transparent" Clicked="OnDeleteButtonClicked" ToolTipProperties.Text="Click to remove this connection." Margin="0,0,3,0"/>
                                 </StackLayout>
                             </Grid>
                             <BoxView HeightRequest="1" Color="Gray" Margin="5,0"/>
