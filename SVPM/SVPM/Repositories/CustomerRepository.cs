@@ -25,9 +25,9 @@ public static class CustomerRepository
                 CustomerId = reader.GetGuid(reader.GetOrdinal("CustomerId")),
                 FullName = reader.GetString(reader.GetOrdinal("FullName")),
                 CustomerTag = reader.GetString(reader.GetOrdinal("CustomerTag")),
-                Email = reader.GetString(reader.GetOrdinal("Email")),
-                Phone = reader.GetString(reader.GetOrdinal("Phone")),
-                Notes = reader.GetString(reader.GetOrdinal("Notes")),
+                Email = reader.IsDBNull(reader.GetOrdinal("Email")) ? "" : reader.GetString(reader.GetOrdinal("Email")),
+                Phone = reader.IsDBNull(reader.GetOrdinal("Phone")) ? "" : reader.GetString(reader.GetOrdinal("Phone")),
+                Notes = reader.IsDBNull(reader.GetOrdinal("Notes")) ? "" : reader.GetString(reader.GetOrdinal("Notes")),
                 VerifyHash = reader.GetString(reader.GetOrdinal("VerifyHash")),
                 Updated = reader.GetDateTime(reader.GetOrdinal("Updated")),
                 RecordState = RecordStates.Loaded,
@@ -53,11 +53,11 @@ public static class CustomerRepository
 
             await using var command = new SqlCommand(query, connection);
             command.Parameters.AddWithValue("@CustomerId", customer.CustomerId);
-            command.Parameters.AddWithValue("@FullName", customer.FullName ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@CustomerTag", customer.CustomerTag ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@Email", customer.Email ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@Phone", customer.Phone ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@Notes", customer.Notes ?? (object)DBNull.Value);
+            command.Parameters.AddWithValue("@FullName", customer.FullName ?? String.Empty);
+            command.Parameters.AddWithValue("@CustomerTag", customer.CustomerTag ?? String.Empty);
+            command.Parameters.AddWithValue("@Email", customer.Email ?? String.Empty);
+            command.Parameters.AddWithValue("@Phone", customer.Phone ?? String.Empty);
+            command.Parameters.AddWithValue("@Notes", customer.Notes ?? String.Empty);
             command.Parameters.AddWithValue("@VerifyHash", customer.VerifyHash);
             command.Parameters.AddWithValue("@Updated", customer.Updated);
 
@@ -135,11 +135,11 @@ public static class CustomerRepository
             WHERE CustomerId = @CustomerId";
 
             await using var updateCommand = new SqlCommand(updateQuery, connection, transaction as SqlTransaction);
-            updateCommand.Parameters.AddWithValue("@FullName", customer.FullName ?? (object)DBNull.Value);
-            updateCommand.Parameters.AddWithValue("@CustomerTag", customer.CustomerTag ?? (object)DBNull.Value);
-            updateCommand.Parameters.AddWithValue("@Email", customer.Email ?? (object)DBNull.Value);
-            updateCommand.Parameters.AddWithValue("@Phone", customer.Phone ?? (object)DBNull.Value);
-            updateCommand.Parameters.AddWithValue("@Notes", customer.Notes ?? (object)DBNull.Value);
+            updateCommand.Parameters.AddWithValue("@FullName", customer.FullName);
+            updateCommand.Parameters.AddWithValue("@CustomerTag", customer.CustomerTag);
+            updateCommand.Parameters.AddWithValue("@Email", customer.Email ?? String.Empty);
+            updateCommand.Parameters.AddWithValue("@Phone", customer.Phone ?? String.Empty);
+            updateCommand.Parameters.AddWithValue("@Notes", customer.Notes ?? String.Empty);
             updateCommand.Parameters.AddWithValue("@VerifyHash", customer.VerifyHash);
             updateCommand.Parameters.AddWithValue("@Updated", customer.Updated);
             updateCommand.Parameters.AddWithValue("@CustomerId", customer.CustomerId);

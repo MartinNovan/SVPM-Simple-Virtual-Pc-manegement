@@ -151,9 +151,9 @@ public partial class CreateVirtualPc
                             virtualPc.OwningCustomers?.Add(selectedCustomer);
                         }
                     }
-                    virtualPc.VerifyHash = CalculateHash.CalculateVerifyHash(null, virtualPc);
                     virtualPc.SetOwningCustomersNames();
                 }
+                virtualPc.VerifyHash = CalculateHash.CalculateVerifyHash(null, virtualPc);
                 virtualPc.InitializeOriginalValues();
                 VirtualPCs.Add(virtualPc);
             }

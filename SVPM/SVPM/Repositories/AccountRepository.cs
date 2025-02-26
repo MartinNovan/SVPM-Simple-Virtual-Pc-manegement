@@ -26,8 +26,8 @@ public static class AccountRepository
                 AccountId = reader.GetGuid(reader.GetOrdinal("AccountId")),
                 AssociatedVirtualPc = new VirtualPc { VirtualPcId = reader.GetGuid(reader.GetOrdinal("VirtualPcId")) },
                 Username = reader.GetString(reader.GetOrdinal("Username")),
-                Password = reader.GetString(reader.GetOrdinal("Password")),
-                BackupPassword = reader.IsDBNull(reader.GetOrdinal("BackupPassword")) ? " " : reader.GetString(reader.GetOrdinal("BackupPassword")),
+                Password = reader.IsDBNull(reader.GetOrdinal("Password")) ? "" : reader.GetString(reader.GetOrdinal("Password")),
+                BackupPassword = reader.IsDBNull(reader.GetOrdinal("BackupPassword")) ? "" : reader.GetString(reader.GetOrdinal("BackupPassword")),
                 Admin = reader.GetBoolean(reader.GetOrdinal("Admin")),
                 Updated = reader.GetDateTime(reader.GetOrdinal("Updated")),
                 VerifyHash = reader.GetString(reader.GetOrdinal("VerifyHash")),
@@ -55,9 +55,9 @@ public static class AccountRepository
             command.Parameters.AddWithValue("@AccountId", account.AccountId);
             if (account.AssociatedVirtualPc != null)
                 command.Parameters.AddWithValue("@VirtualPcId", account.AssociatedVirtualPc.VirtualPcId);
-            command.Parameters.AddWithValue("@Username", account.Username ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@Password", account.Password ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@BackupPassword", account.BackupPassword ?? (object)DBNull.Value);
+            command.Parameters.AddWithValue("@Username", account.Username);
+            command.Parameters.AddWithValue("@Password", account.Password ?? String.Empty);
+            command.Parameters.AddWithValue("@BackupPassword", account.BackupPassword ?? String.Empty);
             command.Parameters.AddWithValue("@Admin", account.Admin);
             command.Parameters.AddWithValue("@Updated", account.Updated);
             command.Parameters.AddWithValue("@VerifyHash", account.VerifyHash);
@@ -126,8 +126,8 @@ public static class AccountRepository
             if (account.AssociatedVirtualPc != null)
                 command.Parameters.AddWithValue("@VirtualPcId", account.AssociatedVirtualPc.VirtualPcId);
             command.Parameters.AddWithValue("@Username", account.Username);
-            command.Parameters.AddWithValue("@Password", account.Password);
-            command.Parameters.AddWithValue("@BackupPassword", account.BackupPassword);
+            command.Parameters.AddWithValue("@Password", account.Password ?? String.Empty);
+            command.Parameters.AddWithValue("@BackupPassword", account.BackupPassword ?? String.Empty);
             command.Parameters.AddWithValue("@Admin", account.Admin);
             command.Parameters.AddWithValue("@Updated", account.Updated);
             command.Parameters.AddWithValue("@VerifyHash", account.VerifyHash);
