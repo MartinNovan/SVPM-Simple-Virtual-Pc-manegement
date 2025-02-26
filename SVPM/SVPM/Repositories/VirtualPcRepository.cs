@@ -8,6 +8,13 @@ using SqlConnection = Microsoft.Data.SqlClient.SqlConnection;
 namespace SVPM.Repositories;
 public static class VirtualPcRepository
 {
+    //TODO: kouknout se na stored procedury v sql a dělat dotazy pomocí toho
+    /*
+            var newcommand = new SqlCommand();
+            newcommand.Connection = connection;
+            newcommand.CommandText = "Test";
+            newcommand.CommandType = CommandType.StoredProcedure;
+     */
     public static ObservableCollection<VirtualPc> VirtualPCs { get; } = [];
     public static async Task GetAllVirtualPCsAsync()
     {
@@ -254,7 +261,6 @@ public static class VirtualPcRepository
                 var dbIpAddress = reader3["IP_Address"] as string;
                 var dbFqdn = reader3["IP_Address"] as string;
                 var dbNotes = reader3["VirtualPcNotes"] as string;
-
                 reader3.Close();
 
                 bool confirm = await Application.Current!.Windows[0].Page!.DisplayAlert(
