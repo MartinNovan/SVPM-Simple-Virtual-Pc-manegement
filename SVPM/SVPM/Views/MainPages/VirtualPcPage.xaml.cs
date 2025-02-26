@@ -1,11 +1,10 @@
 ﻿using SVPM.Models;
-using SVPM.Views.CreateRecordsPages;
-using SVPM.Views.SubWindowPages;
+using SVPM.Views.CreatingPages;
+using SVPM.Views.SubPages;
 using static SVPM.Repositories.CustomersVirtualPCsRepository;
 using static SVPM.Repositories.VirtualPcRepository;
 
-namespace SVPM.Views.MainWindowPages;
-//TODO: Change list view to collection view
+namespace SVPM.Views.MainPages;
 public partial class VirtualPcPage
 {
     public VirtualPcPage()
@@ -25,17 +24,17 @@ public partial class VirtualPcPage
                                  vpc.RecordState != RecordStates.Deleted);
         if (match != null)
         {
-            VirtualPCsListView.ScrollTo(match, position: ScrollToPosition.Start, animated: true);
+            VirtualPCsListView.ScrollTo(match, position: ScrollToPosition.Start, animate: true);
         }
     }
 
-    private async void VirtualPcListView_ItemTapped(object sender, ItemTappedEventArgs e)
+    private async void VirtualPcListView_ItemTapped(object? sender, SelectionChangedEventArgs selectionChangedEventArgs)
     {
         try
         {
-            if (e.Item is VirtualPc selectedVirtualPc)
+            if (selectionChangedEventArgs.CurrentSelection.FirstOrDefault() is VirtualPc selectedVirtualPc)
             {
-                await Navigation.PushAsync(new VirtualPcAccountsPage(selectedVirtualPc.VirtualPcID));
+                await Navigation.PushAsync(new VirtualPcAccountsPage(selectedVirtualPc));
             }
         }
         catch (Exception ex)
@@ -79,9 +78,14 @@ public partial class VirtualPcPage
             if (!confirm) return;
 
             virtualPc.RecordState = RecordStates.Deleted;
-            foreach (var mapping in Mappings.Where(m => m.VirtualPcID == virtualPc.VirtualPcID && m.RecordState != RecordStates.Deleted))
+            foreach (var mapping in Mappings.Where(m => m.VirtualPcId == virtualPc.VirtualPcId && m.RecordState != RecordStates.Deleted))
             {
                 mapping.RecordState = RecordStates.Deleted;
+            }
+
+            if (virtualPc.OriginalRecordState != RecordStates.Loaded)
+            {
+                VirtualPCs.Remove(virtualPc);
             }
         }
         catch (Exception ex)

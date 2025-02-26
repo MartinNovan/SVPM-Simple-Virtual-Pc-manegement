@@ -1,9 +1,9 @@
 ﻿using System.Text.Json;
 using Microsoft.Data.SqlClient;
-using SVPM.Views.MainWindowPages;
+using SVPM.Views.MainPages;
 using SqlConnection = SVPM.Models.SqlConnection;
 
-namespace SVPM.Views.ConnectionPages
+namespace SVPM.Views.CreatingPages
 {
     public partial class SqlCreateConnectionPage
     {

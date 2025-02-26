@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="SVPM.Views.SubWindowPages.CustomerVirtualPCsPage"
+             x:Class="SVPM.Views.SubPages.CustomerVirtualPCsPage"
              xmlns:models="using:SVPM.Models"
              NavigationPage.HasNavigationBar="False">
     <Grid ColumnDefinitions="Auto, *" x:DataType="models:Customer">
@@ -44,17 +44,17 @@
                                     <Label Text="{Binding VirtualPcName}" FontSize="Medium" />
                                     <Grid ColumnDefinitions="auto, *" ColumnSpacing="15" Margin="15,0,0,0">
                                         <StackLayout Grid.Column="0">
-                                            <Label Text="{Binding ServiceName, StringFormat='Service: {0}'}" />
+                                            <Label Text="{Binding Service, StringFormat='Service: {0}'}" />
                                             <Label Text="{Binding OperatingSystem, StringFormat='OS: {0}'}" />
-                                            <Label Text="{Binding CPU_Cores, StringFormat='CPU: {0} cores'}" />
-                                            <Label Text="{Binding RAM_Size_GB, StringFormat='RAM: {0} GB'}" />
-                                            <Label Text="{Binding Disk_Size_GB, StringFormat='Drive: {0} GB'}" />
+                                            <Label Text="{Binding CpuCores, StringFormat='CPU: {0} cores'}" />
+                                            <Label Text="{Binding RamSize, StringFormat='RAM: {0} GB'}" />
+                                            <Label Text="{Binding DiskSize, StringFormat='Drive: {0} GB'}" />
                                         </StackLayout>
                                         <StackLayout Grid.Column="1">
                                             <Label Text="{Binding Backupping, StringFormat='Backupping: {0}'}" />
                                             <Label Text="{Binding Administration, StringFormat='Administration: {0}'}" />
-                                            <Label Text="{Binding IP_Address, StringFormat='IP: {0}'}" />
-                                            <Label Text="{Binding FQDN, StringFormat='FQDN: {0}'}" />
+                                            <Label Text="{Binding IpAddress, StringFormat='IP: {0}'}" />
+                                            <Label Text="{Binding Fqdn, StringFormat='FQDN: {0}'}" />
                                             <Label Text="{Binding OwningCustomersNames, StringFormat='Customer: {0}'}" />
                                         </StackLayout>
                                     </Grid>

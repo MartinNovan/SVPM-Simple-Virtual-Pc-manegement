@@ -1,39 +1,38 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
        xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-       xmlns:models="using:SVPM.Models"
-       xmlns:mainWindowPages1="clr-namespace:SVPM.Views.MainWindowPages"
-       xmlns:connectionPages="clr-namespace:SVPM.Views.ConnectionPages"
+       xmlns:mainPages="using:SVPM.Views.MainPages"
+       xmlns:configPages="using:SVPM.Views.ConfigPages"
+       xmlns:models="clr-namespace:SVPM.Models"
        x:Class="SVPM.AppShell"
        FlyoutBehavior="Flyout"
-       Title="SVPM"
-       x:DataType="models:SqlConnection">
+       Title="SVPM">
        <Shell.TitleView>
-              <Grid ColumnDefinitions="auto, *, auto, auto, auto" ColumnSpacing="5" Margin="5,0">
+              <Grid ColumnDefinitions="auto, *, auto, auto, auto" ColumnSpacing="5" Margin="5,0" x:DataType="models:SqlConnection">
                      <Label Grid.Column="0" Text="Selected database:" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
                      <Picker Grid.Column="1" x:Name="SqlPicker" SelectedIndexChanged="SqlPicker_OnSelectedIndexChanged" Loaded="SqlPicker_OnLoaded" ItemDisplayBinding="{Binding Name}" Width="200" />
                      <StackLayout Grid.Column="2" Orientation="Horizontal">
                             <Label Text="Upload all:" ToolTipProperties.Text="This will upload all local data to the database." VerticalTextAlignment="Center" HorizontalTextAlignment="Center"/>
                             <CheckBox x:Name="UploadAllCheckBox" IsChecked="False" CheckedChanged="CheckBox_OnCheckedChanged"/>
                      </StackLayout>
-                     <Button Grid.Column="3" Text="Pull from Origin ↓" Clicked="PullFromDatabase"/>
-                     <Button Grid.Column="4" Text="Push to Origin ↑" Clicked="PushToDatabase"/>
+                     <Button Grid.Column="3" Text="Pull data ↓" Clicked="PullFromDatabase"/>
+                     <Button Grid.Column="4" Text="Push data ↑" Clicked="PushToDatabase"/>
               </Grid>
        </Shell.TitleView>
        <FlyoutItem FlyoutDisplayOptions="AsMultipleItems">
               <ShellContent
                      Title="Customers"
-                     ContentTemplate="{DataTemplate mainWindowPages1:CustomersPage}"
+                     ContentTemplate="{DataTemplate mainPages:CustomersPage}"
                      Route="CustomersPage"/>
               <ShellContent
                      Title="VirtualPcs"
-                     ContentTemplate="{DataTemplate mainWindowPages1:VirtualPcPage}"
+                     ContentTemplate="{DataTemplate mainPages:VirtualPcPage}"
                      Route="VirtualPcPage"/>
               <ShellContent
                      Title="Accounts"
-                     ContentTemplate="{DataTemplate mainWindowPages1:AccountsPage}"
+                     ContentTemplate="{DataTemplate mainPages:AccountsPage}"
                      Route="AccountsPage"/>
        </FlyoutItem>
-       <ShellContent Title="Manage connections" ContentTemplate="{DataTemplate connectionPages:SqlConnectionPage}"/>
-       <ShellContent Title="Settings"/>
+       <ShellContent Title="Manage connections" ContentTemplate="{DataTemplate configPages:SqlConnectionPage}"/>
+       <ShellContent Title="Settings" ContentTemplate="{DataTemplate configPages:SettingsPage}"/>
 </Shell>

@@ -1,15 +1,16 @@
 ﻿using SVPM.Models;
-using SVPM.Views.CreateRecordsPages;
+using SVPM.Repositories;
+using SVPM.Views.CreatingPages;
 using static SVPM.Repositories.AccountRepository;
 
-namespace SVPM.Views.MainWindowPages;
+namespace SVPM.Views.MainPages;
 //TODO: Change list view to collection view
 public partial class AccountsPage
 {
     public AccountsPage()
     {
         InitializeComponent();
-        AccountsListView.ItemsSource = AccountsList;
+        AccountsListView.ItemsSource = AccountRepository.Accounts;
     }
     private void OnSearchBarTextChanged(object sender, TextChangedEventArgs e)
     {
@@ -18,7 +19,7 @@ public partial class AccountsPage
         {
             return;
         }
-        var match = AccountsList
+        var match = AccountRepository.Accounts
             .FirstOrDefault(a => a.Username?.ToLower().Contains(searchText) ?? false);
         if (match != null)
         {
@@ -51,6 +52,10 @@ public partial class AccountsPage
             bool confirm = await DisplayAlert("Warning!", "Do you really want to delete this customer?", "OK", "Cancel");
             if (!confirm) return;
             account.RecordState = RecordStates.Deleted;
+            if (account.OriginalRecordState != RecordStates.Loaded)
+            {
+                AccountRepository.Accounts.Remove(account);
+            }
         }
         catch (Exception ex)
         {

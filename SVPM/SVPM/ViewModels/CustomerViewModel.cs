@@ -27,7 +27,7 @@ public class CustomerViewModel : INotifyPropertyChanged
 
             customer.RecordState = RecordStates.Deleted;
             foreach (var mapping in Mappings.Where(m =>
-                         m.CustomerID == customer.CustomerID))
+                         m.CustomerId == customer.CustomerId))
             {
                 mapping.RecordState = RecordStates.Deleted;
             }

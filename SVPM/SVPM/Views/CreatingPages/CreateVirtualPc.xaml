@@ -2,7 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:models="using:SVPM.Models"
-             x:Class="SVPM.Views.CreateRecordsPages.CreateVirtualPc"
+             x:Class="SVPM.Views.CreatingPages.CreateVirtualPc"
              NavigationPage.HasNavigationBar="False">
     <ContentPage.Content>
         <ScrollView>
@@ -17,10 +17,10 @@
                         <Entry x:Name="OperatingSystemEntry" Placeholder="Operating system" Margin="5"/>
                         <Label Text="CPU:" Margin="5" />
                         <Entry x:Name="CpuCoresEntry" Placeholder="CPU" Keyboard="Numeric" Margin="5"/>
-                        <Label Text="RAM (GB):" Margin="5" />
-                        <Entry x:Name="RamSizeEntry" Placeholder="RAM (GB)" Keyboard="Numeric" Margin="5"/>
-                        <Label Text="Drive (GB):" Margin="5" />
-                        <Entry x:Name="DriveSizeEntry" Placeholder="Drive (GB)" Keyboard="Numeric" Margin="5" />
+                        <Label Text="RAM:" Margin="5" />
+                        <Entry x:Name="RamSizeEntry" Placeholder="RAM (Size)" Keyboard="Numeric" Margin="5"/>
+                        <Label Text="Disk:" Margin="5" />
+                        <Entry x:Name="DiskSizeEntry" Placeholder="Disk (Size)" Keyboard="Numeric" Margin="5" />
                         <StackLayout Orientation="Horizontal">
                             <Label Text="Backupping:" VerticalOptions="Center" Margin="5"/>
                             <CheckBox x:Name="BackuppingCheckBox" Margin="5"/>

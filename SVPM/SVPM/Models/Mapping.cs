@@ -4,11 +4,11 @@ namespace SVPM.Models;
 
 public class Mapping
 {
-    public Guid MappingID { get; set; }
-    public Guid VirtualPcID { get; set; }
-    public Guid CustomerID { get; set; }
+    public Guid MappingId { get; set; }
+    public Guid CustomerId { get; set; }
+    public Guid VirtualPcId { get; set; }
     public RecordStates RecordState { get; set; }
-    public bool inDatabase { get; set; }
+    public bool InDatabase { get; set; }
     public async Task SaveChanges()
     {
         try

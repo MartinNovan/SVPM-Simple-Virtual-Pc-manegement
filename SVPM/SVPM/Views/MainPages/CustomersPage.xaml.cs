@@ -1,11 +1,11 @@
 ﻿using SVPM.Models;
-using SVPM.Views.CreateRecordsPages;
-using SVPM.Views.SubWindowPages;
+using SVPM.Views.CreatingPages;
+using SVPM.Views.SubPages;
 using static SVPM.Repositories.CustomerRepository;
 using static SVPM.Repositories.CustomersVirtualPCsRepository;
 using static SVPM.Repositories.VirtualPcRepository;
 
-namespace SVPM.Views.MainWindowPages;
+namespace SVPM.Views.MainPages;
 
 public partial class CustomersPage
 {
@@ -83,7 +83,7 @@ public partial class CustomersPage
 
             customer.RecordState = RecordStates.Deleted;
             foreach (var mapping in Mappings.Where(m =>
-                         m.CustomerID == customer.CustomerID))
+                         m.CustomerId == customer.CustomerId))
             {
                 mapping.RecordState = RecordStates.Deleted;
             }
@@ -92,6 +92,11 @@ public partial class CustomersPage
                          vpc.OwningCustomers != null && vpc.OwningCustomers.Contains(customer)))
             {
                 if (vpc.OwningCustomers != null) vpc.OwningCustomers.Remove(customer);
+            }
+
+            if (customer.OriginalRecordState != RecordStates.Loaded)
+            {
+                Customers.Remove(customer);
             }
         }
         catch (Exception ex)

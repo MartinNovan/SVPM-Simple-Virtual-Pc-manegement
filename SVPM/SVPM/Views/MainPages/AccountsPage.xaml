@@ -2,7 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:models="clr-namespace:SVPM.Models"
-             x:Class="SVPM.Views.MainWindowPages.AccountsPage">
+             x:Class="SVPM.Views.MainPages.AccountsPage">
     <StackLayout Padding="5">
         <Grid ColumnDefinitions="auto, *, auto" ColumnSpacing="5" Margin="5">
             <Label Grid.Column="0" Text="Accounts:" FontSize="24" VerticalOptions="Center"/>
@@ -20,10 +20,10 @@
                                     <Label Text="{Binding Username}" FontSize="Medium" />
                                     <StackLayout Orientation="Vertical">
                                         <Label Text="{Binding Password, StringFormat='   Password: {0}'}" />
-                                        <Label Text="{Binding IsAdmin, StringFormat='   Admin: {0}'}" />
-                                        <Label Text="{Binding LastUpdated, StringFormat='   Updated: {0}'}" />
+                                        <Label Text="{Binding Admin, StringFormat='   Admin: {0}'}" />
+                                        <Label Text="{Binding Updated, StringFormat='   Updated: {0}'}" />
                                         <Label Text="{Binding VirtualPcName, StringFormat='   Associated PC: {0}'}" />
-                                        <Label Text="{Binding OriginalPassword, StringFormat='   Original password: {0}'}" />
+                                        <Label Text="{Binding BackupPassword, StringFormat='   Original password: {0}'}" />
                                         <Label Text="{Binding RecordState, StringFormat='   State: {0}'}" />
                                     </StackLayout>
                                 </StackLayout>

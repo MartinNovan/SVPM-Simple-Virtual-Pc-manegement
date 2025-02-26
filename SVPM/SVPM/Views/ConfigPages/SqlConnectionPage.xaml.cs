@@ -1,6 +1,8 @@
 ﻿using SVPM.Models;
+using SVPM.Views.CreatingPages;
+
 //TODO: Change list view to collection view
-namespace SVPM.Views.ConnectionPages
+namespace SVPM.Views.ConfigPages
 {
     public partial class SqlConnectionPage
     {
