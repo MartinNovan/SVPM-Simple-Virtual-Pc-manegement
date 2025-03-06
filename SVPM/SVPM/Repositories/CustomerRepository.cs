@@ -127,7 +127,7 @@ public static class CustomerRepository
             var isChange = await LookForChange(customer, connection, transaction as SqlTransaction);
             if (isChange) return;
 
-            var conflict = await LookForConflict(customer, connection);
+            var conflict = await LookForConflict(customer, connection, transaction as SqlTransaction);
             if (conflict) return;
 
             var updateQuery = $@"UPDATE {GlobalSettings.CustomerTable}
