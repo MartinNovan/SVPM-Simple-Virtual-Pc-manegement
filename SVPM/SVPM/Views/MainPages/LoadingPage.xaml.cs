@@ -31,7 +31,7 @@ public partial class LoadingPage
         try
         {
             Text.Text = "Loading Customers...";
-            await GetAllCustomersAsync();
+            await GetCustomersAsync();
             ProgressBar.Progress = 0.25;
             Text.Text = "Loading Mappings...";
             await GetAllMappingAsync();

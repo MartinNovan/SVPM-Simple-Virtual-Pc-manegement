@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Data;
 using Microsoft.Data.SqlClient;
 using SVPM.Models;
 using SqlConnection = Microsoft.Data.SqlClient.SqlConnection;
@@ -15,10 +16,10 @@ public static class AccountRepository
         await using var connection = new SqlConnection(GlobalSettings.ConnectionString);
         await connection.OpenAsync();
 
-        var query = $"SELECT * FROM {GlobalSettings.AccountTable}";
-        await using var command = new SqlCommand(query, connection);
-        await using var reader = await command.ExecuteReaderAsync();
+        await using var getCommand = new SqlCommand("GetAccounts", connection);
+        getCommand.CommandType = CommandType.StoredProcedure;
 
+        await using var reader = await getCommand.ExecuteReaderAsync();
         while (await reader.ReadAsync())
         {
             Accounts.Add(new Account
@@ -47,22 +48,18 @@ public static class AccountRepository
         await connection.OpenAsync();
         try
         {
-            var query = $@"
-            INSERT INTO {GlobalSettings.AccountTable} (AccountId , VirtualPcId, Username, Password, BackupPassword, Admin, Updated, VerifyHash)
-            VALUES (@AccountId, @VirtualPcId, @Username, @Password, @BackupPassword, @Admin, @Updated, @VerifyHash)";
+            await using var addCommand = new SqlCommand("AddAccount", connection);
+            addCommand.CommandType = CommandType.StoredProcedure;
+            addCommand.Parameters.AddWithValue("@AccountId", account.AccountId);
+            addCommand.Parameters.AddWithValue("@VirtualPcId", account.AssociatedVirtualPc!.VirtualPcId);
+            addCommand.Parameters.AddWithValue("@Username", account.Username);
+            addCommand.Parameters.AddWithValue("@Password", account.Password ?? String.Empty);
+            addCommand.Parameters.AddWithValue("@BackupPassword", account.BackupPassword ?? String.Empty);
+            addCommand.Parameters.AddWithValue("@Admin", account.Admin);
+            addCommand.Parameters.AddWithValue("@Updated", account.Updated);
+            addCommand.Parameters.AddWithValue("@VerifyHash", account.VerifyHash);
 
-            await using var command = new SqlCommand(query, connection);
-            command.Parameters.AddWithValue("@AccountId", account.AccountId);
-            if (account.AssociatedVirtualPc != null)
-                command.Parameters.AddWithValue("@VirtualPcId", account.AssociatedVirtualPc.VirtualPcId);
-            command.Parameters.AddWithValue("@Username", account.Username);
-            command.Parameters.AddWithValue("@Password", account.Password ?? String.Empty);
-            command.Parameters.AddWithValue("@BackupPassword", account.BackupPassword ?? String.Empty);
-            command.Parameters.AddWithValue("@Admin", account.Admin);
-            command.Parameters.AddWithValue("@Updated", account.Updated);
-            command.Parameters.AddWithValue("@VerifyHash", account.VerifyHash);
-
-            await command.ExecuteNonQueryAsync();
+            await addCommand.ExecuteNonQueryAsync();
             account.RecordState = RecordStates.Loaded;
             account.InitializeOriginalValues();
         }
@@ -84,12 +81,9 @@ public static class AccountRepository
 
         try
         {
-            var query = $"DELETE FROM {GlobalSettings.AccountTable} WHERE AccountId = @AccountId";
-            await using (var command = new SqlCommand(query, connection, transaction as SqlTransaction))
-            {
-                command.Parameters.AddWithValue("@AccountId", account.AccountId);
-                await command.ExecuteNonQueryAsync();
-            }
+            await using var deleteCommand = new SqlCommand("DeleteAccount", connection, transaction as SqlTransaction);
+            deleteCommand.CommandType = CommandType.StoredProcedure;
+            deleteCommand.Parameters.AddWithValue("@AccountId", account.AccountId);
 
             await transaction.CommitAsync();
             Accounts.Remove(account);
@@ -117,23 +111,18 @@ public static class AccountRepository
 
         try
         {
-            var query = $@"
-            UPDATE {GlobalSettings.AccountTable}
-            SET VirtualPcId = @VirtualPcId, Username = @Username, Password = @Password, BackupPassword = @BackupPassword, Admin = @Admin, Updated = @Updated, VerifyHash = @VerifyHash
-            WHERE AccountId = @AccountId";
+            await using var updateCommand = new SqlCommand("UpdateAccount", connection, transaction as SqlTransaction);
+            updateCommand.CommandType = CommandType.StoredProcedure;
+            updateCommand.Parameters.AddWithValue("@VirtualPcId", account.AssociatedVirtualPc!.VirtualPcId);
+            updateCommand.Parameters.AddWithValue("@Username", account.Username);
+            updateCommand.Parameters.AddWithValue("@Password", account.Password ?? String.Empty);
+            updateCommand.Parameters.AddWithValue("@BackupPassword", account.BackupPassword ?? String.Empty);
+            updateCommand.Parameters.AddWithValue("@Admin", account.Admin);
+            updateCommand.Parameters.AddWithValue("@Updated", account.Updated);
+            updateCommand.Parameters.AddWithValue("@VerifyHash", account.VerifyHash);
+            updateCommand.Parameters.AddWithValue("@AccountId", account.AccountId);
 
-            await using var command = new SqlCommand(query, connection, transaction as SqlTransaction);
-            if (account.AssociatedVirtualPc != null)
-                command.Parameters.AddWithValue("@VirtualPcId", account.AssociatedVirtualPc.VirtualPcId);
-            command.Parameters.AddWithValue("@Username", account.Username);
-            command.Parameters.AddWithValue("@Password", account.Password ?? String.Empty);
-            command.Parameters.AddWithValue("@BackupPassword", account.BackupPassword ?? String.Empty);
-            command.Parameters.AddWithValue("@Admin", account.Admin);
-            command.Parameters.AddWithValue("@Updated", account.Updated);
-            command.Parameters.AddWithValue("@VerifyHash", account.VerifyHash);
-            command.Parameters.AddWithValue("@AccountId", account.AccountId);
-
-            await command.ExecuteNonQueryAsync();
+            await updateCommand.ExecuteNonQueryAsync();
             await transaction.CommitAsync();
             account.RecordState = RecordStates.Loaded;
             account.InitializeOriginalValues();
@@ -148,35 +137,21 @@ public static class AccountRepository
     {
         try
         {
-            var selectQuery = $"SELECT VerifyHash FROM {GlobalSettings.AccountTable} WHERE AccountId = @AccountId";
+            await using var checkCommand = new SqlCommand("CheckForAccountConflict", connection, transaction);
+            checkCommand.CommandType = CommandType.StoredProcedure;
+            checkCommand.Parameters.AddWithValue("@AccountId", account.AccountId);
+            checkCommand.Parameters.AddWithValue("@OriginalVerifyHash", account.OriginalVerifyHash);
 
-            await using var selectCommand = new SqlCommand(selectQuery, connection, transaction);
-            selectCommand.Parameters.AddWithValue("@AccountId", account.AccountId);
+            await using var reader = await checkCommand.ExecuteReaderAsync();
 
-            await using var reader = await selectCommand.ExecuteReaderAsync();
-            if (!reader.HasRows)
+            if (reader.HasRows)
             {
-                await Application.Current!.Windows[0].Page!.DisplayAlert("Error", "Account not found in the database.", "OK");
-                return true;
-            }
-
-            await reader.ReadAsync();
-            var dbVerifyHash = reader.GetString(reader.GetOrdinal("VerifyHash"));
-            reader.Close();
-
-            if (dbVerifyHash != account.OriginalVerifyHash)
-            {
-                var selectQuery2 = $"Select * FROM {GlobalSettings.AccountTable} WHERE AccountId = @AccountId";
-                await using var selectCommand2 = new SqlCommand(selectQuery2, connection, transaction);
-                selectCommand2.Parameters.AddWithValue("@AccountId", account.AccountId);
-                await using var reader2 = await selectCommand2.ExecuteReaderAsync();
-
-                await reader2.ReadAsync();
-                var dbUsername = reader2.GetString(reader2.GetOrdinal("Username"));
-                var dbPassword = reader2.GetString(reader2.GetOrdinal("Password"));
-                var dbBackupPassword = reader2.GetString(reader2.GetOrdinal("BackupPassword"));
-                var dbAdmin = reader2.GetBoolean(reader2.GetOrdinal("Admin"));
-                await reader2.CloseAsync();
+                await reader.ReadAsync();
+                var dbUsername = reader.GetString(reader.GetOrdinal("Username"));
+                var dbPassword = reader.GetString(reader.GetOrdinal("Password"));
+                var dbBackupPassword = reader.GetString(reader.GetOrdinal("BackupPassword"));
+                var dbAdmin = reader.GetBoolean(reader.GetOrdinal("Admin"));
+                await reader.CloseAsync();
 
                 bool confirm = await Application.Current!.Windows[0].Page!.DisplayAlert(
                     "Conflict Detected",

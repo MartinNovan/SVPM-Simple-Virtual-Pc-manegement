@@ -107,7 +107,6 @@ public partial class CreateCustomer
                    Email = CustomerEmailEntry.Text,
                    Phone = CustomerPhoneEntry.Text,
                    Notes = CustomerNotesEntry.Text,
-                   Updated = DateTime.Now,
                    RecordState = RecordStates.Created
                };
                customer.VerifyHash = CalculateHash.CalculateVerifyHash(customer);
