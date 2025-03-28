@@ -74,23 +74,20 @@ public static class AccountRepository
         if(account.OriginalRecordState != RecordStates.Loaded) {Accounts.Remove(account); return;}
         await using var connection = new SqlConnection(GlobalSettings.ConnectionString);
         await connection.OpenAsync();
-        await using var transaction = await connection.BeginTransactionAsync();
 
-        var isChange = await LookForChange(account, connection, transaction as SqlTransaction);
+        var isChange = await LookForChange(account, connection);
         if (isChange) return;
 
         try
         {
-            await using var deleteCommand = new SqlCommand("DeleteAccount", connection, transaction as SqlTransaction);
+            await using var deleteCommand = new SqlCommand("DeleteAccount", connection);
             deleteCommand.CommandType = CommandType.StoredProcedure;
             deleteCommand.Parameters.AddWithValue("@AccountId", account.AccountId);
 
-            await transaction.CommitAsync();
             Accounts.Remove(account);
         }
         catch (Exception ex)
         {
-            await transaction.RollbackAsync();
             await Application.Current!.Windows[0].Page!.DisplayAlert("Error", $"Error when deleting account: {ex.Message}", "OK");
         }
     }
@@ -104,14 +101,13 @@ public static class AccountRepository
         }
         await using var connection = new SqlConnection(GlobalSettings.ConnectionString);
         await connection.OpenAsync();
-        await using var transaction = await connection.BeginTransactionAsync();
 
-        var isChange = await LookForChange(account, connection, transaction as SqlTransaction);
+        var isChange = await LookForChange(account, connection);
         if (isChange) return;
 
         try
         {
-            await using var updateCommand = new SqlCommand("UpdateAccount", connection, transaction as SqlTransaction);
+            await using var updateCommand = new SqlCommand("UpdateAccount", connection);
             updateCommand.CommandType = CommandType.StoredProcedure;
             updateCommand.Parameters.AddWithValue("@VirtualPcId", account.AssociatedVirtualPc!.VirtualPcId);
             updateCommand.Parameters.AddWithValue("@Username", account.Username);
@@ -123,21 +119,19 @@ public static class AccountRepository
             updateCommand.Parameters.AddWithValue("@AccountId", account.AccountId);
 
             await updateCommand.ExecuteNonQueryAsync();
-            await transaction.CommitAsync();
             account.RecordState = RecordStates.Loaded;
             account.InitializeOriginalValues();
         }
         catch (Exception ex)
         {
-            await transaction.RollbackAsync();
             await Application.Current!.Windows[0].Page!.DisplayAlert("Error", $"Error when updating account: {ex.Message}", "OK");
         }
     }
-    private static async Task<bool> LookForChange(Account account, SqlConnection connection, SqlTransaction? transaction = null)
+    private static async Task<bool> LookForChange(Account account, SqlConnection connection)
     {
         try
         {
-            await using var checkCommand = new SqlCommand("CheckForAccountConflict", connection, transaction);
+            await using var checkCommand = new SqlCommand("CheckForAccountConflict", connection);
             checkCommand.CommandType = CommandType.StoredProcedure;
             checkCommand.Parameters.AddWithValue("@AccountId", account.AccountId);
             checkCommand.Parameters.AddWithValue("@OriginalVerifyHash", account.OriginalVerifyHash);

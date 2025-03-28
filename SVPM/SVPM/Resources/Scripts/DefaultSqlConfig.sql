@@ -16,7 +16,7 @@ DROP PROCEDURE IF EXISTS GetMappings;
 DROP PROCEDURE IF EXISTS AddMapping;
 DROP PROCEDURE IF EXISTS DeleteMapping;
 
-DROP PROCEDURE IF EXISTS GetAccountss;
+DROP PROCEDURE IF EXISTS GetAccounts;
 DROP PROCEDURE IF EXISTS GetSpecificAccount;
 DROP PROCEDURE IF EXISTS AddAccount;
 DROP PROCEDURE IF EXISTS DeleteAccount;
@@ -129,20 +129,30 @@ CREATE PROCEDURE DeleteCustomer
 @CustomerId UNIQUEIDENTIFIER
 AS
 BEGIN
-    IF NOT EXISTS (SELECT 1 FROM Customers WHERE CustomerId = @CustomerId)
-        BEGIN
-            RAISERROR('Customer not found', 16, 1);
-        END
+    BEGIN TRANSACTION;
 
-    DELETE FROM CustomersVirtualPCs WHERE CustomerId = @CustomerId;
+    BEGIN TRY
+        IF NOT EXISTS (SELECT 1 FROM Customers WHERE CustomerId = @CustomerId)
+            BEGIN
+                RAISERROR('Customer not found', 16, 1);
+            END
 
-    DELETE FROM Customers WHERE CustomerId = @CustomerId;
+        DELETE FROM CustomersVirtualPCs WHERE CustomerId = @CustomerId;
+        DELETE FROM Customers WHERE CustomerId = @CustomerId;
 
-    IF EXISTS (SELECT 1 FROM CustomersVirtualPCs WHERE CustomerId = @CustomerId)
-        BEGIN
-            RAISERROR('Some mappings weren''t properly deleted!', 16, 1);
-        END
+        IF EXISTS (SELECT 1 FROM CustomersVirtualPCs WHERE CustomerId = @CustomerId)
+            BEGIN
+                RAISERROR('Some mappings weren''t properly deleted!', 16, 1);
+            END
+
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRANSACTION;
+        THROW;
+    END CATCH;
 END;
+
 
 GO
 
@@ -157,27 +167,36 @@ CREATE PROCEDURE UpdateCustomer
 AS
 BEGIN
     SET NOCOUNT ON;
+    BEGIN TRANSACTION;
 
-    IF NOT EXISTS (SELECT 1 FROM Customers WHERE CustomerId = @CustomerId)
-        BEGIN
-            RAISERROR('Customer not found.', 16, 1);
-        END
+    BEGIN TRY
+        IF NOT EXISTS (SELECT 1 FROM Customers WHERE CustomerId = @CustomerId)
+            BEGIN
+                RAISERROR('Customer not found.', 16, 1);
+            END
 
-    IF EXISTS (SELECT 1 FROM Customers WHERE CustomerTag = @CustomerTag AND CustomerId != @CustomerId)
-        BEGIN
-            RAISERROR('Customer with this tag is already in database.', 16, 1);
-        END
+        IF EXISTS (SELECT 1 FROM Customers WHERE CustomerTag = @CustomerTag AND CustomerId != @CustomerId)
+            BEGIN
+                RAISERROR('Customer with this tag is already in database.', 16, 1);
+            END
 
-    UPDATE Customers
-    SET
-        FullName = @FullName,
-        CustomerTag = @CustomerTag,
-        Email = @Email,
-        Phone = @Phone,
-        Notes = @Notes,
-        VerifyHash = @VerifyHash,
-        Updated = GETDATE()
-    WHERE CustomerId = @CustomerId;
+        UPDATE Customers
+        SET
+            FullName = @FullName,
+            CustomerTag = @CustomerTag,
+            Email = @Email,
+            Phone = @Phone,
+            Notes = @Notes,
+            VerifyHash = @VerifyHash,
+            Updated = GETDATE()
+        WHERE CustomerId = @CustomerId;
+
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRANSACTION;
+        THROW;
+    END CATCH;
 END;
 
 GO
@@ -257,25 +276,33 @@ CREATE PROCEDURE DeleteVirtualPc
 @VirtualPcId UNIQUEIDENTIFIER
 AS
 BEGIN
-    IF NOT EXISTS (SELECT 1 FROM VirtualPCs WHERE VirtualPcId = @VirtualPcId)
-        BEGIN
-            RAISERROR('Virtual PC not found', 16, 1);
-        END
+    BEGIN TRANSACTION;
 
-    DELETE FROM CustomersVirtualPCs WHERE VirtualPcId = @VirtualPcId;
+    BEGIN TRY
+        IF NOT EXISTS (SELECT 1 FROM VirtualPCs WHERE VirtualPcId = @VirtualPcId)
+            BEGIN
+                RAISERROR('Virtual PC not found', 16, 1);
+            END
 
-    DELETE FROM Accounts WHERE VirtualPcId = @VirtualPcId;
+        DELETE FROM CustomersVirtualPCs WHERE VirtualPcId = @VirtualPcId;
+        DELETE FROM Accounts WHERE VirtualPcId = @VirtualPcId;
+        DELETE FROM VirtualPCs WHERE VirtualPcId = @VirtualPcId;
 
-    DELETE FROM VirtualPCs WHERE VirtualPcId = @VirtualPcId;
+        IF EXISTS (SELECT 1 FROM CustomersVirtualPCs WHERE VirtualPcId = @VirtualPcId)
+            BEGIN
+                RAISERROR('Some mappings weren''t properly deleted!', 16, 1);
+            END
+        IF EXISTS (SELECT 1 FROM Accounts WHERE VirtualPcId = @VirtualPcId)
+            BEGIN
+                RAISERROR('Some accounts weren''t properly deleted!', 16, 1);
+            END
 
-    IF EXISTS (SELECT 1 FROM CustomersVirtualPCs WHERE VirtualPcId = @VirtualPcId)
-        BEGIN
-            RAISERROR('Some mappings weren''t properly deleted!', 16, 1);
-        END
-    IF EXISTS (SELECT 1 FROM Accounts WHERE VirtualPcId = @VirtualPcId)
-        BEGIN
-            RAISERROR('Some accounts weren''t properly deleted!', 16, 1);
-        END
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRANSACTION;
+        THROW;
+    END CATCH;
 END;
 
 GO
@@ -297,32 +324,41 @@ CREATE PROCEDURE UpdateVirtualPc
 AS
 BEGIN
     SET NOCOUNT ON;
+    BEGIN TRANSACTION;
 
-    IF NOT EXISTS (SELECT 1 FROM VirtualPCs WHERE VirtualPcId = @VirtualPcId)
-        BEGIN
-            RAISERROR('Virtual PC not found', 16, 1);
-        END
+    BEGIN TRY
+        IF NOT EXISTS (SELECT 1 FROM VirtualPCs WHERE VirtualPcId = @VirtualPcId)
+            BEGIN
+                RAISERROR('Virtual PC not found', 16, 1);
+            END
 
-    IF EXISTS (SELECT 1 FROM VirtualPCs WHERE VirtualPcName = @VirtualPcName AND VirtualPcId != @VirtualPcId)
-        BEGIN
-            RAISERROR('VirtualPC with this name is already in database.', 16, 1);
-        END
+        IF EXISTS (SELECT 1 FROM VirtualPCs WHERE VirtualPcName = @VirtualPcName AND VirtualPcId != @VirtualPcId)
+            BEGIN
+                RAISERROR('VirtualPC with this name is already in database.', 16, 1);
+            END
 
-    UPDATE VirtualPCs
-    SET VirtualPcName = @VirtualPcName,
-        Service = @Service,
-        OperatingSystem = @OperatingSystem,
-        CpuCores = @CpuCores,
-        RamSize = @RamSize,
-        DiskSize = @DiskSize,
-        Backupping = @Backupping,
-        Administration = @Administration,
-        IpAddress = @IpAddress,
-        Fqdn = @Fqdn,
-        Notes = @Notes,
-        Updated = GETDATE(),
-        VerifyHash = @VerifyHash
-    WHERE VirtualPcId = @VirtualPcId;
+        UPDATE VirtualPCs
+        SET VirtualPcName = @VirtualPcName,
+            Service = @Service,
+            OperatingSystem = @OperatingSystem,
+            CpuCores = @CpuCores,
+            RamSize = @RamSize,
+            DiskSize = @DiskSize,
+            Backupping = @Backupping,
+            Administration = @Administration,
+            IpAddress = @IpAddress,
+            Fqdn = @Fqdn,
+            Notes = @Notes,
+            Updated = GETDATE(),
+            VerifyHash = @VerifyHash
+        WHERE VirtualPcId = @VirtualPcId;
+
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRANSACTION;
+        THROW;
+    END CATCH;
 END;
 
 GO
@@ -427,12 +463,22 @@ CREATE PROCEDURE DeleteAccount
 @AccountId UNIQUEIDENTIFIER
 AS
 BEGIN
-    IF NOT EXISTS (SELECT 1 FROM Accounts WHERE AccountId = @AccountId)
-        BEGIN
-            RAISERROR('Account not found', 16, 1);
-        END
+    BEGIN TRANSACTION;
 
-    DELETE FROM Accounts WHERE AccountId = @AccountId;
+    BEGIN TRY
+        IF NOT EXISTS (SELECT 1 FROM Accounts WHERE AccountId = @AccountId)
+            BEGIN
+                RAISERROR('Account not found', 16, 1);
+            END
+
+        DELETE FROM Accounts WHERE AccountId = @AccountId;
+
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRANSACTION;
+        THROW;
+    END CATCH;
 END;
 
 GO
@@ -448,21 +494,30 @@ CREATE PROCEDURE UpdateAccount
 AS
 BEGIN
     SET NOCOUNT ON;
+    BEGIN TRANSACTION;
 
-    IF NOT EXISTS (SELECT 1 FROM Accounts WHERE AccountId = @AccountId)
-        BEGIN
-            RAISERROR('Account not found', 16, 1);
-        END
+    BEGIN TRY
+        IF NOT EXISTS (SELECT 1 FROM Accounts WHERE AccountId = @AccountId)
+            BEGIN
+                RAISERROR('Account not found', 16, 1);
+            END
 
-    UPDATE Accounts
-    SET VirtualPcId = @VirtualPcId,
-        Username = @Username,
-        Password = @Password,
-        BackupPassword = @BackupPassword,
-        Admin = @Admin,
-        VerifyHash = @VerifyHash,
-        Updated = GETDATE()
-    WHERE AccountId = @AccountId;
+        UPDATE Accounts
+        SET VirtualPcId = @VirtualPcId,
+            Username = @Username,
+            Password = @Password,
+            BackupPassword = @BackupPassword,
+            Admin = @Admin,
+            VerifyHash = @VerifyHash,
+            Updated = GETDATE()
+        WHERE AccountId = @AccountId;
+
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRANSACTION;
+        THROW;
+    END CATCH;
 END;
 
 GO

@@ -52,20 +52,17 @@ public static class CustomersVirtualPCsRepository
         if (!mapping.InDatabase){Mappings.Remove(mapping); return; }
         await using var connection = new SqlConnection(GlobalSettings.ConnectionString);
         await connection.OpenAsync();
-        await using var transaction = await connection.BeginTransactionAsync();
         try
         {
-            var command = new SqlCommand("DeleteMapping", connection, transaction as SqlTransaction);
+            var command = new SqlCommand("DeleteMapping", connection);
             command.CommandType = CommandType.StoredProcedure;
             command.Parameters.AddWithValue("@MappingId", mapping.MappingId);
 
             await command.ExecuteNonQueryAsync();
             Mappings.Remove(mapping);
-            await transaction.CommitAsync();
         }
         catch (Exception ex)
         {
-            await transaction.RollbackAsync();
             await Application.Current!.Windows[0].Page!.DisplayAlert("Error", ex.Message, "OK");
         }
     }

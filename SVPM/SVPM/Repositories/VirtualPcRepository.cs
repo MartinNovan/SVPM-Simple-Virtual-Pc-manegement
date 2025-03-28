@@ -89,23 +89,20 @@ public static class VirtualPcRepository
         if(virtualPc.OriginalRecordState != RecordStates.Loaded) { VirtualPCs.Remove(virtualPc); return; }
         await using var connection = new SqlConnection(GlobalSettings.ConnectionString);
         await connection.OpenAsync();
-        await using var transaction = await connection.BeginTransactionAsync();
         try
         {
-            var isChange = await LookForChange(virtualPc, connection, transaction as SqlTransaction);
+            var isChange = await LookForChange(virtualPc, connection);
             if (isChange) return;
 
-            await using var deleteCommand = new SqlCommand("DeleteVirtualPc", connection, transaction as SqlTransaction);
+            await using var deleteCommand = new SqlCommand("DeleteVirtualPc", connection);
             deleteCommand.CommandType = CommandType.StoredProcedure;
             deleteCommand.Parameters.AddWithValue("@VirtualPcId", virtualPc.VirtualPcId);
             await deleteCommand.ExecuteNonQueryAsync();
 
-            await transaction.CommitAsync();
             VirtualPCs.Remove(virtualPc);
         }
         catch (Exception ex)
         {
-            await transaction.RollbackAsync();
             await Application.Current!.Windows[0].Page!.DisplayAlert("Error", $"Error when deleting virtual PC: {ex.Message}", "OK");
         }
     }
@@ -119,14 +116,13 @@ public static class VirtualPcRepository
         }
         await using var connection = new SqlConnection(GlobalSettings.ConnectionString);
         await connection.OpenAsync();
-        await using var transaction = await connection.BeginTransactionAsync();
 
         try
         {
-            var isChange = await LookForChange(virtualPc, connection, transaction as SqlTransaction);
+            var isChange = await LookForChange(virtualPc, connection);
             if (isChange) return;
 
-            await using var updateCommand = new SqlCommand("UpdateVirtualPc", connection, transaction as SqlTransaction);
+            await using var updateCommand = new SqlCommand("UpdateVirtualPc", connection);
             updateCommand.CommandType = CommandType.StoredProcedure;
             updateCommand.Parameters.AddWithValue("@VirtualPcName", virtualPc.VirtualPcName);
             updateCommand.Parameters.AddWithValue("@Service", virtualPc.Service  ?? (object)DBNull.Value);
@@ -143,22 +139,20 @@ public static class VirtualPcRepository
             updateCommand.Parameters.AddWithValue("@VirtualPcId", virtualPc.VirtualPcId);
 
             await updateCommand.ExecuteNonQueryAsync();
-            await transaction.CommitAsync();
             virtualPc.RecordState = RecordStates.Loaded;
             virtualPc.InitializeOriginalValues();
         }
         catch (Exception ex)
         {
-            await transaction.RollbackAsync();
             await Application.Current!.Windows[0].Page!.DisplayAlert("Error", $"Error when updating virtual PC: {ex.Message}", "OK");
         }
     }
 
-    private static async Task<bool> LookForChange(VirtualPc virtualPc, SqlConnection connection, SqlTransaction? transaction = null)
+    private static async Task<bool> LookForChange(VirtualPc virtualPc, SqlConnection connection)
     {
         try
         {
-            await using var checkCommand = new SqlCommand("CheckForVirtualPcConflict", connection, transaction);
+            await using var checkCommand = new SqlCommand("CheckForVirtualPcConflict", connection);
             checkCommand.CommandType = CommandType.StoredProcedure;
             checkCommand.Parameters.AddWithValue("@VirtualPcId", virtualPc.VirtualPcId);
             checkCommand.Parameters.AddWithValue("@OriginalVerifyHash", virtualPc.OriginalVerifyHash);

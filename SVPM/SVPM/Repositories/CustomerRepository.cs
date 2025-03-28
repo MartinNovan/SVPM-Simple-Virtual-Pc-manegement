@@ -71,23 +71,20 @@ public static class CustomerRepository
         if (customer.OriginalRecordState != RecordStates.Loaded){ Customers.Remove(customer); return;}
         await using var connection = new SqlConnection(GlobalSettings.ConnectionString);
         await connection.OpenAsync();
-        await using var transaction = await connection.BeginTransactionAsync();
         try
         {
-            var isChange = await LookForChange(customer, connection, transaction as SqlTransaction);
+            var isChange = await LookForChange(customer, connection);
             if (isChange) return;
 
-            await using var deleteCommand = new SqlCommand("DeleteCustomer", connection, transaction as SqlTransaction);
+            await using var deleteCommand = new SqlCommand("DeleteCustomer", connection);
             deleteCommand.CommandType = CommandType.StoredProcedure;
             deleteCommand.Parameters.AddWithValue("@CustomerId", customer.CustomerId);
             await deleteCommand.ExecuteNonQueryAsync();
 
-            await transaction.CommitAsync();
             Customers.Remove(customer);
         }
         catch (Exception ex)
         {
-            await transaction.RollbackAsync();
             await Application.Current!.Windows[0].Page!.DisplayAlert("Error", $"Error when deleting customer: {ex.Message}", "OK");
         }
     }
@@ -102,14 +99,13 @@ public static class CustomerRepository
 
         await using var connection = new SqlConnection(GlobalSettings.ConnectionString);
         await connection.OpenAsync();
-        await using var transaction = await connection.BeginTransactionAsync();
 
         try
         {
-            var isChange = await LookForChange(customer, connection, transaction as SqlTransaction);
+            var isChange = await LookForChange(customer, connection);
             if (isChange) return;
 
-            await using var updateCommand = new SqlCommand("UpdateCustomer", connection, transaction as SqlTransaction); // Přidáno propojení s transakcí
+            await using var updateCommand = new SqlCommand("UpdateCustomer", connection);
             updateCommand.CommandType = CommandType.StoredProcedure;
             updateCommand.Parameters.AddWithValue("@FullName", customer.FullName);
             updateCommand.Parameters.AddWithValue("@CustomerTag", customer.CustomerTag);
@@ -120,22 +116,20 @@ public static class CustomerRepository
             updateCommand.Parameters.AddWithValue("@CustomerId", customer.CustomerId);
 
             await updateCommand.ExecuteNonQueryAsync();
-            await transaction.CommitAsync();
             customer.RecordState = RecordStates.Loaded;
             customer.InitializeOriginalValues();
         }
         catch (Exception ex)
         {
-            await transaction.RollbackAsync();
             await Application.Current!.Windows[0].Page!.DisplayAlert("Error", $"Error when updating customer: {ex.Message}", "OK");
         }
     }
 
-    private static async Task<bool> LookForChange(Customer customer, SqlConnection connection, SqlTransaction? transaction = null)
+    private static async Task<bool> LookForChange(Customer customer, SqlConnection connection)
     {
         try
         {
-            await using var checkCommand = new SqlCommand("CheckForCustomerConflict", connection, transaction);
+            await using var checkCommand = new SqlCommand("CheckForCustomerConflict", connection);
             checkCommand.CommandType = CommandType.StoredProcedure;
             checkCommand.Parameters.AddWithValue("@CustomerId", customer.CustomerId);
             checkCommand.Parameters.AddWithValue("@OriginalVerifyHash", customer.OriginalVerifyHash);
