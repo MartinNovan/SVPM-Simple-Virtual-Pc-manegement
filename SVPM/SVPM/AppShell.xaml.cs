@@ -21,7 +21,7 @@ public partial class AppShell
         try
         {
             FileHelpers.CreateJsonFileIfNotExists();
-            string json = await File.ReadAllTextAsync(Connectionlist!);
+            var json = await File.ReadAllTextAsync(Connectionlist!);
             if (!string.IsNullOrEmpty(json))
             {
                 var connections = JsonSerializer.Deserialize<List<SqlConnection>>(json) ?? new();
@@ -44,7 +44,6 @@ public partial class AppShell
     {
         try
         {
-            if (SqlPicker.SelectedItem == null) return;
             if (SqlPicker.SelectedItem is not SqlConnection connection) return;
             var builder = new SqlConnectionStringBuilder
             {
@@ -79,33 +78,61 @@ public partial class AppShell
 
     private async void SqlPicker_OnLoaded(object? sender, EventArgs e)
     {
-        await LoadSqlConnectionsAsync();
-        SqlPicker.ItemsSource = SqlConnections;
-        if(_lastlySelectedItem != -1)  SqlPicker.SelectedIndex = _lastlySelectedItem;
+        try
+        {
+            await LoadSqlConnectionsAsync();
+            SqlPicker.ItemsSource = SqlConnections;
+            if(_lastlySelectedItem != -1)  SqlPicker.SelectedIndex = _lastlySelectedItem;
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Error", $"Error when loading connections: {ex.Message}", "OK");
+        }
     }
 
     private async void PullFromDatabase(object? sender, EventArgs e)
     {
-        if(GlobalSettings.ConnectionString == null) return;
-        await Navigation.PushAsync(new LoadingPage(false));
+        try
+        {
+            if(GlobalSettings.ConnectionString == null) return;
+            await Navigation.PushAsync(new LoadingPage(false));
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Error", $"Error when pulling from source: {ex.Message}", "OK");
+        }
     }
 
     private async void PushToDatabase(object? sender, EventArgs e)
     {
-        if(GlobalSettings.ConnectionString == null) return;
-        await Navigation.PushAsync(new LoadingPage(true));
+        try
+        {
+            if(GlobalSettings.ConnectionString == null) return;
+            await Navigation.PushAsync(new LoadingPage(true));
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Error", $"Error when pushing to source: {ex.Message}", "OK");
+        }
     }
 
     private async void CheckBox_OnCheckedChanged(object? sender, CheckedChangedEventArgs e)
     {
-        if (UploadAllCheckBox.IsChecked)
+        try
         {
-            await DisplayAlert("Warning", "With this setting 'ON' all your local data will be pushed to database regardless if they were or weren't changed!", "OK" );
-            Console.WriteLine("Turning on this mode.");
+            if (UploadAllCheckBox.IsChecked)
+            {
+                await DisplayAlert("Warning", "With this setting 'ON' all your local data will be pushed to database regardless if they were or weren't changed!", "OK" );
+                Console.WriteLine("Turning on this mode.");
+            }
+            else
+            {
+                Console.WriteLine("Turning it off");
+            }
         }
-        else
+        catch (Exception ex)
         {
-            Console.WriteLine("Turning it off");
+            await DisplayAlert("Error", $"Error when changing mode: {ex.Message}", "OK");
         }
     }
 }

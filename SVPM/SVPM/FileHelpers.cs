@@ -44,22 +44,20 @@ public static class FileHelpers
     
     public static void CreateJsonFileIfNotExists()
     {
-        if (!File.Exists(GlobalSettings.ConnectionListPath))
+        if (File.Exists(GlobalSettings.ConnectionListPath)) return;
+        try
         {
-            try
-            {
-                EnsureDirectoryExists();
-                var emptyConnections = new List<SqlConnection>();
-                string emptyJson = JsonSerializer.Serialize(emptyConnections,
-                    new JsonSerializerOptions { WriteIndented = true });
-                File.WriteAllText(GlobalSettings.ConnectionListPath, emptyJson);
+            EnsureDirectoryExists();
+            var emptyConnections = new List<SqlConnection>();
+            string emptyJson = JsonSerializer.Serialize(emptyConnections,
+                new JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(GlobalSettings.ConnectionListPath, emptyJson);
 
-                Application.Current!.Windows[0].Page!.DisplayAlert("Info", "Connections file not found. A new file has been created.", "OK");
-            }
-            catch (Exception ex)
-            {
-                Application.Current!.Windows[0].Page!.DisplayAlert("Error", $"Failed to create a file with connections: {ex.Message}", "OK");
-            }
+            Application.Current!.Windows[0].Page!.DisplayAlert("Info", "Connections file not found. A new file has been created.", "OK");
+        }
+        catch (Exception ex)
+        {
+            Application.Current!.Windows[0].Page!.DisplayAlert("Error", $"Failed to create a file with connections: {ex.Message}", "OK");
         }
     }
 }
