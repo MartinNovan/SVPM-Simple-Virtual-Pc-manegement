@@ -8,6 +8,7 @@ public class Mapping
     public Guid CustomerId { get; set; }
     public Guid VirtualPcId { get; set; }
     public RecordStates RecordState { get; set; }
+    public DateTime Updated { get; set; }
     public bool InDatabase { get; set; }
     public async Task SaveChanges()
     {

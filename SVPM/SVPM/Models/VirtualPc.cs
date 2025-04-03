@@ -169,8 +169,8 @@ public class VirtualPc : INotifyPropertyChanged
             }
         }
     }
-    private DateTime _updated;
-    public DateTime Updated
+    private DateTime? _updated;
+    public DateTime? Updated
     {
         get => _updated;
         set

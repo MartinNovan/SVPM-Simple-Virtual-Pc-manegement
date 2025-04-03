@@ -37,7 +37,7 @@
                             </StackLayout>
                             <StackLayout Grid.Column="2" VerticalOptions="Center" HorizontalOptions="Center">
                                 <ImageButton Style="{StaticResource EditImage}" Scale="0.7" CornerRadius="3" HeightRequest="10" WidthRequest="10" VerticalOptions="Center" BackgroundColor="Transparent" Clicked="EditConnection_Clicked" ToolTipProperties.Text="Click to edit this connection." />
-                                <ImageButton Style="{StaticResource DeleteButton}"  Scale="0.7" CornerRadius="3" HeightRequest="10" WidthRequest="10" VerticalOptions="Center" BackgroundColor="Transparent" Clicked="OnDeleteButtonClicked" ToolTipProperties.Text="Click to remove this connection." Margin="0,0,3,0"/>
+                                <ImageButton Style="{StaticResource DeleteImage}"  Scale="0.7" CornerRadius="3" HeightRequest="10" WidthRequest="10" VerticalOptions="Center" BackgroundColor="Transparent" Clicked="OnDeleteButtonClicked" ToolTipProperties.Text="Click to remove this connection." Margin="0,0,3,0"/>
                             </StackLayout>
                         </Grid>
                         <BoxView HeightRequest="1" Color="Gray" Margin="5,0" />

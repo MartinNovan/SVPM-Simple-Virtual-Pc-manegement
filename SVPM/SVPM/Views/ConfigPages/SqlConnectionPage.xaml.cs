@@ -1,4 +1,5 @@
-﻿using SVPM.Models;
+﻿using System.Text.Json;
+using SVPM.Models;
 using SVPM.Views.CreatingPages;
 
 //TODO: Change list view to collection view
@@ -57,21 +58,21 @@ namespace SVPM.Views.ConfigPages
         private async void OnDeleteButtonClicked(object sender, EventArgs e)
         {
             try
-            {/*
-                if (sender is not ImageButton button || button.BindingContext is not Models.SqlConnections connection) return;
+            {
+                if (sender is not ImageButton button || button.BindingContext is not SqlConnection connection) return;
 
                 bool confirm = await DisplayAlert("Warning!", "Do you really want to delete a saved connection?", "OK", "Cancel");
                 if (!confirm) return;
                 
-                if (File.Exists(_connectionlist))
+                if (File.Exists(GlobalSettings.ConnectionListPath))
                 {
-                    string json = await File.ReadAllTextAsync(_connectionlist);
-                    var connections = JsonSerializer.Deserialize<List<Models.SqlConnections>>(json) ?? new();
+                    string json = await File.ReadAllTextAsync(GlobalSettings.ConnectionListPath);
+                    var connections = JsonSerializer.Deserialize<List<SqlConnection>>(json) ?? new();
                     if (connections.RemoveAll(c => c.Name == connection.Name) > 0)
                     {
                         string updatedJson = JsonSerializer.Serialize(connections, new JsonSerializerOptions { WriteIndented = true });
-                        await File.WriteAllTextAsync(_connectionlist, updatedJson);
-                        SqlConnections.Remove(connection);
+                        await File.WriteAllTextAsync(GlobalSettings.ConnectionListPath, updatedJson);
+                        AppShell.SqlConnections.Remove(connection);
                         await DisplayAlert("Success", "The connection has been successfully deleted.", "OK");
                     }
                     else
@@ -82,7 +83,7 @@ namespace SVPM.Views.ConfigPages
                 else
                 {
                     await DisplayAlert("Error", "The connections file was not found.", "OK");
-                }*/
+                }
             }
             catch (Exception ex)
             {

@@ -56,7 +56,6 @@ public static class AccountRepository
             addCommand.Parameters.AddWithValue("@Password", account.Password ?? String.Empty);
             addCommand.Parameters.AddWithValue("@BackupPassword", account.BackupPassword ?? String.Empty);
             addCommand.Parameters.AddWithValue("@Admin", account.Admin);
-            addCommand.Parameters.AddWithValue("@Updated", account.Updated);
             addCommand.Parameters.AddWithValue("@VerifyHash", account.VerifyHash);
 
             await addCommand.ExecuteNonQueryAsync();
@@ -114,7 +113,6 @@ public static class AccountRepository
             updateCommand.Parameters.AddWithValue("@Password", account.Password ?? String.Empty);
             updateCommand.Parameters.AddWithValue("@BackupPassword", account.BackupPassword ?? String.Empty);
             updateCommand.Parameters.AddWithValue("@Admin", account.Admin);
-            updateCommand.Parameters.AddWithValue("@Updated", account.Updated);
             updateCommand.Parameters.AddWithValue("@VerifyHash", account.VerifyHash);
             updateCommand.Parameters.AddWithValue("@AccountId", account.AccountId);
 

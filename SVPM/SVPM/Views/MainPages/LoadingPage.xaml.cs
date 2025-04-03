@@ -32,15 +32,18 @@ public partial class LoadingPage
         {
             Text.Text = "Loading Customers...";
             await GetCustomersAsync();
-            ProgressBar.Progress = 0.25;
+            ProgressBar.Progress = 0.2;
             Text.Text = "Loading Mappings...";
             await GetAllMappingAsync();
-            ProgressBar.Progress = 0.5;
+            ProgressBar.Progress = 0.4;
             Text.Text = "Loading Virtual PCs...";
             await GetAllVirtualPCsAsync();
-            ProgressBar.Progress = 0.75;
+            ProgressBar.Progress = 0.6;
             Text.Text = "Loading Accounts...";
             await GetAllAccountsAsync();
+            ProgressBar.Progress = 0.8;
+            Text.Text = "Loading Logs...";
+            await LogRepository.GetAllLogs();
             ProgressBar.Progress = 1;
             Text.Text = "Done!";
         }

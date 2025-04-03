@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 using SVPM.Repositories;
 
 namespace SVPM.Models;
-public sealed class Customer : INotifyPropertyChanged
+public class Customer : INotifyPropertyChanged
 {
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -83,8 +83,8 @@ public sealed class Customer : INotifyPropertyChanged
             }
         }
     }
-    private DateTime _updated;
-    public DateTime Updated
+    private DateTime? _updated;
+    public DateTime? Updated
     {
         get => _updated;
         set
