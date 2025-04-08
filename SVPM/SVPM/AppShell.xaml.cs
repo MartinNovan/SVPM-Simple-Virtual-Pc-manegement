@@ -110,11 +110,13 @@ public partial class AppShell
         try
         {
             if(GlobalSettings.ConnectionString == null) return;
-            if(CustomerRepository.Customers.All(c => c.RecordState == RecordStates.Loaded) && CustomerRepository.Customers.All(vpc => vpc.RecordState == RecordStates.Loaded) && AccountRepository.Accounts.All(a => a.RecordState == RecordStates.Loaded))
+            /*
+            if(CustomerRepository.Customers.All(c => c.RecordState == RecordStates.Loaded) || CustomerRepository.Customers.All(vpc => vpc.RecordState == RecordStates.Loaded) || AccountRepository.Accounts.All(a => a.RecordState == RecordStates.Loaded))
             {
                 await DisplayAlert("Info", "No changes made, skipping pushing!", "OK");
                 return;
             }
+            */
             await Navigation.PushAsync(new LoadingPage(true));
         }
         catch (Exception ex)

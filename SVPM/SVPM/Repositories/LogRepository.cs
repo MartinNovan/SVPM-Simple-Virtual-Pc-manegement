@@ -115,8 +115,6 @@ public static class LogRepository
                 Updated = reader.GetDateTime(reader.GetOrdinal("Updated")),
                 ChangedBy = reader.GetString(reader.GetOrdinal("ChangedBy")),
             };
-            mappingLog.CustomerFullName = CustomerRepository.Customers.First(x => x.CustomerId == mappingLog.CustomerId).FullName;
-            mappingLog.VirtualPcName = VirtualPcRepository.VirtualPCs.First(x => x.VirtualPcId == mappingLog.VirtualPcId).VirtualPcName;
             MappingsLogs.Add(mappingLog);
         }
     }
@@ -152,8 +150,6 @@ public static class LogRepository
                 ChangedBy = reader.GetString(reader.GetOrdinal("ChangedBy")),
 
             };
-            accountLog.AssociatedVirtualPc = VirtualPcRepository.VirtualPCs.First(vpc =>
-                vpc.VirtualPcId == accountLog.AssociatedVirtualPc.VirtualPcId);
             AccountsLogs.Add(accountLog);
         }
     }

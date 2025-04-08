@@ -665,143 +665,98 @@ GO
 
 CREATE TRIGGER trg_Customers_Audit
     ON Customers
-    FOR INSERT, UPDATE, DELETE
+    AFTER INSERT, UPDATE, DELETE
     AS
 BEGIN
-    DECLARE @CustomerId UNIQUEIDENTIFIER, @FullName NVARCHAR(255), @CustomerTag NVARCHAR(50),
-            @Email VARCHAR(255), @Phone VARCHAR(20), @Notes NVARCHAR(255), @VerifyHash NVARCHAR(255),
-            @OperationType NVARCHAR(50);
-    IF EXISTS (SELECT * FROM inserted)
-        BEGIN
-                SET @OperationType = 'INSERT';
-            SELECT @CustomerId = CustomerId, @FullName = FullName, @CustomerTag = CustomerTag,
-                   @Email = Email, @Phone = Phone, @Notes = Notes, @VerifyHash = VerifyHash
-            FROM inserted;
-        END
-    ELSE IF EXISTS (SELECT * FROM deleted)
-        BEGIN
-            SET @OperationType = 'DELETE';
-            SELECT @CustomerId = CustomerId, @FullName = FullName, @CustomerTag = CustomerTag,
-            @Email = Email, @Phone = Phone, @Notes = Notes, @VerifyHash = VerifyHash
-            FROM deleted;
-        END
-    ELSE
-    BEGIN
-        SET @OperationType = 'UPDATE';
-        SELECT @CustomerId = CustomerId, @FullName = FullName, @CustomerTag = CustomerTag,
-        @Email = Email, @Phone = Phone, @Notes = Notes, @VerifyHash = VerifyHash
-        FROM inserted;
-    END
+    SET NOCOUNT ON;
 
     INSERT INTO CustomersAudit (CustomerId, OperationType, FullName, CustomerTag, Email, Phone, Notes, VerifyHash, Updated, ChangedBy)
-    VALUES (@CustomerId, @OperationType, @FullName, @CustomerTag, @Email, @Phone, @Notes, @VerifyHash, GETDATE(), SYSTEM_USER);
+    SELECT CustomerId, 'INSERT', FullName, CustomerTag, Email, Phone, Notes, VerifyHash, GETDATE(), SYSTEM_USER
+    FROM inserted
+    WHERE NOT EXISTS (SELECT 1 FROM deleted WHERE deleted.CustomerId = inserted.CustomerId);
+
+    INSERT INTO CustomersAudit (CustomerId, OperationType, FullName, CustomerTag, Email, Phone, Notes, VerifyHash, Updated, ChangedBy)
+    SELECT CustomerId, 'UPDATE', FullName, CustomerTag, Email, Phone, Notes, VerifyHash, GETDATE(), SYSTEM_USER
+    FROM inserted
+    WHERE EXISTS (SELECT 1 FROM deleted WHERE deleted.CustomerId = inserted.CustomerId);
+
+    INSERT INTO CustomersAudit (CustomerId, OperationType, FullName, CustomerTag, Email, Phone, Notes, VerifyHash, Updated, ChangedBy)
+    SELECT CustomerId, 'DELETE', FullName, CustomerTag, Email, Phone, Notes, VerifyHash, GETDATE(), SYSTEM_USER
+    FROM deleted
+    WHERE NOT EXISTS (SELECT 1 FROM inserted WHERE inserted.CustomerId = deleted.CustomerId);
 END;
 
 GO
 
 CREATE TRIGGER trg_VirtualPCs_Audit
     ON VirtualPCs
-    FOR INSERT, UPDATE, DELETE
+    AFTER INSERT, UPDATE, DELETE
     AS
 BEGIN
-    DECLARE @VirtualPcId UNIQUEIDENTIFIER, @VirtualPcName NVARCHAR(255), @Service NVARCHAR(255),
-            @OperatingSystem NVARCHAR(255), @CpuCores VARCHAR(20), @RamSize VARCHAR(20), @DiskSize VARCHAR(20),
-            @Backupping BIT, @Administration BIT, @IpAddress VARCHAR(45), @Fqdn NVARCHAR(255), @Notes NVARCHAR(255),
-            @VerifyHash NVARCHAR(255), @OperationType NVARCHAR(50);
+    SET NOCOUNT ON;
 
-    IF EXISTS (SELECT * FROM inserted)
-        BEGIN
-                SET @OperationType = 'INSERT';
-        SELECT @VirtualPcId = VirtualPcId, @VirtualPcName = VirtualPcName, @Service = Service,
-               @OperatingSystem = OperatingSystem, @CpuCores = CpuCores, @RamSize = RamSize, @DiskSize = DiskSize,
-               @Backupping = Backupping, @Administration = Administration, @IpAddress = IpAddress,
-               @Fqdn = Fqdn, @Notes = Notes, @VerifyHash = VerifyHash
-        FROM inserted;
-        END
-    ELSE IF EXISTS (SELECT * FROM deleted)
-        BEGIN
-            SET @OperationType = 'DELETE';
-            SELECT @VirtualPcId = VirtualPcId, @VirtualPcName = VirtualPcName, @Service = Service,
-            @OperatingSystem = OperatingSystem, @CpuCores = CpuCores, @RamSize = RamSize, @DiskSize = DiskSize,
-            @Backupping = Backupping, @Administration = Administration, @IpAddress = IpAddress,
-            @Fqdn = Fqdn, @Notes = Notes, @VerifyHash = VerifyHash
-            FROM deleted;
-        END
-    ELSE
-        BEGIN
-            SET @OperationType = 'UPDATE';
-            SELECT @VirtualPcId = VirtualPcId, @VirtualPcName = VirtualPcName, @Service = Service,
-            @OperatingSystem = OperatingSystem, @CpuCores = CpuCores, @RamSize = RamSize, @DiskSize = DiskSize,
-            @Backupping = Backupping, @Administration = Administration, @IpAddress = IpAddress,
-            @Fqdn = Fqdn, @Notes = Notes, @VerifyHash = VerifyHash
-            FROM inserted;
-        END
+    INSERT INTO VirtualPCsAudit (VirtualPcId, OperationType, VirtualPcName, Service, OperatingSystem, CpuCores, RamSize, DiskSize,
+                                 Backupping, Administration, IpAddress, Fqdn, Notes, VerifyHash, Updated, ChangedBy)
+    SELECT VirtualPcId, 'INSERT', VirtualPcName, Service, OperatingSystem, CpuCores, RamSize, DiskSize,
+           Backupping, Administration, IpAddress, Fqdn, Notes, VerifyHash, GETDATE(), SYSTEM_USER
+    FROM inserted
+    WHERE NOT EXISTS (SELECT 1 FROM deleted WHERE deleted.VirtualPcId = inserted.VirtualPcId);
 
-INSERT INTO VirtualPCsAudit (VirtualPcId, OperationType, VirtualPcName, Service, OperatingSystem, CpuCores, RamSize, DiskSize,
-                             Backupping, Administration, IpAddress, Fqdn, Notes, VerifyHash, Updated, ChangedBy)
-VALUES (@VirtualPcId, @OperationType, @VirtualPcName, @Service, @OperatingSystem, @CpuCores, @RamSize, @DiskSize,
-        @Backupping, @Administration, @IpAddress, @Fqdn, @Notes, @VerifyHash, GETDATE(), SYSTEM_USER);
+    INSERT INTO VirtualPCsAudit (VirtualPcId, OperationType, VirtualPcName, Service, OperatingSystem, CpuCores, RamSize, DiskSize,
+                                 Backupping, Administration, IpAddress, Fqdn, Notes, VerifyHash, Updated, ChangedBy)
+    SELECT VirtualPcId, 'UPDATE', VirtualPcName, Service, OperatingSystem, CpuCores, RamSize, DiskSize,
+           Backupping, Administration, IpAddress, Fqdn, Notes, VerifyHash, GETDATE(), SYSTEM_USER
+    FROM inserted
+    WHERE EXISTS (SELECT 1 FROM deleted WHERE deleted.VirtualPcId = inserted.VirtualPcId);
+
+    INSERT INTO VirtualPCsAudit (VirtualPcId, OperationType, VirtualPcName, Service, OperatingSystem, CpuCores, RamSize, DiskSize,
+                                 Backupping, Administration, IpAddress, Fqdn, Notes, VerifyHash, Updated, ChangedBy)
+    SELECT VirtualPcId, 'DELETE', VirtualPcName, Service, OperatingSystem, CpuCores, RamSize, DiskSize,
+           Backupping, Administration, IpAddress, Fqdn, Notes, VerifyHash, GETDATE(), SYSTEM_USER
+    FROM deleted
+    WHERE NOT EXISTS (SELECT 1 FROM inserted WHERE inserted.VirtualPcId = deleted.VirtualPcId);
 END;
 
 GO
 
 CREATE TRIGGER trg_Accounts_Audit
     ON Accounts
-    FOR INSERT, UPDATE, DELETE
+    AFTER INSERT, UPDATE, DELETE
     AS
 BEGIN
-    DECLARE @AccountId UNIQUEIDENTIFIER, @VirtualPcId UNIQUEIDENTIFIER, @Username NVARCHAR(255), 
-            @Password NVARCHAR(255), @BackupPassword NVARCHAR(255), @Admin BIT, @VerifyHash NVARCHAR(255),
-            @OperationType NVARCHAR(50);
+    SET NOCOUNT ON;
 
-    IF EXISTS (SELECT * FROM inserted)
-        BEGIN
-            SET @OperationType = 'INSERT';
-            SELECT @AccountId = AccountId, @VirtualPcId = VirtualPcId, @Username = Username,
-            @Password = Password, @BackupPassword = BackupPassword, @Admin = Admin, @VerifyHash = VerifyHash
-            FROM inserted;
-        END
-    ELSE IF EXISTS (SELECT * FROM deleted)
-        BEGIN
-            SET @OperationType = 'DELETE';
-            SELECT @AccountId = AccountId, @VirtualPcId = VirtualPcId, @Username = Username,
-            @Password = Password, @BackupPassword = BackupPassword, @Admin = Admin, @VerifyHash = VerifyHash
-            FROM deleted;
-        END
-    ELSE
-        BEGIN
-            SET @OperationType = 'UPDATE';
-            SELECT @AccountId = AccountId, @VirtualPcId = VirtualPcId, @Username = Username,
-            @Password = Password, @BackupPassword = BackupPassword, @Admin = Admin, @VerifyHash = VerifyHash
-            FROM inserted;
-        END
+    INSERT INTO AccountsAudit (AccountId, OperationType, VirtualPcId, Username, Password, BackupPassword, Admin, VerifyHash, Updated, ChangedBy)
+    SELECT AccountId, 'INSERT', VirtualPcId, Username, Password, BackupPassword, Admin, VerifyHash, GETDATE(), SYSTEM_USER
+    FROM inserted
+    WHERE NOT EXISTS (SELECT 1 FROM deleted WHERE deleted.AccountId = inserted.AccountId);
 
-INSERT INTO AccountsAudit (AccountId, OperationType, VirtualPcId, Username, Password, BackupPassword, Admin, VerifyHash, Updated, ChangedBy)
-VALUES (@AccountId, @OperationType, @VirtualPcId, @Username, @Password, @BackupPassword, @Admin, @VerifyHash, GETDATE(), SYSTEM_USER);
+    INSERT INTO AccountsAudit (AccountId, OperationType, VirtualPcId, Username, Password, BackupPassword, Admin, VerifyHash, Updated, ChangedBy)
+    SELECT AccountId, 'UPDATE', VirtualPcId, Username, Password, BackupPassword, Admin, VerifyHash, GETDATE(), SYSTEM_USER
+    FROM inserted
+    WHERE EXISTS (SELECT 1 FROM deleted WHERE deleted.AccountId = inserted.AccountId);
+
+    INSERT INTO AccountsAudit (AccountId, OperationType, VirtualPcId, Username, Password, BackupPassword, Admin, VerifyHash, Updated, ChangedBy)
+    SELECT AccountId, 'DELETE', VirtualPcId, Username, Password, BackupPassword, Admin, VerifyHash, GETDATE(), SYSTEM_USER
+    FROM deleted
+    WHERE NOT EXISTS (SELECT 1 FROM inserted WHERE inserted.AccountId = deleted.AccountId);
 END;
 
 GO
 
 CREATE TRIGGER trg_CustomersVirtualPCs_Audit
     ON CustomersVirtualPCs
-    FOR INSERT, UPDATE, DELETE
+    AFTER INSERT, DELETE
     AS
 BEGIN
-    DECLARE @MappingId UNIQUEIDENTIFIER, @CustomerId UNIQUEIDENTIFIER, @VirtualPcId UNIQUEIDENTIFIER,
-            @OperationType NVARCHAR(50);
+    SET NOCOUNT ON;
 
-    IF EXISTS (SELECT * FROM inserted)
-        BEGIN
-            SET @OperationType = 'INSERT';
-            SELECT @MappingId = MappingId, @CustomerId = CustomerId, @VirtualPcId = VirtualPcId
-            FROM inserted;
-        END
-    ELSE IF EXISTS (SELECT * FROM deleted)
-        BEGIN
-            SET @OperationType = 'DELETE';
-            SELECT @MappingId = MappingId, @CustomerId = CustomerId, @VirtualPcId = VirtualPcId
-            FROM deleted;
-        END
-INSERT INTO CustomersVirtualPCsAudit (MappingId, OperationType, CustomerId, VirtualPcId, Updated, ChangedBy)
-VALUES (@MappingId, @OperationType, @CustomerId, @VirtualPcId, GETDATE(), SYSTEM_USER);
+    INSERT INTO CustomersVirtualPCsAudit (MappingId, OperationType, CustomerId, VirtualPcId, Updated, ChangedBy)
+    SELECT MappingId, 'INSERT', CustomerId, VirtualPcId, GETDATE(), SYSTEM_USER
+    FROM inserted;
+
+    INSERT INTO CustomersVirtualPCsAudit (MappingId, OperationType, CustomerId, VirtualPcId, Updated, ChangedBy)
+    SELECT MappingId, 'DELETE', CustomerId, VirtualPcId, GETDATE(), SYSTEM_USER
+    FROM deleted;
 END;
+GO

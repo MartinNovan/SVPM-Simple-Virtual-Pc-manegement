@@ -22,7 +22,6 @@ public class Account : INotifyPropertyChanged
             {
                 _associatedVirtualPc = value;
                 NotifyPropertyChanged();
-                NotifyPropertyChanged(nameof(VirtualPcName));
             }
         }
     }
@@ -93,8 +92,7 @@ public class Account : INotifyPropertyChanged
         }
     }
     public string? VerifyHash { get; set; }
-
-    public string? VirtualPcName => AssociatedVirtualPc?.VirtualPcName;
+    
     private RecordStates _recordState;
     public RecordStates RecordState
     {

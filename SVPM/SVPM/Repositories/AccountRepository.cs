@@ -83,6 +83,7 @@ public static class AccountRepository
             deleteCommand.CommandType = CommandType.StoredProcedure;
             deleteCommand.Parameters.AddWithValue("@AccountId", account.AccountId);
 
+            await deleteCommand.ExecuteNonQueryAsync();
             Accounts.Remove(account);
         }
         catch (Exception ex)
