@@ -24,9 +24,9 @@ public partial class LoadingPage
         {
             LoadingData();
         }
-        Navigation.PopAsync();
+        //Navigation.PopAsync();
     }
-    private async void LoadingData()
+    private async Task LoadingData()
     {
         try
         {

@@ -10,6 +10,11 @@
              Loaded="LoadingPage_OnLoaded">
     <ContentPage.Content>
         <StackLayout HorizontalOptions="Fill" VerticalOptions="Center">
+            <StackLayout>
+                <Image Style="{StaticResource PcIcon}" HeightRequest="70" WidthRequest="70"/>
+                <ActivityIndicator IsRunning="True"/>
+                <Image Style="{StaticResource CloudIcon}" HeightRequest="70" WidthRequest="70"/>
+            </StackLayout>
             <Label x:Name="Text" VerticalOptions="Center" HorizontalOptions="Center" FontSize="20" FontAttributes="Bold"/>
             <ProgressBar x:Name="ProgressBar" Margin="20,5"/>
         </StackLayout>
