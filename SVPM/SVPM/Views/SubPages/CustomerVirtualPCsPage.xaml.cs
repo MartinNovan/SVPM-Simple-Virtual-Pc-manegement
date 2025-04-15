@@ -18,7 +18,7 @@ namespace SVPM.Views.SubPages
         {
             try
             {
-                VirtualPCsListView.ItemsSource = VirtualPCs.Where(a => a.OwningCustomersNames != null && a.OwningCustomersNames.Contains(_customer.FullName!)).ToList();
+                VirtualPCsListView.ItemsSource = VirtualPCs.Where(a => a.OwningCustomersNames != null && a.OwningCustomersNames.Contains(_customer.FullName!));
             }
             catch (Exception ex)
             {
@@ -31,16 +31,15 @@ namespace SVPM.Views.SubPages
 
             if (string.IsNullOrWhiteSpace(searchText))
             {
-                VirtualPCsListView.ItemsSource = VirtualPCs;
+                VirtualPCsListView.ItemsSource = VirtualPCs.Where(a => a.OwningCustomersNames != null && a.OwningCustomersNames.Contains(_customer.FullName!));
             }
             else
             {
-                if (VirtualPCs != null)
-                    VirtualPCsListView.ItemsSource = VirtualPCs
-                        .Where(a => a is { VirtualPcName: not null } &&
-                                    (a.VirtualPcName.ToLower().Contains(searchText) ||
-                                    a.OwningCustomersNames.Contains(_customer.FullName!)))
-                        .ToList();
+                VirtualPCsListView.ItemsSource = VirtualPCs
+                    .Where(a => a.OwningCustomersNames != null &&
+                                a.VirtualPcName != null &&
+                                a.VirtualPcName.ToLower().Contains(searchText) &&
+                                a.OwningCustomersNames.Contains(_customer.FullName!));
             }
         }
 
@@ -71,9 +70,5 @@ namespace SVPM.Views.SubPages
             }
         }
 
-        private void ReloadButton_OnClicked(object? sender, EventArgs e)
-        {
-            LoadVirtualPCs();
-        }
     }
 }

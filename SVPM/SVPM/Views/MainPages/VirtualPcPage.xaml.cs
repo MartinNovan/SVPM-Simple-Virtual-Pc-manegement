@@ -10,7 +10,6 @@ public partial class VirtualPcPage
     public VirtualPcPage()
     {
         InitializeComponent();
-        VirtualPCsListView.ItemsSource = VirtualPCs;
     }
     private void OnSearchBarTextChanged(object sender, TextChangedEventArgs e)
     {
@@ -55,7 +54,7 @@ public partial class VirtualPcPage
         }
     }
 
-    private async void EditConnection_Clicked(object? sender, EventArgs e)
+    private async void EditButton_Clicked(object? sender, EventArgs e)
     {
         try
         {
@@ -92,5 +91,10 @@ public partial class VirtualPcPage
         {
             await DisplayAlert("Error", $"Failed to delete virtual pc: {ex.Message}", "OK");
         }
+    }
+
+    private void VirtualPCsListView_OnLoaded(object? sender, EventArgs e)
+    {
+        VirtualPCsListView.ItemsSource = VirtualPCs;
     }
 }

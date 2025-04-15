@@ -1,7 +1,6 @@
 ﻿using SVPM.Models;
 using SVPM.Repositories;
 using SVPM.Views.CreatingPages;
-using static SVPM.Repositories.AccountRepository;
 
 namespace SVPM.Views.MainPages;
 //TODO: Change list view to collection view
@@ -10,7 +9,6 @@ public partial class AccountsPage
     public AccountsPage()
     {
         InitializeComponent();
-        AccountsListView.ItemsSource = AccountRepository.Accounts;
     }
     private void OnSearchBarTextChanged(object sender, TextChangedEventArgs e)
     {
@@ -23,7 +21,7 @@ public partial class AccountsPage
             .FirstOrDefault(a => a.Username?.ToLower().Contains(searchText) ?? false);
         if (match != null)
         {
-            AccountsListView.ScrollTo(match, position: ScrollToPosition.Start, animated: true);
+            AccountsListView.ScrollTo(match, position: ScrollToPosition.Start, animate: true);
         }
     }
     private async void AddButton_OnClicked(object? sender, EventArgs e)
@@ -38,9 +36,10 @@ public partial class AccountsPage
         }
     }
 
-    private void EditConnection_Clicked(object? sender, EventArgs e)
+    private void EditButton_Clicked(object? sender, EventArgs e)
     {
-        Navigation.PushAsync(new CreateAccount());
+        if (sender is not ImageButton { BindingContext: Account account } || account.RecordState == RecordStates.Deleted) return;
+        Navigation.PushAsync(new CreateAccount(account));
     }
 
     private async void OnDeleteButtonClicked(object? sender, EventArgs e)
@@ -61,5 +60,10 @@ public partial class AccountsPage
         {
             await DisplayAlert("Error", $"Failed to delete customer: {ex.Message}", "OK");
         }
+    }
+
+    private void AccountsListView_OnLoaded(object? sender, EventArgs e)
+    {
+        AccountsListView.ItemsSource = AccountRepository.Accounts;
     }
 }

@@ -9,7 +9,7 @@
             <SearchBar Grid.Column="1" Placeholder="Search for customers..."  TextChanged="OnSearchBarTextChanged"/>
             <Button Grid.Column="2" Text="+" Clicked="AddButton_OnClicked" VerticalOptions="End" FontSize="20" ToolTipProperties.Text="Add a new record." />
         </Grid>
-        <CollectionView x:Name="CustomersListView" SelectionChanged="CustomersListView_ItemTapped" SelectionMode="Single" CanReorderItems="True" VerticalOptions="FillAndExpand">
+        <CollectionView x:Name="CustomersListView" SelectionChanged="CustomersListView_ItemTapped" SelectionMode="Single" CanReorderItems="True" VerticalOptions="FillAndExpand" Loaded="CustomersListView_OnLoaded">
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="models:Customer">
                     <StackLayout>
@@ -32,9 +32,9 @@
                                     <Label Text="{Binding Updated}" Grid.Column="1" Grid.Row="3"/>
                                 </Grid>
                             </StackLayout>
-                            <StackLayout Grid.Column="2">
-                                <ImageButton Style="{DynamicResource EditImage}" Scale="0.7" CornerRadius="3" HeightRequest="10" WidthRequest="10" VerticalOptions="Center" BackgroundColor="Transparent" Clicked="EditConnection_Clicked" ToolTipProperties.Text="Click to edit this connection." />
-                                <ImageButton Style="{DynamicResource DeleteImage}"  Scale="0.7" CornerRadius="3" HeightRequest="10" WidthRequest="10" VerticalOptions="Center" BackgroundColor="Transparent" Clicked="OnDeleteButtonClicked" ToolTipProperties.Text="Click to remove this connection." Margin="0,0,3,0"/>
+                            <StackLayout Grid.Column="2" VerticalOptions="Center" HorizontalOptions="Center">
+                                <ImageButton Style="{DynamicResource EditImage}" Scale="0.7" CornerRadius="3" HeightRequest="10" WidthRequest="10" VerticalOptions="Center" BackgroundColor="Transparent" Clicked="EditButton_Clicked" ToolTipProperties.Text="Click to edit this customer." />
+                                <ImageButton Style="{DynamicResource DeleteImage}"  Scale="0.7" CornerRadius="3" HeightRequest="10" WidthRequest="10" VerticalOptions="Center" BackgroundColor="Transparent" Clicked="OnDeleteButtonClicked" ToolTipProperties.Text="Click to remove this customer." Margin="0,0,3,0"/>
                             </StackLayout>
                         </Grid>
                         <BoxView HeightRequest="1" Color="Gray" Margin="5,0" />

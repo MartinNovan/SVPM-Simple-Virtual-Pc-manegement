@@ -8,8 +8,8 @@
         <StackLayout Grid.Column="0" MaximumWidthRequest="300">
             <ScrollView HorizontalScrollBarVisibility="Always">
                 <StackLayout Padding="10">
-                    <Image Source="avatar.png" HeightRequest="200" WidthRequest="500" />
-                    <Label Text="Jméno:"/>
+                    <Image Style="{DynamicResource Key=CustomerImage}" HeightRequest="200" WidthRequest="500" />
+                    <Label Text="Name:"/>
                     <Label Text="{Binding FullName}" FontSize="18" />
                     <BoxView HeightRequest="1" Color="Gray" Margin="0,5,0,5" />
                     <Label Text="Tag:"/>
@@ -18,10 +18,10 @@
                     <Label Text="Email:"/>
                     <Label Text="{Binding Email}" FontSize="18" />
                     <BoxView HeightRequest="1" Color="Gray" Margin="0,5,0,5" />
-                    <Label Text="Telefon:"/>
+                    <Label Text="Phone:"/>
                     <Label Text="{Binding Phone}" FontSize="18" />
                     <BoxView HeightRequest="1" Color="Gray" Margin="0,5,0,5" />
-                    <Label Text="Poznámky:"/>
+                    <Label Text="Notes:"/>
                     <Label Text="{Binding Notes}" FontSize="18" />
                 </StackLayout>
             </ScrollView>
@@ -31,7 +31,6 @@
             <Label Grid.Column="0" Text="Virtual PCs:" FontSize="24" VerticalOptions="Center"/>
             <SearchBar Grid.Column="1" Placeholder="Search for virtual PCs..." TextChanged="OnSearchBarTextChanged" />
             <Button x:Name="AddButton" Grid.Column="2" Text="+" Clicked="AddButton_OnClicked" VerticalOptions="End" FontSize="20" ToolTipProperties.Text="Add a new record." />
-            <Button x:Name="RefreshButton" Grid.Column="3" Text="⟳" Clicked="ReloadButton_OnClicked" VerticalOptions="End" FontSize="20" ToolTipProperties.Text="Refresh this list from database."/>
         </Grid>
         <ListView x:Name="VirtualPCsListView" ItemTapped="VirtualPcListView_ItemTapped" >
             <ListView.ItemTemplate>

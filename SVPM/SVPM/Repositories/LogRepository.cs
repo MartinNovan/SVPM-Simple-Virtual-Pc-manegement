@@ -1,21 +1,16 @@
-﻿using System.Collections.ObjectModel;
-using System.Data;
+﻿using System.Data;
 using Microsoft.Data.SqlClient;
 using SVPM.Models;
+using SVPM.ViewModels;
 using SqlConnection = Microsoft.Data.SqlClient.SqlConnection;
 
 namespace SVPM.Repositories;
 
 public static class LogRepository
 {
-    public static ObservableCollection<CustomerLog> CustomersLogs { get; set; } = new();
-    public static ObservableCollection<VirtualPcLog> VirtualPcsLogs { get; set; } = new();
-    public static ObservableCollection<MappingLog> MappingsLogs { get; set; } = new();
-    public static ObservableCollection<AccountLog> AccountsLogs { get; set; } = new();
-
     private static async Task GetCustomerLogs()
     {
-        CustomersLogs.Clear();
+        CustomerLogViewModel.CustomersLogs.Clear();
         await using var connection = new SqlConnection(GlobalSettings.ConnectionString);
         await connection.OpenAsync();
 
@@ -40,13 +35,13 @@ public static class LogRepository
                 Updated = reader.GetDateTime(reader.GetOrdinal("Updated")),
                 ChangedBy = reader.GetString(reader.GetOrdinal("ChangedBy")),
             };
-            CustomersLogs.Add(customerLog);
+            CustomerLogViewModel.CustomersLogs.Add(customerLog);
         }
     }
 
     private static async Task GetVirtualPcLogs()
     {
-        VirtualPcsLogs.Clear();
+        VirtualPcLogViewModel.VirtualPcsLogs.Clear();
         await using var connection = new SqlConnection(GlobalSettings.ConnectionString);
         await connection.OpenAsync();
 
@@ -89,13 +84,13 @@ public static class LogRepository
                 ChangedBy = reader.GetString(reader.GetOrdinal("ChangedBy")),
             };
 
-            VirtualPcsLogs.Add(virtualPcLog);
+            VirtualPcLogViewModel.VirtualPcsLogs.Add(virtualPcLog);
         }
     }
 
     private static async Task GetMappingLogs()
     {
-        MappingsLogs.Clear();
+        MappingLogViewModel.MappingsLogs.Clear();
         await using var connection = new SqlConnection(GlobalSettings.ConnectionString);
         await connection.OpenAsync();
 
@@ -115,13 +110,13 @@ public static class LogRepository
                 Updated = reader.GetDateTime(reader.GetOrdinal("Updated")),
                 ChangedBy = reader.GetString(reader.GetOrdinal("ChangedBy")),
             };
-            MappingsLogs.Add(mappingLog);
+            MappingLogViewModel.MappingsLogs.Add(mappingLog);
         }
     }
 
     private static async Task GetAccountsLogs()
     {
-        AccountsLogs.Clear();
+        AccountLogViewModel.AccountsLogs.Clear();
         await using var connection = new SqlConnection(GlobalSettings.ConnectionString);
         await connection.OpenAsync();
         
@@ -150,7 +145,7 @@ public static class LogRepository
                 ChangedBy = reader.GetString(reader.GetOrdinal("ChangedBy")),
 
             };
-            AccountsLogs.Add(accountLog);
+            AccountLogViewModel.AccountsLogs.Add(accountLog);
         }
     }
     

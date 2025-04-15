@@ -22,7 +22,7 @@
                 </Grid>
                 <BoxView HeightRequest="2" Color="Gray" Margin="5,0" />
             </StackLayout>
-            <CollectionView x:Name="AccountsLogList" Grid.Row="1" Margin="5" SelectionMode="None">
+            <CollectionView x:Name="AccountsLogList" Grid.Row="1" Margin="5" SelectionMode="None" Loaded="AccountsLogList_OnLoaded">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="models:AccountLog">
                         <StackLayout>

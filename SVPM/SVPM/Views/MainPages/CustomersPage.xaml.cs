@@ -12,7 +12,6 @@ public partial class CustomersPage
     public CustomersPage()
     {
         InitializeComponent();
-        CustomersListView.ItemsSource = Customers;
     }
 
     private void OnSearchBarTextChanged(object sender, TextChangedEventArgs e)
@@ -59,7 +58,7 @@ public partial class CustomersPage
         }
     }
 
-    private async void EditConnection_Clicked(object? sender, EventArgs e)
+    private async void EditButton_Clicked(object? sender, EventArgs e)
     {
         try
         {
@@ -103,5 +102,10 @@ public partial class CustomersPage
         {
             await DisplayAlert("Error", $"Failed to delete customer: {ex.Message}", "OK");
         }
+    }
+
+    private void CustomersListView_OnLoaded(object? sender, EventArgs e)
+    {
+        CustomersListView.ItemsSource = Customers;
     }
 }

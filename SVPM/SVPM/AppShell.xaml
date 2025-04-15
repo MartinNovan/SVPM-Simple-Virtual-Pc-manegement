@@ -13,8 +13,8 @@
                      <Label Grid.Column="0" Text="Selected database:" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
                      <Picker Grid.Column="1" x:Name="SqlPicker" SelectedIndexChanged="SqlPicker_OnSelectedIndexChanged" Loaded="SqlPicker_OnLoaded" ItemDisplayBinding="{Binding Name}" Width="200" />
                      <StackLayout Grid.Column="2" Orientation="Horizontal">
-                            <Label Text="Upload all:" ToolTipProperties.Text="This will upload all local data to the database." VerticalTextAlignment="Center" HorizontalTextAlignment="Center"/>
-                            <CheckBox x:Name="UploadAllCheckBox" IsChecked="False" CheckedChanged="CheckBox_OnCheckedChanged"/>
+                            <Label Text="Upload all:" ToolTipProperties.Text="This is not yet implemented!" VerticalTextAlignment="Center" HorizontalTextAlignment="Center"/> <!-- ToolTipProperties.Text="This will upload all local data to the database." -->
+                            <CheckBox x:Name="UploadAllCheckBox" IsChecked="False" IsEnabled="False" ToolTipProperties.Text="This is not yet implemented!" CheckedChanged="CheckBox_OnCheckedChanged" />
                      </StackLayout>
                      <Button Grid.Column="3" Text="Pull data ↓" Clicked="PullFromDatabase"/>
                      <Button Grid.Column="4" Text="Push data ↑" Clicked="PushToDatabase"/>
