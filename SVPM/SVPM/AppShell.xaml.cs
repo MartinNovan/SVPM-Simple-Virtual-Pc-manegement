@@ -1,8 +1,5 @@
-﻿using System.Collections.ObjectModel;
-using System.Text.Json;
-using Microsoft.Data.SqlClient;
-using SVPM.Models;
-using SVPM.Repositories;
+﻿using Microsoft.Data.SqlClient;
+using SVPM.ViewModels;
 using SVPM.Views.MainPages;
 using SqlConnection = SVPM.Models.SqlConnection;
 
@@ -10,36 +7,10 @@ namespace SVPM;
 //TODO Dodělat setting page, ukládat neuložené hodnoty například to TEMP souboru, možnost automaticky (např. 5min intervali) ukládat do databáze a kontrolovat změny v databázi a dodělat setting JSON soubor
 public partial class AppShell
 {
-    public static ObservableCollection<SqlConnection> SqlConnections { get; } = new();
-    private static readonly string? Connectionlist = GlobalSettings.ConnectionListPath;
     private int _lastlySelectedItem = -1;
     public AppShell()
     {
         InitializeComponent();
-    }
-
-    private async Task LoadSqlConnectionsAsync()
-    {
-        try
-        {
-            FileHelpers.CreateJsonFileIfNotExists();
-            var json = await File.ReadAllTextAsync(Connectionlist!);
-            if (!string.IsNullOrEmpty(json))
-            {
-                var connections = JsonSerializer.Deserialize<List<SqlConnection>>(json) ?? new();
-                SqlConnections.Clear();
-                connections.ForEach(SqlConnections.Add);
-            }
-        }
-        catch (JsonException ex)
-        {
-            await DisplayAlert("Error", $"Invalid JSON format. A new file has been created.\nDetails: {ex.Message}", "OK");
-            FileHelpers.CreateJsonFileIfNotExists();
-        }
-        catch (Exception ex)
-        {
-            await DisplayAlert("Error", $"Failed to load connection: {ex.Message}", "OK");
-        }
     }
 
     private async void SqlPicker_OnSelectedIndexChanged(object? sender, EventArgs e)
@@ -47,28 +18,7 @@ public partial class AppShell
         try
         {
             if (SqlPicker.SelectedItem is not SqlConnection connection) return;
-            var builder = new SqlConnectionStringBuilder
-            {
-                DataSource = connection.ServerAddress,
-                InitialCatalog = connection.DatabaseName,
-                IntegratedSecurity = connection.UseWindowsAuth,
-                TrustServerCertificate = !connection.UseCertificate
-            };
-
-            if (!connection.UseWindowsAuth)
-            {
-                builder.UserID = connection.Username;
-                builder.Password = connection.Password;
-            }
-
-            if (connection.UseCertificate && !string.IsNullOrWhiteSpace(connection.CertificatePath))
-            {
-                builder.ServerCertificate = connection.CertificatePath;
-            }
-
-            await using var sqlConnection = new Microsoft.Data.SqlClient.SqlConnection(builder.ToString());
-            await sqlConnection.OpenAsync();
-            GlobalSettings.ConnectionString = builder.ToString();
+            await SqlConnectionViewModel.Instance.SelectConnectionAsync(connection);
             _lastlySelectedItem = SqlPicker.SelectedIndex;
         }
         catch (Exception ex)
@@ -82,8 +32,7 @@ public partial class AppShell
     {
         try
         {
-            await LoadSqlConnectionsAsync();
-            SqlPicker.ItemsSource = SqlConnections;
+            SqlPicker.ItemsSource = SqlConnectionViewModel.Instance.SortedSqlConnections;
             if(_lastlySelectedItem != -1)  SqlPicker.SelectedIndex = _lastlySelectedItem;
         }
         catch (Exception ex)
@@ -109,14 +58,7 @@ public partial class AppShell
     {
         try
         {
-            if(GlobalSettings.ConnectionString == null) return;
-            /*
-            if(CustomerRepository.Customers.All(c => c.RecordState == RecordStates.Loaded) || CustomerRepository.Customers.All(vpc => vpc.RecordState == RecordStates.Loaded) || AccountRepository.Accounts.All(a => a.RecordState == RecordStates.Loaded))
-            {
-                await DisplayAlert("Info", "No changes made, skipping pushing!", "OK");
-                return;
-            }
-            */
+            if (GlobalSettings.ConnectionString == null) return;
             await Navigation.PushAsync(new LoadingPage(true));
         }
         catch (Exception ex)

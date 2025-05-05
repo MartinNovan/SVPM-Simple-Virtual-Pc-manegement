@@ -13,10 +13,6 @@ public partial class MappingsLogPage
     public MappingsLogPage()
     {
         InitializeComponent();
-    }
-
-    private void MappingsLogList_OnLoaded(object? sender, EventArgs e)
-    {
-        MappingsLogList.ItemsSource = MappingLogViewModel.MappingsLogs.OrderByDescending(ml => ml.Updated);
+        BindingContext = MappingLogViewModel.Instance;
     }
 }

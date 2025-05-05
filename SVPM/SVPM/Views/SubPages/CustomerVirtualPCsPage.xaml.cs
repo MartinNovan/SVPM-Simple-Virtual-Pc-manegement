@@ -18,7 +18,8 @@ namespace SVPM.Views.SubPages
         {
             try
             {
-                VirtualPCsListView.ItemsSource = VirtualPCs.Where(a => a.OwningCustomersNames != null && a.OwningCustomersNames.Contains(_customer.FullName!));
+                //TODO: FINISH THIS
+                VirtualPCsListView.ItemsSource = VirtualPCs;
             }
             catch (Exception ex)
             {
@@ -31,15 +32,13 @@ namespace SVPM.Views.SubPages
 
             if (string.IsNullOrWhiteSpace(searchText))
             {
-                VirtualPCsListView.ItemsSource = VirtualPCs.Where(a => a.OwningCustomersNames != null && a.OwningCustomersNames.Contains(_customer.FullName!));
+                VirtualPCsListView.ItemsSource = VirtualPCs;
             }
             else
             {
                 VirtualPCsListView.ItemsSource = VirtualPCs
-                    .Where(a => a.OwningCustomersNames != null &&
-                                a.VirtualPcName != null &&
-                                a.VirtualPcName.ToLower().Contains(searchText) &&
-                                a.OwningCustomersNames.Contains(_customer.FullName!));
+                    .Where(a => a.VirtualPcName != null &&
+                                a.VirtualPcName.ToLower().Contains(searchText));
             }
         }
 

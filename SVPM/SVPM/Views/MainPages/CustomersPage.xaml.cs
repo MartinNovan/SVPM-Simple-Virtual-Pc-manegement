@@ -87,12 +87,6 @@ public partial class CustomersPage
                 mapping.RecordState = RecordStates.Deleted;
             }
 
-            foreach (var vpc in VirtualPCs.Where(vpc =>
-                         vpc.OwningCustomers != null && vpc.OwningCustomers.Contains(customer)))
-            {
-                if (vpc.OwningCustomers != null) vpc.OwningCustomers.Remove(customer);
-            }
-
             if (customer.OriginalRecordState != RecordStates.Loaded)
             {
                 Customers.Remove(customer);

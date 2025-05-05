@@ -35,13 +35,8 @@ public partial class CreateVirtualPc
         IpAddressEntry.Text = virtualPc.IpAddress ?? string.Empty;
         FqdnEntry.Text = virtualPc.Fqdn ?? string.Empty;
         NotesEntry.Text = virtualPc.Notes ?? string.Empty;
-        if (virtualPc.OwningCustomers != null)
-        {
-            foreach (var owningCustomer in virtualPc.OwningCustomers)
-            {
-                CustomerCollectionView.SelectedItems.Add(owningCustomer);
-            }
-        }
+        //TODO: Add customer names to the list
+        CustomerCollectionView.SelectedItems = null;
     }
 
     private void OnSearchTextChanged(object? sender, TextChangedEventArgs e)
@@ -88,18 +83,15 @@ public partial class CreateVirtualPc
 
                     foreach (var customer in Customers)
                     {
-                        if (!CustomerCollectionView.SelectedItems.Contains(customer) &&
-                            existingVirtualPc.OwningCustomers!.Contains(customer))
+                        if (!CustomerCollectionView.SelectedItems.Contains(customer))
                         {
                             var deleteMapping = Mappings.FirstOrDefault(m =>
                                 m.CustomerId == customer.CustomerId &&
                                 m.VirtualPcId == existingVirtualPc.VirtualPcId &&
                                 m.RecordState != RecordStates.Deleted);
                             if (deleteMapping != null) deleteMapping.RecordState = RecordStates.Deleted;
-                            existingVirtualPc.OwningCustomers.Remove(customer);
                         }
-                        else if (CustomerCollectionView.SelectedItems.Contains(customer) &&
-                                 !existingVirtualPc.OwningCustomers!.Contains(customer))
+                        else if (CustomerCollectionView.SelectedItems.Contains(customer))
                         {
                             var customerVirtualPc = new Mapping
                             {
@@ -108,11 +100,9 @@ public partial class CreateVirtualPc
                                 RecordState = RecordStates.Created
                             };
                             Mappings.Add(customerVirtualPc);
-                            existingVirtualPc.OwningCustomers.Add(customer);
                         }
                     }
                     existingVirtualPc.VerifyHash = CalculateHash.CalculateVerifyHash(null, existingVirtualPc);
-                    existingVirtualPc.SetOwningCustomersNames();
                 }
             }
             else
@@ -133,7 +123,6 @@ public partial class CreateVirtualPc
                     Notes = NotesEntry.Text,
                     Updated = DateTime.Now,
                     RecordState = RecordStates.Created,
-                    OwningCustomers = new ObservableCollection<Customer>()
                 };
                 if (CustomerCollectionView.SelectedItems.Count != 0)
                 {
@@ -148,10 +137,8 @@ public partial class CreateVirtualPc
                                 RecordState = RecordStates.Created
                             };
                             Mappings.Add(customerVirtualPc);
-                            virtualPc.OwningCustomers?.Add(selectedCustomer);
                         }
                     }
-                    virtualPc.SetOwningCustomersNames();
                 }
                 virtualPc.VerifyHash = CalculateHash.CalculateVerifyHash(null, virtualPc);
                 virtualPc.InitializeOriginalValues();

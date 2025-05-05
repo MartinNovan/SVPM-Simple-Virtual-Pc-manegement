@@ -1,16 +1,14 @@
 ﻿using System.Data;
 using Microsoft.Data.SqlClient;
 using SVPM.Models;
-using SVPM.ViewModels;
 using SqlConnection = Microsoft.Data.SqlClient.SqlConnection;
 
 namespace SVPM.Repositories;
 
 public static class LogRepository
 {
-    private static async Task GetCustomerLogs()
+    public static async Task<List<CustomerLog>> GetCustomerLogs()
     {
-        CustomerLogViewModel.CustomersLogs.Clear();
         await using var connection = new SqlConnection(GlobalSettings.ConnectionString);
         await connection.OpenAsync();
 
@@ -18,7 +16,8 @@ public static class LogRepository
         getCommand.CommandType = CommandType.StoredProcedure;
 
         await using var reader = await getCommand.ExecuteReaderAsync();
-
+        
+        var logs = new List<CustomerLog>();
         while (await reader.ReadAsync())
         {
             var customerLog = new CustomerLog
@@ -35,13 +34,13 @@ public static class LogRepository
                 Updated = reader.GetDateTime(reader.GetOrdinal("Updated")),
                 ChangedBy = reader.GetString(reader.GetOrdinal("ChangedBy")),
             };
-            CustomerLogViewModel.CustomersLogs.Add(customerLog);
+            logs.Add(customerLog);
         }
+        return logs;
     }
 
-    private static async Task GetVirtualPcLogs()
+    public static async Task<List<VirtualPcLog>> GetVirtualPcLogs()
     {
-        VirtualPcLogViewModel.VirtualPcsLogs.Clear();
         await using var connection = new SqlConnection(GlobalSettings.ConnectionString);
         await connection.OpenAsync();
 
@@ -49,6 +48,8 @@ public static class LogRepository
         getCommand.CommandType = CommandType.StoredProcedure;
 
         await using var reader = await getCommand.ExecuteReaderAsync();
+        
+        var logs = new List<VirtualPcLog>();
         while (await reader.ReadAsync())
         {
             var virtualPcLog = new VirtualPcLog
@@ -84,13 +85,13 @@ public static class LogRepository
                 ChangedBy = reader.GetString(reader.GetOrdinal("ChangedBy")),
             };
 
-            VirtualPcLogViewModel.VirtualPcsLogs.Add(virtualPcLog);
+            logs.Add(virtualPcLog);
         }
+        return logs;
     }
 
-    private static async Task GetMappingLogs()
+    public static async Task<List<MappingLog>> GetMappingLogs()
     {
-        MappingLogViewModel.MappingsLogs.Clear();
         await using var connection = new SqlConnection(GlobalSettings.ConnectionString);
         await connection.OpenAsync();
 
@@ -98,6 +99,8 @@ public static class LogRepository
         getCommand.CommandType = CommandType.StoredProcedure;
 
         await using var reader = await getCommand.ExecuteReaderAsync();
+        
+        var logs = new List<MappingLog>();
         while (await reader.ReadAsync())
         {
             var mappingLog = new MappingLog
@@ -110,13 +113,13 @@ public static class LogRepository
                 Updated = reader.GetDateTime(reader.GetOrdinal("Updated")),
                 ChangedBy = reader.GetString(reader.GetOrdinal("ChangedBy")),
             };
-            MappingLogViewModel.MappingsLogs.Add(mappingLog);
+            logs.Add(mappingLog);
         }
+        return logs;
     }
 
-    private static async Task GetAccountsLogs()
+    public static async Task<List<AccountLog>> GetAccountsLogs()
     {
-        AccountLogViewModel.AccountsLogs.Clear();
         await using var connection = new SqlConnection(GlobalSettings.ConnectionString);
         await connection.OpenAsync();
         
@@ -124,6 +127,8 @@ public static class LogRepository
         getCommand.CommandType = CommandType.StoredProcedure;
         
         await using var reader = await getCommand.ExecuteReaderAsync();
+        
+        var logs = new List<AccountLog>();
         while (await reader.ReadAsync())
         {
             var accountLog = new AccountLog
@@ -145,15 +150,8 @@ public static class LogRepository
                 ChangedBy = reader.GetString(reader.GetOrdinal("ChangedBy")),
 
             };
-            AccountLogViewModel.AccountsLogs.Add(accountLog);
+            logs.Add(accountLog);
         }
-    }
-    
-    public static async Task GetAllLogs()
-    {
-        await GetCustomerLogs();
-        await GetVirtualPcLogs();
-        await GetMappingLogs();
-        await GetAccountsLogs();
+        return logs;
     }
 }

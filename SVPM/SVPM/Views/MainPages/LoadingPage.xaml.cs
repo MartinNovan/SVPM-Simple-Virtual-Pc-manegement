@@ -1,4 +1,5 @@
 ﻿using SVPM.Repositories;
+using SVPM.ViewModels;
 using static SVPM.Repositories.CustomerRepository;
 using static SVPM.Repositories.CustomersVirtualPCsRepository;
 using static SVPM.Repositories.VirtualPcRepository;
@@ -24,9 +25,8 @@ public partial class LoadingPage
         {
             LoadingData();
         }
-        //Navigation.PopAsync();
     }
-    private async Task LoadingData()
+    private async void LoadingData()
     {
         try
         {
@@ -43,13 +43,18 @@ public partial class LoadingPage
             await GetAllAccountsAsync();
             ProgressBar.Progress = 0.8;
             Text.Text = "Loading Logs...";
-            await LogRepository.GetAllLogs();
+            await CustomerLogViewModel.Instance.LoadLogsAsync();
+            await VirtualPcLogViewModel.Instance.LoadLogsAsync();
+            await MappingLogViewModel.Instance.LoadLogsAsync();
+            await AccountLogViewModel.Instance.LoadLogsAsync();
             ProgressBar.Progress = 1;
             Text.Text = "Done!";
+            await Navigation.PopAsync();
         }
         catch (Exception ex)
         {
             await Application.Current!.Windows[0].Page!.DisplayAlert("Error", $"Error while loading data from database: {ex.Message}", "OK");
+            await Navigation.PopAsync();
         }
     }
 
@@ -82,10 +87,12 @@ public partial class LoadingPage
             }
             ProgressBar.Progress = 1;
             Text.Text = "Done!";
+            await Navigation.PopAsync();
         }
         catch (Exception ex)
         {
             await Application.Current!.Windows[0].Page!.DisplayAlert("Error", $"Error while pushing data to database: {ex.Message}", "OK");
+            await Navigation.PopAsync();
         }
     }
 }

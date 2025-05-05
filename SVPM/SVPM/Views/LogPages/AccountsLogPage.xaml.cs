@@ -13,10 +13,6 @@ public partial class AccountsLogPage
     public AccountsLogPage()
     {
         InitializeComponent();
-    }
-
-    private void AccountsLogList_OnLoaded(object? sender, EventArgs e)
-    {
-        AccountsLogList.ItemsSource = AccountLogViewModel.AccountsLogs.OrderByDescending(al => al.Updated);
+        BindingContext = AccountLogViewModel.Instance;
     }
 }

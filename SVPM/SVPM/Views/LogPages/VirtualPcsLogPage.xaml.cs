@@ -13,10 +13,6 @@ public partial class VirtualPcsLogPage
     public VirtualPcsLogPage()
     {
         InitializeComponent();
-    }
-
-    private void VirtualPcsLogList_OnLoaded(object? sender, EventArgs e)
-    {
-        VirtualPcsLogList.ItemsSource = VirtualPcLogViewModel.VirtualPcsLogs.OrderByDescending(vpcl => vpcl.Updated);
+        BindingContext = VirtualPcLogViewModel.Instance;
     }
 }

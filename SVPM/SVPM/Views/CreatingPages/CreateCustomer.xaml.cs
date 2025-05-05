@@ -28,12 +28,8 @@ public partial class CreateCustomer
         CustomerEmailEntry.Text = customer?.Email ?? string.Empty;
         CustomerPhoneEntry.Text = customer?.Phone ?? string.Empty;
         CustomerNotesEntry.Text = customer?.Notes ?? string.Empty;
-        var selectedVirtualPcs = VirtualPCs
-            .Where(vpc => vpc.OwningCustomers != null && customer != null && vpc.OwningCustomers.Contains(customer)).ToList();
-        foreach (var vpc in selectedVirtualPcs)
-        {
-            VpcCollectionView.SelectedItems.Add(vpc);
-        }
+        //TODO: Add vpc names to the list
+        VpcCollectionView.SelectedItems = null;
     }
     private void OnSearchTextChanged(object sender, TextChangedEventArgs e)
     {
@@ -85,14 +81,12 @@ public partial class CreateCustomer
                            };
 
                            Mappings.Add(customerVirtualPc);
-                           vpc.OwningCustomers?.Add(existingCustomer);
                        }
                        else if (!VpcCollectionView.SelectedItems.Contains(vpc) && vpc.OwningCustomers != null && vpc.OwningCustomers.Contains(existingCustomer))
                        {
                            var deleteMapping = Mappings.FirstOrDefault(m =>
                                m.CustomerId == existingCustomer.CustomerId && m.VirtualPcId == vpc.VirtualPcId && m.RecordState != RecordStates.Deleted);
                            if (deleteMapping != null) deleteMapping.RecordState = RecordStates.Deleted;
-                           vpc.OwningCustomers.Remove(existingCustomer);
                        }
                    }
                }
@@ -130,7 +124,6 @@ public partial class CreateCustomer
                        };
 
                        Mappings.Add(customerVirtualPc);
-                       selectedVirtualPc.OwningCustomers?.Add(customer);
                    }
                }
            }

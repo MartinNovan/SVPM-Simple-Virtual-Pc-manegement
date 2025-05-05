@@ -40,14 +40,8 @@ public static class VirtualPcRepository
                 Updated = reader.GetDateTime(reader.GetOrdinal("Updated")),
                 VerifyHash = reader.GetString(reader.GetOrdinal("VerifyHash")),
                 RecordState = RecordStates.Loaded,
-                OwningCustomers = new ObservableCollection<Customer>()
             };
-            foreach (var mapping in Mappings.Where(m => m.VirtualPcId == virtualPc.VirtualPcId))
-            {
-                virtualPc.OwningCustomers?.Add(Customers.First(c => c.CustomerId == mapping.CustomerId));
-            }
             virtualPc.InitializeOriginalValues();
-            virtualPc.SetOwningCustomersNames();
             VirtualPCs.Add(virtualPc);
         }
     }

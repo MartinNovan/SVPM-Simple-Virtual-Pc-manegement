@@ -197,41 +197,6 @@ public class VirtualPc : INotifyPropertyChanged
         }
     }
 
-    private ObservableCollection<Customer>? _owningCustomers;
-    public ObservableCollection<Customer>? OwningCustomers
-    {
-        get => _owningCustomers;
-        set
-        {
-            if (_owningCustomers != value)
-            {
-                _owningCustomers = value;
-                SetOwningCustomersNames();
-                NotifyPropertyChanged();
-            }
-        }
-    }
-    public void SetOwningCustomersNames()
-    {
-        OwningCustomersNames = OwningCustomers is { Count: > 0 }
-            ? string.Join(", ", OwningCustomers.Select(c => c.FullName))
-            : "No customers";
-    }
-    private string? _owningCustomersNames;
-
-    public string? OwningCustomersNames
-    {
-        get => _owningCustomersNames;
-        set
-        {
-            if (_owningCustomersNames != value)
-            {
-                _owningCustomersNames = value;
-                NotifyPropertyChanged();
-            }
-        }
-    }
-
     public string? OriginalVirtualPcName { get; private set; }
     public string? OriginalVerifyHash { get; private set; }
     public RecordStates OriginalRecordState { get; private set; }
