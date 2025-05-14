@@ -1,6 +1,5 @@
-﻿using System.Collections.ObjectModel;
-using SVPM.Models;
-using static SVPM.Repositories.CustomerRepository;
+﻿using SVPM.Models;
+using SVPM.ViewModels;
 using static SVPM.Repositories.CustomersVirtualPCsRepository;
 using static SVPM.Repositories.VirtualPcRepository;
 
@@ -8,6 +7,7 @@ namespace SVPM.Views.CreatingPages;
 public partial class CreateVirtualPc
 {
     private static VirtualPc? _updatedVirtualPc;
+    
     public CreateVirtualPc(VirtualPc? virtualPc = null)
     {
         InitializeComponent();
@@ -15,7 +15,7 @@ public partial class CreateVirtualPc
     }
     private void CustomerCollectionView_OnLoaded(object? sender, EventArgs e)
     {
-        CustomerCollectionView.ItemsSource = Customers.Where(c => c.RecordState != RecordStates.Deleted).OrderBy(c => c.FullName);
+        CustomerCollectionView.ItemsSource = CustomerViewModel.Instance.SortedCustomers;
         if (_updatedVirtualPc != null)
         {
             PopulateFields(_updatedVirtualPc);
@@ -42,14 +42,14 @@ public partial class CreateVirtualPc
     private void OnSearchTextChanged(object? sender, TextChangedEventArgs e)
     {
         string searchText = e.NewTextValue?.ToLower() ?? "";
-
+/*
         var match = Customers
             .FirstOrDefault(c => c.FullName != null && c.FullName.ToLower().Contains(searchText) && c.RecordState != RecordStates.Deleted);
 
         if (match != null)
         {
             CustomerCollectionView.ScrollTo(match, position: ScrollToPosition.Start, animate: true);
-        }
+        }*/
     }
     private async void VirtualPcConfirmClicked(object sender, EventArgs e)
     {
@@ -63,6 +63,7 @@ public partial class CreateVirtualPc
 
             if (_updatedVirtualPc != null)
             {
+                /*
                 var existingVirtualPc = VirtualPCs
                     .FirstOrDefault(vpc => vpc.VirtualPcId == _updatedVirtualPc.VirtualPcId);
                 if (existingVirtualPc != null)
@@ -103,7 +104,7 @@ public partial class CreateVirtualPc
                         }
                     }
                     existingVirtualPc.VerifyHash = CalculateHash.CalculateVerifyHash(null, existingVirtualPc);
-                }
+                }*/
             }
             else
             {
@@ -136,13 +137,13 @@ public partial class CreateVirtualPc
                                 VirtualPcId = virtualPc.VirtualPcId,
                                 RecordState = RecordStates.Created
                             };
-                            Mappings.Add(customerVirtualPc);
+                            //Mappings.Add(customerVirtualPc);
                         }
                     }
                 }
                 virtualPc.VerifyHash = CalculateHash.CalculateVerifyHash(null, virtualPc);
                 virtualPc.InitializeOriginalValues();
-                VirtualPCs.Add(virtualPc);
+                //VirtualPCs.Add(virtualPc);
             }
             await DisplayAlert("Success", "Virtual PC successfully added/edited.", "OK");
             CustomerCollectionView.ItemsSource = null;

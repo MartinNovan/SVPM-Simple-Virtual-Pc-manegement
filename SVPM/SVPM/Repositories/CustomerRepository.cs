@@ -1,5 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using System.Data;
+﻿using System.Data;
 using Microsoft.Data.SqlClient;
 using SVPM.Models;
 using SqlConnection = Microsoft.Data.SqlClient.SqlConnection;
@@ -8,10 +7,8 @@ namespace SVPM.Repositories;
 
 public static class CustomerRepository
 {
-    public static ObservableCollection<Customer> Customers { get; } = [];
-    public static async Task GetCustomersAsync()
+    public static async Task<List<Customer>> GetCustomersAsync()
     {
-        Customers.Clear();
         await using var connection = new SqlConnection(GlobalSettings.ConnectionString);
         await connection.OpenAsync();
 
@@ -20,6 +17,7 @@ public static class CustomerRepository
 
         await using var reader = await getCommand.ExecuteReaderAsync();
 
+        var customers = new List<Customer>();
         while (await reader.ReadAsync())
         {
             var customer = new Customer
@@ -35,8 +33,9 @@ public static class CustomerRepository
                 RecordState = RecordStates.Loaded,
             };
             customer.InitializeOriginalValues();
-            Customers.Add(customer);
+            customers.Add(customer);
         }
+        return customers;
     }
 
     public static async Task AddCustomer(Customer customer)
@@ -56,9 +55,6 @@ public static class CustomerRepository
             addCommand.Parameters.AddWithValue("@VerifyHash", customer.VerifyHash);
 
             await addCommand.ExecuteNonQueryAsync();
-
-            customer.RecordState = RecordStates.Loaded;
-            customer.InitializeOriginalValues();
         }
         catch (Exception ex)
         {
@@ -68,7 +64,6 @@ public static class CustomerRepository
 
     public static async Task DeleteCustomer(Customer customer)
     {
-        if (customer.OriginalRecordState != RecordStates.Loaded){ Customers.Remove(customer); return;}
         await using var connection = new SqlConnection(GlobalSettings.ConnectionString);
         await connection.OpenAsync();
         try
@@ -80,8 +75,6 @@ public static class CustomerRepository
             deleteCommand.CommandType = CommandType.StoredProcedure;
             deleteCommand.Parameters.AddWithValue("@CustomerId", customer.CustomerId);
             await deleteCommand.ExecuteNonQueryAsync();
-
-            Customers.Remove(customer);
         }
         catch (Exception ex)
         {
@@ -91,12 +84,6 @@ public static class CustomerRepository
 
     public static async Task UpdateCustomer(Customer customer)
     {
-        if (customer.OriginalRecordState != RecordStates.Loaded)
-        {
-            await AddCustomer(customer);
-            return;
-        }
-
         await using var connection = new SqlConnection(GlobalSettings.ConnectionString);
         await connection.OpenAsync();
 
@@ -116,8 +103,6 @@ public static class CustomerRepository
             updateCommand.Parameters.AddWithValue("@CustomerId", customer.CustomerId);
 
             await updateCommand.ExecuteNonQueryAsync();
-            customer.RecordState = RecordStates.Loaded;
-            customer.InitializeOriginalValues();
         }
         catch (Exception ex)
         {

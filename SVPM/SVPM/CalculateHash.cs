@@ -23,10 +23,11 @@ public static class CalculateHash
                     break;
                 case (null, not null, null):
                     var customersId = "";
+                    /*
                     if (virtualPc.OwningCustomers?.Count > 0)
                     {
                         customersId = string.Join(", ", virtualPc.OwningCustomers.Select(c => c.CustomerId));
-                    }
+                    }*/
                     verifyHash = virtualPc.VirtualPcName + virtualPc.Service + virtualPc.OperatingSystem +
                                  virtualPc.CpuCores + virtualPc.RamSize + virtualPc.DiskSize + virtualPc.Backupping +
                                  virtualPc.Administration + virtualPc.IpAddress + virtualPc.Fqdn + virtualPc.Notes + customersId;

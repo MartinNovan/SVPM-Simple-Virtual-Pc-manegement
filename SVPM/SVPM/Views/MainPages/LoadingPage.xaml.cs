@@ -31,13 +31,13 @@ public partial class LoadingPage
         try
         {
             Text.Text = "Loading Customers...";
-            await GetCustomersAsync();
+            await CustomerViewModel.Instance.LoadCustomersAsync();
             ProgressBar.Progress = 0.2;
             Text.Text = "Loading Mappings...";
-            await GetAllMappingAsync();
+            await MappingViewModel.Instance.LoadMappingsAsync();
             ProgressBar.Progress = 0.4;
             Text.Text = "Loading Virtual PCs...";
-            await GetAllVirtualPCsAsync();
+            await VirtualPcViewModel.Instance.LoadVirtualPCsAsync();
             ProgressBar.Progress = 0.6;
             Text.Text = "Loading Accounts...";
             await GetAllAccountsAsync();
@@ -63,22 +63,18 @@ public partial class LoadingPage
         try
         {
             Text.Text = "Uploading customers changes...";
-            foreach (var customer in Customers.ToList())
-            {
-                await customer.SaveChanges();
-            }
+            await CustomerViewModel.Instance.UploadChanges();
             ProgressBar.Progress = 0.25;
             Text.Text = "Uploading Virtual PCs changes...";
+            /*
             foreach (var virtualPc in VirtualPCs.ToList())
             {
                 await virtualPc.SaveChanges();
             }
+            */
             ProgressBar.Progress = 0.5;
             Text.Text = "Uploading mappings changes...";
-            foreach (var mapping in Mappings.ToList())
-            {
-                await mapping.SaveChanges();
-            }
+            await MappingViewModel.Instance.UploadChanges();
             ProgressBar.Progress = 0.75;
             Text.Text = "Uploading accounts changes...";
             foreach (var account in AccountRepository.Accounts.ToList())

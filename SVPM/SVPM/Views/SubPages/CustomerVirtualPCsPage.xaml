@@ -32,39 +32,36 @@
             <SearchBar Grid.Column="1" Placeholder="Search for virtual PCs..." TextChanged="OnSearchBarTextChanged" />
             <Button x:Name="AddButton" Grid.Column="2" Text="+" Clicked="AddButton_OnClicked" VerticalOptions="End" FontSize="20" ToolTipProperties.Text="Add a new record." />
         </Grid>
-        <ListView x:Name="VirtualPCsListView" ItemTapped="VirtualPcListView_ItemTapped" >
-            <ListView.ItemTemplate>
+        <CollectionView x:Name="VirtualPCsListView" SelectionChanged="VirtualPcListView_ItemTapped" >
+            <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="models:VirtualPc">
-                    <ViewCell>
-                        <StackLayout>
-                            <StackLayout Orientation="Horizontal">
-                                <Image Source="server.png" HeightRequest="50" WidthRequest="50" Margin="5"/>
-                                <StackLayout>
-                                    <Label Text="{Binding VirtualPcName}" FontSize="Medium" />
-                                    <Grid ColumnDefinitions="auto, *" ColumnSpacing="15" Margin="15,0,0,0">
-                                        <StackLayout Grid.Column="0">
-                                            <Label Text="{Binding Service, StringFormat='Service: {0}'}" />
-                                            <Label Text="{Binding OperatingSystem, StringFormat='OS: {0}'}" />
-                                            <Label Text="{Binding CpuCores, StringFormat='CPU: {0} cores'}" />
-                                            <Label Text="{Binding RamSize, StringFormat='RAM: {0} GB'}" />
-                                            <Label Text="{Binding DiskSize, StringFormat='Drive: {0} GB'}" />
-                                        </StackLayout>
-                                        <StackLayout Grid.Column="1">
-                                            <Label Text="{Binding Backupping, StringFormat='Backupping: {0}'}" />
-                                            <Label Text="{Binding Administration, StringFormat='Administration: {0}'}" />
-                                            <Label Text="{Binding IpAddress, StringFormat='IP: {0}'}" />
-                                            <Label Text="{Binding Fqdn, StringFormat='FQDN: {0}'}" />
-                                            <Label Text="{Binding OwningCustomersNames, StringFormat='Customer: {0}'}" />
-                                        </StackLayout>
-                                    </Grid>
-                                </StackLayout>
+                    <StackLayout>
+                        <StackLayout Orientation="Horizontal">
+                            <Image Source="server.png" HeightRequest="50" WidthRequest="50" Margin="5"/>
+                            <StackLayout>
+                                <Label Text="{Binding VirtualPcName}" FontSize="Medium" />
+                                <Grid ColumnDefinitions="auto, *" ColumnSpacing="15" Margin="15,0,0,0">
+                                    <StackLayout Grid.Column="0">
+                                        <Label Text="{Binding Service, StringFormat='Service: {0}'}" />
+                                        <Label Text="{Binding OperatingSystem, StringFormat='OS: {0}'}" />
+                                        <Label Text="{Binding CpuCores, StringFormat='CPU: {0} cores'}" />
+                                        <Label Text="{Binding RamSize, StringFormat='RAM: {0} GB'}" />
+                                        <Label Text="{Binding DiskSize, StringFormat='Drive: {0} GB'}" />
+                                    </StackLayout>
+                                    <StackLayout Grid.Column="1">
+                                        <Label Text="{Binding Backupping, StringFormat='Backupping: {0}'}" />
+                                        <Label Text="{Binding Administration, StringFormat='Administration: {0}'}" />
+                                        <Label Text="{Binding IpAddress, StringFormat='IP: {0}'}" />
+                                        <Label Text="{Binding Fqdn, StringFormat='FQDN: {0}'}" />
+                                    </StackLayout>
+                                </Grid>
                             </StackLayout>
-                            <BoxView HeightRequest="1" Color="Gray" Margin="5,0" />
                         </StackLayout>
-                    </ViewCell>
+                        <BoxView HeightRequest="1" Color="Gray" Margin="5,0" />
+                    </StackLayout>
                 </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
     </StackLayout>
     </Grid>
 </ContentPage>

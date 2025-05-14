@@ -2,17 +2,13 @@ using System.Collections.ObjectModel;
 using System.Data;
 using Microsoft.Data.SqlClient;
 using SVPM.Models;
-using static SVPM.Repositories.CustomerRepository;
-using static SVPM.Repositories.CustomersVirtualPCsRepository;
 using SqlConnection = Microsoft.Data.SqlClient.SqlConnection;
 
 namespace SVPM.Repositories;
 public static class VirtualPcRepository
 {
-    public static ObservableCollection<VirtualPc> VirtualPCs { get; } = [];
-    public static async Task GetAllVirtualPCsAsync()
+    public static async Task<List<VirtualPc>> GetAllVirtualPCsAsync()
     {
-        VirtualPCs.Clear();
         await using var connection = new SqlConnection(GlobalSettings.ConnectionString);
         await connection.OpenAsync();
 
@@ -21,6 +17,7 @@ public static class VirtualPcRepository
 
         await using var reader = await getCommand.ExecuteReaderAsync();
 
+        var virtualPCs = new List<VirtualPc>();
         while (await reader.ReadAsync())
         {
             var virtualPc = new VirtualPc
@@ -42,8 +39,9 @@ public static class VirtualPcRepository
                 RecordState = RecordStates.Loaded,
             };
             virtualPc.InitializeOriginalValues();
-            VirtualPCs.Add(virtualPc);
+            virtualPCs.Add(virtualPc);
         }
+        return virtualPCs;
     }
 
     public static async Task AddVirtualPc(VirtualPc virtualPc)
@@ -80,7 +78,7 @@ public static class VirtualPcRepository
 
     public static async Task DeleteVirtualPc(VirtualPc virtualPc)
     {
-        if(virtualPc.OriginalRecordState != RecordStates.Loaded) { VirtualPCs.Remove(virtualPc); return; }
+        //if(virtualPc.OriginalRecordState != RecordStates.Loaded) { VirtualPCs.Remove(virtualPc); return; }
         await using var connection = new SqlConnection(GlobalSettings.ConnectionString);
         await connection.OpenAsync();
         try
@@ -93,7 +91,7 @@ public static class VirtualPcRepository
             deleteCommand.Parameters.AddWithValue("@VirtualPcId", virtualPc.VirtualPcId);
             await deleteCommand.ExecuteNonQueryAsync();
 
-            VirtualPCs.Remove(virtualPc);
+            //VirtualPCs.Remove(virtualPc);
         }
         catch (Exception ex)
         {

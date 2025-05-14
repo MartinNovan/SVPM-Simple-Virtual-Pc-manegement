@@ -8,12 +8,12 @@
              Shell.TabBarIsVisible="False">
     <Shell.TitleView>
         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="5" >
-            <Button Text="+" Grid.Column="1" Clicked="CreateConnection_Clicked" Height="15" FontSize="20" ToolTipProperties.Text="Create a new connection."/>
+            <Label Text="Manage SQL Connections:" FontSize="25" Margin="5" VerticalOptions="Center" VerticalTextAlignment="Center"/>
+            <Button Text="+" Grid.Column="1" Clicked="CreateConnection_Clicked" Margin="5,0" VerticalOptions="Center" HorizontalOptions="Center" Scale="0.9" Height="15" FontSize="20" ToolTipProperties.Text="Create a new connection."/>
         </Grid>
     </Shell.TitleView>
     <StackLayout Padding="10">
-        <CollectionView x:Name="SqlConnectionListView" ItemsSource="{Binding SortedSqlConnections}"
-                        x:DataType="viewModels:SqlConnectionViewModel">
+        <CollectionView ItemsSource="{Binding SortedSqlConnections}" x:DataType="viewModels:SqlConnectionViewModel">
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="models:SqlConnection">
                     <StackLayout>
@@ -21,7 +21,7 @@
                             <Image Source="sql_connection.png" HeightRequest="40" WidthRequest="40" Margin="5" Grid.Column="0" />
                             <StackLayout Grid.Column="1" Margin="10,0,0,0" VerticalOptions="Center">
                                 <Label Text="{Binding Name}" FontSize="Medium" FontAttributes="Bold"/>
-                                <Grid ColumnDefinitions="auto, *" RowDefinitions="auto, auto" ColumnSpacing="5" Margin="15,0,0,0">
+                                <Grid ColumnDefinitions="auto, *" RowDefinitions="auto, auto" ColumnSpacing="5">
                                     <Label Text="Server: " Grid.Column="0" Grid.Row="0"/>
                                     <Label Text="{Binding ServerAddress}" Grid.Column="1" Grid.Row="0"/>
                                     <Label Text="Database: " Grid.Column="0" Grid.Row="1"/>

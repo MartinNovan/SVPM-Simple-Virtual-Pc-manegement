@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:models="using:SVPM.Models"
+             xmlns:viewModels="using:SVPM.ViewModels"
              x:Class="SVPM.Views.CreatingPages.CreateCustomer"
              NavigationPage.HasNavigationBar="False">
     <ContentPage.Content>
@@ -23,7 +24,7 @@
                 <StackLayout Grid.Row="1">
                     <Label Text="Virtual PCs:" Margin="5" />
                     <Entry Placeholder="Search for virtual PC..." TextChanged="OnSearchTextChanged" />
-                    <CollectionView x:Name="VpcCollectionView" SelectionMode="Multiple" MaximumHeightRequest="200" Loaded="VpcCollectionView_OnLoaded">
+                    <CollectionView x:Name="VpcCollectionView" SelectionMode="Multiple" MaximumHeightRequest="200" Loaded="VpcCollectionView_OnLoaded" ItemsSource="{Binding SortedVirtualPCs}" x:DataType="viewModels:VirtualPcViewModel">
                         <CollectionView.ItemTemplate>
                             <DataTemplate>
                                 <StackLayout>

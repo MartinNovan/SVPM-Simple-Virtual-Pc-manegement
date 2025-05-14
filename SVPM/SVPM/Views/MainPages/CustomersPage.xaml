@@ -2,13 +2,14 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:models="clr-namespace:SVPM.Models"
+             xmlns:viewModels="clr-namespace:SVPM.ViewModels"
              x:Class="SVPM.Views.MainPages.CustomersPage">
     <StackLayout Padding="5">
         <Grid ColumnDefinitions="*, auto" ColumnSpacing="5" Margin="5">
             <SearchBar Grid.Column="0" Placeholder="Search for customers..."  TextChanged="OnSearchBarTextChanged"/>
             <Button Grid.Column="1" Text="+" Clicked="AddButton_OnClicked" VerticalOptions="End" FontSize="20" ToolTipProperties.Text="Add a new record." />
         </Grid>
-        <CollectionView x:Name="CustomersListView" SelectionChanged="CustomersListView_ItemTapped" SelectionMode="Single" CanReorderItems="True" VerticalOptions="FillAndExpand" Loaded="CustomersListView_OnLoaded">
+        <CollectionView SelectionChanged="CustomersListView_ItemTapped" SelectionMode="Single" ItemsSource="{Binding SortedCustomers}" x:DataType="viewModels:CustomerViewModel" VerticalOptions="FillAndExpand">
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="models:Customer">
                     <StackLayout>

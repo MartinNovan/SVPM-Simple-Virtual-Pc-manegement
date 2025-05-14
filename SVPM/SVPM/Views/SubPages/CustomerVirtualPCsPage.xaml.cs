@@ -1,25 +1,28 @@
-﻿using SVPM.Models;
+﻿using System.Collections.ObjectModel;
+using SVPM.Models;
+using SVPM.Services;
+using SVPM.ViewModels;
 using SVPM.Views.CreatingPages;
 using static SVPM.Repositories.VirtualPcRepository;
-//TODO: Change list view to collection view
 namespace SVPM.Views.SubPages
 {
     public partial class CustomerVirtualPCsPage
     {
-        private readonly Customer _customer;
+        public readonly Customer _customer;
         public CustomerVirtualPCsPage(Customer customer)
         {
             _customer = customer;
             InitializeComponent();
-            BindingContext = _customer;
+            //BindingContext = _customer;
+            BindingContext = CustomerViewModel.Instance;
             LoadVirtualPCs();
         }
         private async void LoadVirtualPCs()
         {
             try
             {
-                //TODO: FINISH THIS
-                VirtualPCsListView.ItemsSource = VirtualPCs;
+                var virtualPCs = await CustomerService.Instance.GetCustomerVirtualPCs(_customer);
+                VirtualPCsListView.ItemsSource = virtualPCs;
             }
             catch (Exception ex)
             {
@@ -29,7 +32,7 @@ namespace SVPM.Views.SubPages
         private void OnSearchBarTextChanged(object sender, TextChangedEventArgs e)
         {
             string? searchText = e.NewTextValue?.ToLower();
-
+/*
             if (string.IsNullOrWhiteSpace(searchText))
             {
                 VirtualPCsListView.ItemsSource = VirtualPCs;
@@ -40,13 +43,14 @@ namespace SVPM.Views.SubPages
                     .Where(a => a.VirtualPcName != null &&
                                 a.VirtualPcName.ToLower().Contains(searchText));
             }
+            */
         }
 
-        private async void VirtualPcListView_ItemTapped(object sender, ItemTappedEventArgs e)
+        private async void VirtualPcListView_ItemTapped(object? sender, SelectionChangedEventArgs selectionChangedEventArgs)
         {
             try
             {
-                if (e.Item is VirtualPc selectedVirtualPc)
+                if (sender is VirtualPc selectedVirtualPc)
                 {
                     await Navigation.PushAsync(new VirtualPcAccountsPage(selectedVirtualPc));
                 }

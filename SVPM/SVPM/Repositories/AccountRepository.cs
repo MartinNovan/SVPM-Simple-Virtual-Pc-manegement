@@ -37,7 +37,7 @@ public static class AccountRepository
         }
         foreach (var account in Accounts)
         {
-            account.AssociatedVirtualPc = VirtualPCs.FirstOrDefault(vpc => vpc.VirtualPcId == account.AssociatedVirtualPc!.VirtualPcId);
+            //account.AssociatedVirtualPc = VirtualPCs.FirstOrDefault(vpc => vpc.VirtualPcId == account.AssociatedVirtualPc!.VirtualPcId);
             account.InitializeOriginalValues();
         }
     }

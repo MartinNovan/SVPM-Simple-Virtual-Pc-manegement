@@ -1,9 +1,8 @@
 ﻿using SVPM.Models;
+using SVPM.ViewModels;
 using SVPM.Views.CreatingPages;
 using SVPM.Views.SubPages;
-using static SVPM.Repositories.CustomerRepository;
 using static SVPM.Repositories.CustomersVirtualPCsRepository;
-using static SVPM.Repositories.VirtualPcRepository;
 
 namespace SVPM.Views.MainPages;
 
@@ -12,6 +11,7 @@ public partial class CustomersPage
     public CustomersPage()
     {
         InitializeComponent();
+        BindingContext = CustomerViewModel.Instance;
     }
 
     private void OnSearchBarTextChanged(object sender, TextChangedEventArgs e)
@@ -20,7 +20,7 @@ public partial class CustomersPage
         if (string.IsNullOrWhiteSpace(searchText))
         {
             return;
-        }
+        }/*
         var match = Customers.FirstOrDefault(c => (c.FullName?.ToLower().Contains(searchText) ?? false) ||
                                                       (c.CustomerTag?.ToLower().Contains(searchText) ?? false) ||
                                                       (c.Email?.ToLower().Contains(searchText) ?? false) ||
@@ -28,7 +28,7 @@ public partial class CustomersPage
         if (match != null)
         {
             CustomersListView.ScrollTo(match, position: ScrollToPosition.Start, animate: true);
-        }
+        }*/
     }
 
     private async void AddButton_OnClicked(object? sender, EventArgs e)
@@ -77,29 +77,11 @@ public partial class CustomersPage
         {
             if (sender is not ImageButton { BindingContext: Customer customer }) return;
 
-            var confirm = await DisplayAlert("Warning!", "Do you really want to delete this customer?", "OK", "Cancel");
-            if (!confirm) return;
-
-            customer.RecordState = RecordStates.Deleted;
-            foreach (var mapping in Mappings.Where(m =>
-                         m.CustomerId == customer.CustomerId))
-            {
-                mapping.RecordState = RecordStates.Deleted;
-            }
-
-            if (customer.OriginalRecordState != RecordStates.Loaded)
-            {
-                Customers.Remove(customer);
-            }
+            
         }
         catch (Exception ex)
         {
             await DisplayAlert("Error", $"Failed to delete customer: {ex.Message}", "OK");
         }
-    }
-
-    private void CustomersListView_OnLoaded(object? sender, EventArgs e)
-    {
-        CustomersListView.ItemsSource = Customers;
     }
 }

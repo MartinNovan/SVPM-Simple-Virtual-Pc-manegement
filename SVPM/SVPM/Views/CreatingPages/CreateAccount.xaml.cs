@@ -1,6 +1,5 @@
 ﻿using SVPM.Models;
 using SVPM.Repositories;
-using static SVPM.Repositories.AccountRepository;
 using static SVPM.Repositories.VirtualPcRepository;
 
 namespace SVPM.Views.CreatingPages;
@@ -15,7 +14,7 @@ public partial class CreateAccount
     }
     private void VpcCollectionView_OnLoaded(object? sender, EventArgs e)
     {
-        VpcCollectionView.ItemsSource = VirtualPCs.Where(vpc => vpc.RecordState != RecordStates.Deleted).OrderBy(vpc => vpc.VirtualPcName);
+        //VpcCollectionView.ItemsSource = VirtualPCs.Where(vpc => vpc.RecordState != RecordStates.Deleted).OrderBy(vpc => vpc.VirtualPcName);
         if (_updatedAccount != null)
         {
             PopulateFields(_updatedAccount);
@@ -41,7 +40,7 @@ public partial class CreateAccount
     private void OnSearchTextChanged(object sender, TextChangedEventArgs e)
     {
         string searchText = e.NewTextValue?.ToLower() ?? "";
-
+/*
         var match = VirtualPCs
             .FirstOrDefault(vpc => vpc.VirtualPcName != null && vpc.VirtualPcName.ToLower().Contains(searchText) && vpc.RecordState != RecordStates.Deleted);
 
@@ -49,6 +48,7 @@ public partial class CreateAccount
         {
             VpcCollectionView.ScrollTo(match, position: ScrollToPosition.Start, animate: true);
         }
+        */
     }
     
     private async void AccountConfirmClicked(object sender, EventArgs e)

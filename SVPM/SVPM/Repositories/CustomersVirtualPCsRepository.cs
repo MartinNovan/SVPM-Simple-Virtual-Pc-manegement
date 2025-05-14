@@ -7,11 +7,8 @@ namespace SVPM.Repositories;
 
 public static class CustomersVirtualPCsRepository
 {
-    public static List<Mapping> Mappings { get; } = [];
-
-    public static async Task GetAllMappingAsync()
+    public static async Task<List<Mapping>> GetAllMappingAsync()
     {
-        Mappings.Clear();
         await using var connection = new SqlConnection(GlobalSettings.ConnectionString);
         await connection.OpenAsync();
 
@@ -19,9 +16,11 @@ public static class CustomersVirtualPCsRepository
         getCommand.CommandType = CommandType.StoredProcedure;
 
         await using var reader = await getCommand.ExecuteReaderAsync();
+        
+        var mappings = new List<Mapping>();
         while (await reader.ReadAsync())
         {
-            Mappings.Add(new Mapping
+            mappings.Add(new Mapping
             {
                 MappingId = reader.GetGuid(reader.GetOrdinal("MappingId")),
                 CustomerId = reader.GetGuid(reader.GetOrdinal("CustomerId")),
@@ -30,6 +29,7 @@ public static class CustomersVirtualPCsRepository
                 InDatabase = true
             });
         }
+        return mappings;
     }
 
     public static async Task AddMappingAsync(Mapping mapping)
@@ -43,13 +43,10 @@ public static class CustomersVirtualPCsRepository
         addCommand.Parameters.AddWithValue("@VirtualPcID", mapping.VirtualPcId);
 
         await addCommand.ExecuteNonQueryAsync();
-        mapping.InDatabase = true;
-        mapping.RecordState = RecordStates.Loaded;
     }
 
     public static async Task DeleteMappingAsync(Mapping mapping)
     {
-        if (!mapping.InDatabase){Mappings.Remove(mapping); return; }
         await using var connection = new SqlConnection(GlobalSettings.ConnectionString);
         await connection.OpenAsync();
         try
@@ -59,7 +56,6 @@ public static class CustomersVirtualPCsRepository
             command.Parameters.AddWithValue("@MappingId", mapping.MappingId);
 
             await command.ExecuteNonQueryAsync();
-            Mappings.Remove(mapping);
         }
         catch (Exception ex)
         {

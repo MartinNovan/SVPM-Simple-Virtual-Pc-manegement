@@ -1,4 +1,5 @@
 ﻿using SVPM.Models;
+using SVPM.ViewModels;
 using SVPM.Views.CreatingPages;
 using SVPM.Views.SubPages;
 using static SVPM.Repositories.CustomersVirtualPCsRepository;
@@ -10,6 +11,7 @@ public partial class VirtualPcPage
     public VirtualPcPage()
     {
         InitializeComponent();
+        BindingContext = VirtualPcViewModel.Instance;
     }
     private void OnSearchBarTextChanged(object sender, TextChangedEventArgs e)
     {
@@ -18,13 +20,13 @@ public partial class VirtualPcPage
         {
             return;
         }
-        var match = VirtualPCs
-            .FirstOrDefault(vpc => (vpc.VirtualPcName?.ToLower().Contains(searchText) ?? false) &&
-                                 vpc.RecordState != RecordStates.Deleted);
+        /*
+        var match = VirtualPCs.FirstOrDefault(vpc => (vpc.VirtualPcName?.ToLower().Contains(searchText) ?? false) && vpc.RecordState != RecordStates.Deleted);
         if (match != null)
         {
             VirtualPCsListView.ScrollTo(match, position: ScrollToPosition.Start, animate: true);
         }
+        */
     }
 
     private async void VirtualPcListView_ItemTapped(object? sender, SelectionChangedEventArgs selectionChangedEventArgs)
@@ -77,24 +79,20 @@ public partial class VirtualPcPage
             if (!confirm) return;
 
             virtualPc.RecordState = RecordStates.Deleted;
+            /*
             foreach (var mapping in Mappings.Where(m => m.VirtualPcId == virtualPc.VirtualPcId && m.RecordState != RecordStates.Deleted))
             {
                 mapping.RecordState = RecordStates.Deleted;
-            }
+            }*/
 
             if (virtualPc.OriginalRecordState != RecordStates.Loaded)
             {
-                VirtualPCs.Remove(virtualPc);
+                //VirtualPCs.Remove(virtualPc);
             }
         }
         catch (Exception ex)
         {
             await DisplayAlert("Error", $"Failed to delete virtual pc: {ex.Message}", "OK");
         }
-    }
-
-    private void VirtualPCsListView_OnLoaded(object? sender, EventArgs e)
-    {
-        VirtualPCsListView.ItemsSource = VirtualPCs;
     }
 }

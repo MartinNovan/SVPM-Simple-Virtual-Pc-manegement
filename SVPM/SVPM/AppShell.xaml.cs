@@ -19,11 +19,9 @@ public partial class AppShell
         {
             if (SqlPicker.SelectedItem is not SqlConnection connection) return;
             await SqlConnectionViewModel.Instance.SelectConnectionAsync(connection);
-            _lastlySelectedItem = SqlPicker.SelectedIndex;
         }
         catch (Exception ex)
         {
-            SqlPicker.SelectedIndex = -1;
             await DisplayAlert("Error", $"Connection failed: {ex.Message}", "OK");
         }
     }
