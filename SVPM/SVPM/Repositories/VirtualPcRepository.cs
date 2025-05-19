@@ -1,4 +1,3 @@
-using System.Collections.ObjectModel;
 using System.Data;
 using Microsoft.Data.SqlClient;
 using SVPM.Models;

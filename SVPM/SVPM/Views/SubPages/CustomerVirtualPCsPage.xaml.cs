@@ -1,9 +1,8 @@
-﻿using System.Collections.ObjectModel;
-using SVPM.Models;
+﻿using SVPM.Models;
 using SVPM.Services;
 using SVPM.ViewModels;
 using SVPM.Views.CreatingPages;
-using static SVPM.Repositories.VirtualPcRepository;
+
 namespace SVPM.Views.SubPages
 {
     public partial class CustomerVirtualPCsPage
@@ -13,8 +12,8 @@ namespace SVPM.Views.SubPages
         {
             _customer = customer;
             InitializeComponent();
-            //BindingContext = _customer;
-            BindingContext = CustomerViewModel.Instance;
+            BindingContext = _customer;
+            VirtualPCsListView.BindingContext = CustomerViewModel.Instance;
             LoadVirtualPCs();
         }
         private async void LoadVirtualPCs()

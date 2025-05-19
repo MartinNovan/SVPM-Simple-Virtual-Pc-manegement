@@ -1,8 +1,8 @@
 ﻿using SVPM.Models;
+using SVPM.Services;
 using SVPM.ViewModels;
 using SVPM.Views.CreatingPages;
 using SVPM.Views.SubPages;
-using static SVPM.Repositories.CustomersVirtualPCsRepository;
 
 namespace SVPM.Views.MainPages;
 
@@ -12,23 +12,13 @@ public partial class CustomersPage
     {
         InitializeComponent();
         BindingContext = CustomerViewModel.Instance;
+        CustomerViewModel.Instance.FilterCustomers(SearchBar.Text.ToLower());
     }
 
     private void OnSearchBarTextChanged(object sender, TextChangedEventArgs e)
     {
         var searchText = e.NewTextValue?.ToLower() ?? "";
-        if (string.IsNullOrWhiteSpace(searchText))
-        {
-            return;
-        }/*
-        var match = Customers.FirstOrDefault(c => (c.FullName?.ToLower().Contains(searchText) ?? false) ||
-                                                      (c.CustomerTag?.ToLower().Contains(searchText) ?? false) ||
-                                                      (c.Email?.ToLower().Contains(searchText) ?? false) ||
-                                                      (c.Phone?.ToLower().Contains(searchText) ?? false));
-        if (match != null)
-        {
-            CustomersListView.ScrollTo(match, position: ScrollToPosition.Start, animate: true);
-        }*/
+        CustomerViewModel.Instance.FilterCustomers(searchText);
     }
 
     private async void AddButton_OnClicked(object? sender, EventArgs e)
@@ -63,6 +53,7 @@ public partial class CustomersPage
         try
         {
             if (sender is not ImageButton { BindingContext: Customer customer } || customer.RecordState == RecordStates.Deleted) return;
+            
             await Navigation.PushAsync(new CreateCustomer(customer));
         }
         catch (Exception ex)
@@ -76,8 +67,7 @@ public partial class CustomersPage
         try
         {
             if (sender is not ImageButton { BindingContext: Customer customer }) return;
-
-            
+            await CustomerService.Instance.RemoveCustomer(customer);
         }
         catch (Exception ex)
         {

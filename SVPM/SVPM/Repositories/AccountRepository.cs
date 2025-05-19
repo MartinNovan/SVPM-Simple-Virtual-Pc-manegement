@@ -3,7 +3,6 @@ using System.Data;
 using Microsoft.Data.SqlClient;
 using SVPM.Models;
 using SqlConnection = Microsoft.Data.SqlClient.SqlConnection;
-using static SVPM.Repositories.VirtualPcRepository;
 
 namespace SVPM.Repositories;
 

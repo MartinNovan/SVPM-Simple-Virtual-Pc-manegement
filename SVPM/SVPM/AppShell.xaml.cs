@@ -1,5 +1,4 @@
-﻿using Microsoft.Data.SqlClient;
-using SVPM.ViewModels;
+﻿using SVPM.ViewModels;
 using SVPM.Views.MainPages;
 using SqlConnection = SVPM.Models.SqlConnection;
 

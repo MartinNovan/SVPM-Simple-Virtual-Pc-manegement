@@ -34,14 +34,41 @@ public class CustomerViewModel
     {
         SortCustomers();
     }
-    private void SortCustomers()
+    private void SortCustomers(string searchText = "")
     {
-        SortedCustomers.Clear();
-        foreach (var customer in Customers.OrderBy(c => c.CustomerTag))
+        if (string.IsNullOrEmpty(searchText))
         {
-            if(customer.RecordState != RecordStates.Deleted) SortedCustomers.Add(customer);
+            SortedCustomers.Clear();
+            foreach (var customer in Customers.OrderBy(c => c.CustomerTag))
+            {
+                if(customer.RecordState != RecordStates.Deleted) SortedCustomers.Add(customer);
+            }
+            return;
         }
+        
+        searchText = searchText.ToLower();
+        SortedCustomers.Clear();
+        var filtered = Customers
+            .Where(c =>
+                (c.CustomerTag != null && c.CustomerTag.ToLower().Contains(searchText)) ||
+                (c.FullName != null && c.FullName.ToLower().Contains(searchText)) ||
+                (c.Email != null && c.Email.ToLower().Contains(searchText)) ||
+                (c.Phone != null && c.Phone.ToLower().Contains(searchText)))
+            .Where(c => c.RecordState != RecordStates.Deleted)
+            .OrderBy(c => c.CustomerTag);
+
+        foreach (var customer in filtered)
+        {
+            SortedCustomers.Add(customer);
+        }
+
     }
+    
+    public void FilterCustomers(string searchText)
+    {
+        SortCustomers(searchText);
+    }
+    
     public async Task LoadCustomersAsync()
     {
         var customers = await CustomerRepository.GetCustomersAsync();
@@ -79,7 +106,9 @@ public class CustomerViewModel
     
     public async Task UploadChanges()
     {
-        foreach (var customer in Customers.ToList())
+        foreach (var customer in Customers.Where(c => c.RecordState != RecordStates.Loaded).OrderBy(c => c.RecordState == RecordStates.Deleted ? 0 :
+                     c.RecordState == RecordStates.Created ? 1 :
+                     c.RecordState == RecordStates.Updated ? 2 : 3).ToList())
         {
             switch (customer.RecordState)
             {

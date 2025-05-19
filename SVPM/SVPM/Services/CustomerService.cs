@@ -1,5 +1,4 @@
 using SVPM.Models;
-using SVPM.Repositories;
 using SVPM.ViewModels;
 
 namespace SVPM.Services;
@@ -24,14 +23,17 @@ public class CustomerService
     
     public async Task RemoveCustomer(Customer customer)
     {
-        foreach (var mapping in MappingViewModel.Instance.Mappings.Where(m => m.CustomerId == customer.CustomerId && m.RecordState != RecordStates.Deleted);
+        foreach (var mapping in MappingViewModel.Instance.Mappings.Where(m => m.CustomerId == customer.CustomerId && m.RecordState != RecordStates.Deleted))
         {
             await MappingViewModel.Instance.RemoveMappingAsync(mapping);  
         }
         await CustomerViewModel.Instance.RemoveCustomer(customer);
     }
-    public async Task CreateCustomer(Guid customerId,string fullname, string customerTag, string? email = null, string? phone = null, string? notes = null, List<VirtualPc>? virtualPcs = null)
+
+    public async Task CreateCustomer(Guid customerId, string fullname, string customerTag, string? email = null,
+        string? phone = null, string? notes = null, List<VirtualPc>? virtualPcs = null)
     {
+
         var customer = new Customer
         {
             CustomerId = customerId,
@@ -49,6 +51,25 @@ public class CustomerService
         if(virtualPcs != null && virtualPcs.Count != 0) await CreateMappingsForCustomer(customer.CustomerId, virtualPcs);
         
         await CustomerViewModel.Instance.SaveCustomer(customer);
+    }
+    
+    public async Task UpdateCustomer(Guid customerId, string fullname, string customerTag, string? email = null,
+        string? phone = null, string? notes = null, List<VirtualPc>? virtualPcs = null)
+    {
+        var customer = CustomerViewModel.Instance.SortedCustomers.FirstOrDefault(c => c.CustomerId == customerId);
+        if (customer != null)
+        {
+            customer.FullName = fullname;
+            customer.CustomerTag = customerTag;
+            customer.Email = email;
+            customer.Phone = phone;
+            customer.Notes = notes;
+            customer.RecordState = RecordStates.Updated;
+
+            if(virtualPcs != null && virtualPcs.Count != 0) await CreateMappingsForCustomer(customer.CustomerId, virtualPcs);
+            
+            await CustomerViewModel.Instance.SaveCustomer(customer);
+        }
     }
 
     private async Task CreateMappingsForCustomer(Guid customerId,List<VirtualPc>? virtualPcs)

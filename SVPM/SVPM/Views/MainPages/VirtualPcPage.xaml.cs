@@ -2,8 +2,6 @@
 using SVPM.ViewModels;
 using SVPM.Views.CreatingPages;
 using SVPM.Views.SubPages;
-using static SVPM.Repositories.CustomersVirtualPCsRepository;
-using static SVPM.Repositories.VirtualPcRepository;
 
 namespace SVPM.Views.MainPages;
 public partial class VirtualPcPage

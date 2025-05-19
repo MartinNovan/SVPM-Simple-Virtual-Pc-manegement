@@ -6,7 +6,7 @@
              x:Class="SVPM.Views.MainPages.CustomersPage">
     <StackLayout Padding="5">
         <Grid ColumnDefinitions="*, auto" ColumnSpacing="5" Margin="5">
-            <SearchBar Grid.Column="0" Placeholder="Search for customers..."  TextChanged="OnSearchBarTextChanged"/>
+            <SearchBar x:Name="SearchBar" Grid.Column="0" Placeholder="Search for customers..."  TextChanged="OnSearchBarTextChanged"/>
             <Button Grid.Column="1" Text="+" Clicked="AddButton_OnClicked" VerticalOptions="End" FontSize="20" ToolTipProperties.Text="Add a new record." />
         </Grid>
         <CollectionView SelectionChanged="CustomersListView_ItemTapped" SelectionMode="Single" ItemsSource="{Binding SortedCustomers}" x:DataType="viewModels:CustomerViewModel" VerticalOptions="FillAndExpand">

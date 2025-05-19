@@ -1,6 +1,5 @@
 ﻿using SVPM.Models;
 using SVPM.Repositories;
-using static SVPM.Repositories.VirtualPcRepository;
 
 namespace SVPM.Views.CreatingPages;
 

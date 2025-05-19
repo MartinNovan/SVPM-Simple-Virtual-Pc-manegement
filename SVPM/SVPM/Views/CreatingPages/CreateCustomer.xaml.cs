@@ -1,8 +1,6 @@
 ﻿using SVPM.Models;
 using SVPM.Services;
 using SVPM.ViewModels;
-using static SVPM.Repositories.CustomersVirtualPCsRepository;
-using static SVPM.Repositories.VirtualPcRepository;
 
 namespace SVPM.Views.CreatingPages;
 
@@ -25,15 +23,15 @@ public partial class CreateCustomer
         }
     }
 
-    private async void PopulateFields(Customer? customer)
+    private async void PopulateFields(Customer customer)
     {
         try
         {
-            CustomerFullNameEntry.Text = customer?.FullName ?? string.Empty;
-            CustomerTagEntry.Text = customer?.CustomerTag ?? string.Empty;
-            CustomerEmailEntry.Text = customer?.Email ?? string.Empty;
-            CustomerPhoneEntry.Text = customer?.Phone ?? string.Empty;
-            CustomerNotesEntry.Text = customer?.Notes ?? string.Empty;
+            CustomerFullNameEntry.Text = customer.FullName ?? string.Empty;
+            CustomerTagEntry.Text = customer.CustomerTag ?? string.Empty;
+            CustomerEmailEntry.Text = customer.Email ?? string.Empty;
+            CustomerPhoneEntry.Text = customer.Phone ?? string.Empty;
+            CustomerNotesEntry.Text = customer.Notes ?? string.Empty;
             var vpcs = await CustomerService.Instance.GetCustomerVirtualPCs(customer);
             VpcCollectionView.SelectedItems.Clear();
             foreach (var vpc in vpcs)
@@ -50,15 +48,7 @@ public partial class CreateCustomer
     private void OnSearchTextChanged(object sender, TextChangedEventArgs e)
     {
         string searchText = e.NewTextValue?.ToLower() ?? "";
-        /*
-        var match = VirtualPCs
-            .FirstOrDefault(vpc => vpc.VirtualPcName != null && vpc.VirtualPcName.ToLower().Contains(searchText) && vpc.RecordState != RecordStates.Deleted);
-
-        if (match != null)
-        {
-            VpcCollectionView.ScrollTo(match, position: ScrollToPosition.Start, animate: true);
-        }
-        */
+        // TODO: implement search service once its done
     }
 
     private async void CustomerConfirmClicked(object sender, EventArgs e)
@@ -72,25 +62,33 @@ public partial class CreateCustomer
                 return;
             }
 
-            await CustomerService.Instance.CreateCustomer(
-                _updatedCustomer?.CustomerId ?? Guid.NewGuid(),
-                CustomerFullNameEntry.Text,
-                CustomerTagEntry.Text,
-                CustomerEmailEntry.Text,
-                CustomerPhoneEntry.Text,
-                CustomerNotesEntry.Text,
-                VpcCollectionView.SelectedItems.Cast<VirtualPc>().ToList()
-            );
-
             if (_updatedCustomer != null)
             {
+                await CustomerService.Instance.UpdateCustomer(
+                    _updatedCustomer.CustomerId,
+                    CustomerFullNameEntry.Text,
+                    CustomerTagEntry.Text,
+                    CustomerEmailEntry.Text,
+                    CustomerPhoneEntry.Text,
+                    CustomerNotesEntry.Text,
+                    VpcCollectionView.SelectedItems.Cast<VirtualPc>().ToList()
+                );
                 await DisplayAlert("Success", "Customer successfully edited.", "OK");
             }
             else
             {
+                await CustomerService.Instance.CreateCustomer(
+                    Guid.NewGuid(),
+                    CustomerFullNameEntry.Text,
+                    CustomerTagEntry.Text,
+                    CustomerEmailEntry.Text,
+                    CustomerPhoneEntry.Text,
+                    CustomerNotesEntry.Text,
+                    VpcCollectionView.SelectedItems.Cast<VirtualPc>().ToList()
+                );
                 await DisplayAlert("Success", "Customer successfully added.", "OK");
-            }
 
+            }
 
             await Navigation.PopAsync();
         }

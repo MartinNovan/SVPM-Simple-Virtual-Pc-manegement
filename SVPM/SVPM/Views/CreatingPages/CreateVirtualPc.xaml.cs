@@ -1,7 +1,5 @@
 ﻿using SVPM.Models;
 using SVPM.ViewModels;
-using static SVPM.Repositories.CustomersVirtualPCsRepository;
-using static SVPM.Repositories.VirtualPcRepository;
 
 namespace SVPM.Views.CreatingPages;
 public partial class CreateVirtualPc
@@ -12,10 +10,11 @@ public partial class CreateVirtualPc
     {
         InitializeComponent();
         _updatedVirtualPc = virtualPc;
+        BindingContext = CustomerViewModel.Instance;
+        CustomerViewModel.Instance.FilterCustomers(SearchBar.Text.ToLower());
     }
     private void CustomerCollectionView_OnLoaded(object? sender, EventArgs e)
     {
-        CustomerCollectionView.ItemsSource = CustomerViewModel.Instance.SortedCustomers;
         if (_updatedVirtualPc != null)
         {
             PopulateFields(_updatedVirtualPc);
@@ -42,14 +41,7 @@ public partial class CreateVirtualPc
     private void OnSearchTextChanged(object? sender, TextChangedEventArgs e)
     {
         string searchText = e.NewTextValue?.ToLower() ?? "";
-/*
-        var match = Customers
-            .FirstOrDefault(c => c.FullName != null && c.FullName.ToLower().Contains(searchText) && c.RecordState != RecordStates.Deleted);
-
-        if (match != null)
-        {
-            CustomerCollectionView.ScrollTo(match, position: ScrollToPosition.Start, animate: true);
-        }*/
+        CustomerViewModel.Instance.FilterCustomers(searchText);
     }
     private async void VirtualPcConfirmClicked(object sender, EventArgs e)
     {

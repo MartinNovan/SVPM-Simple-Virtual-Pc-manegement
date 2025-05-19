@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:models="using:SVPM.Models"
+             xmlns:viewModels="using:SVPM.ViewModels"
              x:Class="SVPM.Views.CreatingPages.CreateVirtualPc"
              NavigationPage.HasNavigationBar="False">
     <ContentPage.Content>
@@ -38,8 +39,8 @@
                     </StackLayout>
                     <StackLayout Grid.Row="1">
                         <Label Text="Associated customers:" Margin="5" />
-                        <Entry Placeholder="Search for customers..." TextChanged="OnSearchTextChanged"/>
-                        <CollectionView x:Name="CustomerCollectionView" SelectionMode="Multiple" MaximumHeightRequest="200" Loaded="CustomerCollectionView_OnLoaded">
+                        <Entry x:Name="SearchBar" Placeholder="Search for customers..." TextChanged="OnSearchTextChanged"/>
+                        <CollectionView x:Name="CustomerCollectionView" SelectionMode="Multiple" MaximumHeightRequest="200" x:DataType="viewModels:CustomerViewModel" ItemsSource="{Binding SortedCustomers}" Loaded="CustomerCollectionView_OnLoaded">
                             <CollectionView.ItemTemplate>
                                 <DataTemplate>
                                     <StackLayout>

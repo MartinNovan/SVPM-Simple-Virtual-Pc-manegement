@@ -1,8 +1,5 @@
 ﻿using SVPM.Repositories;
 using SVPM.ViewModels;
-using static SVPM.Repositories.CustomerRepository;
-using static SVPM.Repositories.CustomersVirtualPCsRepository;
-using static SVPM.Repositories.VirtualPcRepository;
 using static SVPM.Repositories.AccountRepository;
 
 namespace SVPM.Views.MainPages;

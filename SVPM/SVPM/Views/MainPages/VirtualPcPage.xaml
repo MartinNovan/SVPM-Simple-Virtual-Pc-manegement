@@ -9,7 +9,7 @@
             <SearchBar Grid.Column="0" Placeholder="Search for virtual PCs..." TextChanged="OnSearchBarTextChanged" />
             <Button Grid.Column="1" Text="+" Clicked="AddButton_OnClicked" VerticalOptions="End" FontSize="20" ToolTipProperties.Text="Add a new record." />
         </Grid>
-        <CollectionView x:Name="VirtualPCsListView" SelectionChanged="VirtualPcListView_ItemTapped" ItemsSource="{Binding SortedVirtualPCs}" x:DataType="viewModels:VirtualPcViewModel" SelectionMode="Single" VerticalOptions="FillAndExpand">
+        <CollectionView SelectionChanged="VirtualPcListView_ItemTapped" ItemsSource="{Binding SortedVirtualPCs}" x:DataType="viewModels:VirtualPcViewModel" SelectionMode="Single" VerticalOptions="FillAndExpand">
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="models:VirtualPc">
                     <StackLayout>
