@@ -11,7 +11,7 @@ public partial class CreateVirtualPc
         InitializeComponent();
         _updatedVirtualPc = virtualPc;
         BindingContext = CustomerViewModel.Instance;
-        CustomerViewModel.Instance.FilterCustomers(SearchBar.Text.ToLower());
+        CustomerViewModel.Instance.FilterCustomers((SearchBar?.Text ?? "").ToLower());
     }
     private void CustomerCollectionView_OnLoaded(object? sender, EventArgs e)
     {

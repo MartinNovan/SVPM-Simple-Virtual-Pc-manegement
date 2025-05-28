@@ -12,7 +12,7 @@ public partial class CustomersPage
     {
         InitializeComponent();
         BindingContext = CustomerViewModel.Instance;
-        CustomerViewModel.Instance.FilterCustomers(SearchBar.Text.ToLower());
+        CustomerViewModel.Instance.FilterCustomers((SearchBar?.Text ?? "").ToLower());
     }
 
     private void OnSearchBarTextChanged(object sender, TextChangedEventArgs e)

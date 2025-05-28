@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using Microsoft.IdentityModel.Tokens;
 using SVPM.Models;
 using SVPM.Repositories;
 
@@ -65,7 +66,7 @@ public class CustomerViewModel
     }
     
     public void FilterCustomers(string searchText)
-    {
+    { 
         SortCustomers(searchText);
     }
     
