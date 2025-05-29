@@ -37,9 +37,9 @@ public class CustomerViewModel
     }
     private void SortCustomers(string searchText = "")
     {
+        SortedCustomers.Clear();
         if (string.IsNullOrEmpty(searchText))
         {
-            SortedCustomers.Clear();
             foreach (var customer in Customers.OrderBy(c => c.CustomerTag))
             {
                 if(customer.RecordState != RecordStates.Deleted) SortedCustomers.Add(customer);
@@ -48,7 +48,6 @@ public class CustomerViewModel
         }
         
         searchText = searchText.ToLower();
-        SortedCustomers.Clear();
         var filtered = Customers
             .Where(c =>
                 (c.CustomerTag != null && c.CustomerTag.ToLower().Contains(searchText)) ||

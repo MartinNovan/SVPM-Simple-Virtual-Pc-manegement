@@ -34,14 +34,40 @@ public class VirtualPcViewModel
     {
         SortVirtualPCs();
     }
-    private void SortVirtualPCs()
+    private void SortVirtualPCs(string searchText = "")
     {
         SortedVirtualPCs.Clear();
-        foreach (var virtualPc in VirtualPCs.OrderBy(v => v.VirtualPcName))
+        if (String.IsNullOrEmpty(searchText))
         {
-            if(virtualPc.RecordState != RecordStates.Deleted) SortedVirtualPCs.Add(virtualPc);
+            foreach (var virtualPc in VirtualPCs.OrderBy(vpc => vpc.VirtualPcName))
+            {
+                if(virtualPc.RecordState != RecordStates.Deleted) SortedVirtualPCs.Add(virtualPc);
+            }
+            return;
+        }
+        
+        searchText = searchText.ToLower();
+        var filtered = VirtualPCs
+            .Where(vpc =>
+                (vpc.VirtualPcName != null && vpc.VirtualPcName.ToLower().Contains(searchText)) ||
+                (vpc.Fqdn != null && vpc.Fqdn.ToLower().Contains(searchText)) ||
+                (vpc.IpAddress != null && vpc.IpAddress.ToLower().Contains(searchText)) ||
+                (vpc.OperatingSystem != null && vpc.OperatingSystem.ToLower().Contains(searchText)) ||
+                (vpc.Service != null && vpc.Service.ToLower().Contains(searchText)))
+            .Where(vpc => vpc.RecordState != RecordStates.Deleted)
+            .OrderBy(vpc => vpc.VirtualPcName);
+
+        foreach (var virtualpc in filtered)
+        {
+            SortedVirtualPCs.Add(virtualpc);
         }
     }
+    
+    public void FilterVirtualPCs(string searchText)
+    {
+        SortVirtualPCs(searchText);
+    }
+    
     public async Task LoadVirtualPCsAsync()
     {
         var virtualPCs = await VirtualPcRepository.GetAllVirtualPCsAsync();
@@ -53,4 +79,55 @@ public class VirtualPcViewModel
         }
     }
     
+    public async Task RemoveVirtualPc(VirtualPc virtualPc)
+    {
+        virtualPc.RecordState = RecordStates.Deleted;
+        if (virtualPc.OriginalRecordState != RecordStates.Loaded)
+        {
+            VirtualPCs.Remove(virtualPc);
+        }
+    }
+
+    public async Task SaveVirtualPc(VirtualPc virtualPc)
+    {
+        var match = VirtualPCs.FirstOrDefault(vpc => vpc.VirtualPcId == virtualPc.VirtualPcId);
+        if (match != null)
+        {
+            VirtualPCs.Remove(match);
+            virtualPc.RecordState = RecordStates.Updated;
+        }
+        else
+        {
+            virtualPc.RecordState = RecordStates.Created;
+        }
+        VirtualPCs.Add(virtualPc);
+    }
+    
+    public async Task UploadChanges()
+    {
+        foreach (var virtualPc in VirtualPCs.Where(c => c.RecordState != RecordStates.Loaded).OrderBy(c => c.RecordState == RecordStates.Deleted ? 0 :
+                     c.RecordState == RecordStates.Created ? 1 :
+                     c.RecordState == RecordStates.Updated ? 2 : 3).ToList())
+        {
+            switch (virtualPc.RecordState)
+            {
+                case RecordStates.Created:
+                    await VirtualPcRepository.AddVirtualPc(virtualPc);
+                    virtualPc.RecordState = RecordStates.Loaded;
+                    virtualPc.InitializeOriginalValues();
+                    break;
+                case RecordStates.Updated:
+                    if (virtualPc.OriginalRecordState != RecordStates.Loaded) { await VirtualPcRepository.AddVirtualPc(virtualPc); return; }
+                    await VirtualPcRepository.UpdateVirtualPc(virtualPc);
+                    virtualPc.RecordState = RecordStates.Loaded;
+                    virtualPc.InitializeOriginalValues();
+                    break;
+                case RecordStates.Deleted:
+                    if (virtualPc.OriginalRecordState != RecordStates.Loaded){ VirtualPCs.Remove(virtualPc); return;}
+                    await VirtualPcRepository.DeleteVirtualPc(virtualPc);
+                    VirtualPCs.Remove(virtualPc);
+                    break;
+            }
+        }
+    }
 }

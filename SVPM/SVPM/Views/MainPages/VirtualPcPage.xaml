@@ -6,7 +6,7 @@
              x:Class="SVPM.Views.MainPages.VirtualPcPage">
     <StackLayout Padding="5">
         <Grid ColumnDefinitions="*, auto" ColumnSpacing="5" Margin="5">
-            <SearchBar Grid.Column="0" Placeholder="Search for virtual PCs..." TextChanged="OnSearchBarTextChanged" />
+            <SearchBar x:Name="SearchBar" Grid.Column="0" Placeholder="Search for virtual PCs..." TextChanged="OnSearchBarTextChanged" />
             <Button Grid.Column="1" Text="+" Clicked="AddButton_OnClicked" VerticalOptions="End" FontSize="20" ToolTipProperties.Text="Add a new record." />
         </Grid>
         <CollectionView SelectionChanged="VirtualPcListView_ItemTapped" ItemsSource="{Binding SortedVirtualPCs}" x:DataType="viewModels:VirtualPcViewModel" SelectionMode="Single" VerticalOptions="FillAndExpand">

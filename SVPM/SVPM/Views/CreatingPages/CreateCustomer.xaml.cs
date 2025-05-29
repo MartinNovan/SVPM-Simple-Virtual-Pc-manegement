@@ -3,7 +3,6 @@ using SVPM.Services;
 using SVPM.ViewModels;
 
 namespace SVPM.Views.CreatingPages;
-
 public partial class CreateCustomer
 {
     private static Customer? _updatedCustomer;
@@ -13,8 +12,8 @@ public partial class CreateCustomer
         InitializeComponent();
         _updatedCustomer = customer;
         BindingContext = VirtualPcViewModel.Instance;
+        VirtualPcViewModel.Instance.FilterVirtualPCs((SearchBar?.Text ?? "").ToLower());
     }
-
     private void VpcCollectionView_OnLoaded(object? sender, EventArgs e)
     {
         if (_updatedCustomer != null)
@@ -48,7 +47,7 @@ public partial class CreateCustomer
     private void OnSearchTextChanged(object sender, TextChangedEventArgs e)
     {
         string searchText = e.NewTextValue?.ToLower() ?? "";
-        // TODO: implement search service once its done
+        VirtualPcViewModel.Instance.FilterVirtualPCs(searchText);
     }
 
     private async void CustomerConfirmClicked(object sender, EventArgs e)
@@ -78,7 +77,6 @@ public partial class CreateCustomer
             else
             {
                 await CustomerService.Instance.CreateCustomer(
-                    Guid.NewGuid(),
                     CustomerFullNameEntry.Text,
                     CustomerTagEntry.Text,
                     CustomerEmailEntry.Text,
@@ -87,9 +85,7 @@ public partial class CreateCustomer
                     VpcCollectionView.SelectedItems.Cast<VirtualPc>().ToList()
                 );
                 await DisplayAlert("Success", "Customer successfully added.", "OK");
-
             }
-
             await Navigation.PopAsync();
         }
         catch (Exception ex)

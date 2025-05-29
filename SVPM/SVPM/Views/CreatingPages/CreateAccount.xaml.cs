@@ -1,5 +1,6 @@
 ﻿using SVPM.Models;
 using SVPM.Repositories;
+using SVPM.ViewModels;
 
 namespace SVPM.Views.CreatingPages;
 
@@ -10,10 +11,11 @@ public partial class CreateAccount
     {
         InitializeComponent();
         _updatedAccount = account;
+        BindingContext = VirtualPcViewModel.Instance;
+        VirtualPcViewModel.Instance.FilterVirtualPCs((SearchBar?.Text ?? "").ToLower());
     }
     private void VpcCollectionView_OnLoaded(object? sender, EventArgs e)
     {
-        //VpcCollectionView.ItemsSource = VirtualPCs.Where(vpc => vpc.RecordState != RecordStates.Deleted).OrderBy(vpc => vpc.VirtualPcName);
         if (_updatedAccount != null)
         {
             PopulateFields(_updatedAccount);
@@ -39,15 +41,7 @@ public partial class CreateAccount
     private void OnSearchTextChanged(object sender, TextChangedEventArgs e)
     {
         string searchText = e.NewTextValue?.ToLower() ?? "";
-/*
-        var match = VirtualPCs
-            .FirstOrDefault(vpc => vpc.VirtualPcName != null && vpc.VirtualPcName.ToLower().Contains(searchText) && vpc.RecordState != RecordStates.Deleted);
-
-        if (match != null)
-        {
-            VpcCollectionView.ScrollTo(match, position: ScrollToPosition.Start, animate: true);
-        }
-        */
+        VirtualPcViewModel.Instance.FilterVirtualPCs(searchText);
     }
     
     private async void AccountConfirmClicked(object sender, EventArgs e)
@@ -56,7 +50,7 @@ public partial class CreateAccount
         {
             if (VpcCollectionView.SelectedItem == null)
             {
-                await DisplayAlert("Error", "Please select a Virtual PC.", "OK");
+                await DisplayAlert("Error", "Please select a Virtual PC for this account.", "OK");
                 return;
             }
             if (string.IsNullOrWhiteSpace(AccountUsernameEntry.Text))

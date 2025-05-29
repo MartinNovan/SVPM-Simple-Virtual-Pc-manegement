@@ -6,13 +6,9 @@ namespace SVPM.Services;
 public class CustomerService
 {
     public static CustomerService Instance {get;} = new();
-    private CustomerService()
-    {
-    }
-
     public async Task<List<VirtualPc?>> GetCustomerVirtualPCs(Customer customer)
     {
-        var idList = MappingViewModel.Instance.Mappings.Where(mapping => mapping.CustomerId == customer.CustomerId).Select(mapping => mapping.VirtualPcId).ToList();
+        var idList = MappingViewModel.Instance.Mappings.Where(mapping => mapping.CustomerId == customer.CustomerId || mapping.RecordState != RecordStates.Deleted).Select(mapping => mapping.VirtualPcId).ToList();
         var virtualPCs = new List<VirtualPc?>();
         foreach (var id in idList)
         {
@@ -30,13 +26,13 @@ public class CustomerService
         await CustomerViewModel.Instance.RemoveCustomer(customer);
     }
 
-    public async Task CreateCustomer(Guid customerId, string fullname, string customerTag, string? email = null,
+    public async Task CreateCustomer(string fullname, string customerTag, string? email = null,
         string? phone = null, string? notes = null, List<VirtualPc>? virtualPcs = null)
     {
 
         var customer = new Customer
         {
-            CustomerId = customerId,
+            CustomerId = Guid.NewGuid(),
             FullName = fullname,
             CustomerTag = customerTag,
             Email = email,

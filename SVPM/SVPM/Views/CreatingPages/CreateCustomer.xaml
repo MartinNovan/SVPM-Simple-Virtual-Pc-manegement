@@ -23,7 +23,7 @@
                 </StackLayout>
                 <StackLayout Grid.Row="1">
                     <Label Text="Virtual PCs:" Margin="5" />
-                    <Entry Placeholder="Search for virtual PC..." TextChanged="OnSearchTextChanged" />
+                    <Entry x:Name="SearchBar" Placeholder="Search for virtual PC..." TextChanged="OnSearchTextChanged" />
                     <CollectionView x:Name="VpcCollectionView" SelectionMode="Multiple" MaximumHeightRequest="200" Loaded="VpcCollectionView_OnLoaded" ItemsSource="{Binding SortedVirtualPCs}" x:DataType="viewModels:VirtualPcViewModel">
                         <CollectionView.ItemTemplate>
                             <DataTemplate>

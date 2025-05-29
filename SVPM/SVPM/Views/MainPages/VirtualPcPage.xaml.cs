@@ -1,4 +1,5 @@
 ﻿using SVPM.Models;
+using SVPM.Services;
 using SVPM.ViewModels;
 using SVPM.Views.CreatingPages;
 using SVPM.Views.SubPages;
@@ -10,21 +11,12 @@ public partial class VirtualPcPage
     {
         InitializeComponent();
         BindingContext = VirtualPcViewModel.Instance;
+        VirtualPcViewModel.Instance.FilterVirtualPCs((SearchBar?.Text ?? "").ToLower());
     }
     private void OnSearchBarTextChanged(object sender, TextChangedEventArgs e)
     {
         string searchText = e.NewTextValue?.ToLower() ?? "";
-        if (String.IsNullOrWhiteSpace(searchText))
-        {
-            return;
-        }
-        /*
-        var match = VirtualPCs.FirstOrDefault(vpc => (vpc.VirtualPcName?.ToLower().Contains(searchText) ?? false) && vpc.RecordState != RecordStates.Deleted);
-        if (match != null)
-        {
-            VirtualPCsListView.ScrollTo(match, position: ScrollToPosition.Start, animate: true);
-        }
-        */
+        VirtualPcViewModel.Instance.FilterVirtualPCs(searchText);
     }
 
     private async void VirtualPcListView_ItemTapped(object? sender, SelectionChangedEventArgs selectionChangedEventArgs)
@@ -72,21 +64,7 @@ public partial class VirtualPcPage
         try
         {
             if (sender is not ImageButton button || button.BindingContext is not VirtualPc virtualPc) return;
-
-            bool confirm = await DisplayAlert("Warning!", "Do you really want to delete this virtual pc?", "OK", "Cancel");
-            if (!confirm) return;
-
-            virtualPc.RecordState = RecordStates.Deleted;
-            /*
-            foreach (var mapping in Mappings.Where(m => m.VirtualPcId == virtualPc.VirtualPcId && m.RecordState != RecordStates.Deleted))
-            {
-                mapping.RecordState = RecordStates.Deleted;
-            }*/
-
-            if (virtualPc.OriginalRecordState != RecordStates.Loaded)
-            {
-                //VirtualPCs.Remove(virtualPc);
-            }
+            await VirtualPcService.Instance.RemoveVirtualPc(virtualPc);
         }
         catch (Exception ex)
         {
