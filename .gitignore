@@ -1,2 +1,8 @@
-/.idea
-/Pre-release-data
+/SVPM/.idea
+/SVPM/.vs
+/SVPM/.vscode
+/SVPM/SVPM/bin
+/SVPM/SVPM/obj
+*/.idea
+/SVPM/*.user
+/SVPM/SVPM/*.user
