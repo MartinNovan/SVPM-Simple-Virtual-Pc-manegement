@@ -1,5 +1,5 @@
-<h1> <p "font-size:200px;"><img align="left" src="https://github.com/MartinNovan/SVPM-Simple-Virtual-Pc-manegement/blob/main/SVPM/SVPM/Resources/AppIcon/app_icon.png" width="100">SVPM - Simple Virtual PC Management</p> </h1>
-
+<h1> <p "font-size:200px;"><img align="left" src="https://github.com/MartinNovan/SVPM-Simple-Virtual-Pc-manegement/blob/main/SVPM/SVPM/Resources/AppIcon/app_icon.png" width="100">SVPM - Simple Virtual PC Management</p> </h1> 
+Manage your VMs simply and cleanly!
 
 ## 🖥️ Overview
 
