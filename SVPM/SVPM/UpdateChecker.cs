@@ -11,7 +11,7 @@ public static class UpdateChecker
             using var client = new HttpClient();
             client.DefaultRequestHeaders.UserAgent.ParseAdd("YourAppName/1.0");
 
-            var url = "https://api.github.com/repos/MartinNovan/Test/releases/latest";
+            var url = "https://api.github.com/repos/MartinNovan/SVPM-Simple-Virtual-Pc-manegement/releases/latest";
 
             var response = await client.GetAsync(url);
             if (!response.IsSuccessStatusCode) return null;
