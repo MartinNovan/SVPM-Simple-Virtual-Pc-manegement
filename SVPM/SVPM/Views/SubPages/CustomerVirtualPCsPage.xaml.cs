@@ -7,7 +7,7 @@ namespace SVPM.Views.SubPages
 {
     public partial class CustomerVirtualPCsPage
     {
-        public readonly Customer _customer;
+        private readonly Customer _customer;
         public CustomerVirtualPCsPage(Customer customer)
         {
             _customer = customer;
@@ -28,28 +28,11 @@ namespace SVPM.Views.SubPages
                 await DisplayAlert("Error", ex.Message, "OK");
             }
         }
-        private void OnSearchBarTextChanged(object sender, TextChangedEventArgs e)
-        {
-            string? searchText = e.NewTextValue?.ToLower();
-/*
-            if (string.IsNullOrWhiteSpace(searchText))
-            {
-                VirtualPCsListView.ItemsSource = VirtualPCs;
-            }
-            else
-            {
-                VirtualPCsListView.ItemsSource = VirtualPCs
-                    .Where(a => a.VirtualPcName != null &&
-                                a.VirtualPcName.ToLower().Contains(searchText));
-            }
-            */
-        }
-
         private async void VirtualPcListView_ItemTapped(object? sender, SelectionChangedEventArgs selectionChangedEventArgs)
         {
             try
             {
-                if (sender is VirtualPc selectedVirtualPc)
+                if (selectionChangedEventArgs.CurrentSelection.FirstOrDefault() is VirtualPc selectedVirtualPc)
                 {
                     await Navigation.PushAsync(new VirtualPcAccountsPage(selectedVirtualPc));
                 }
@@ -59,18 +42,5 @@ namespace SVPM.Views.SubPages
                 await DisplayAlert("Error", ex.Message, "OK");
             }
         }
-
-        private async void AddButton_OnClicked(object? sender, EventArgs e)
-        {
-            try
-            {
-                await Navigation.PushAsync(new CreateVirtualPc());
-            }
-            catch (Exception ex)
-            {
-                await DisplayAlert("Error", ex.Message, "OK");
-            }
-        }
-
     }
 }

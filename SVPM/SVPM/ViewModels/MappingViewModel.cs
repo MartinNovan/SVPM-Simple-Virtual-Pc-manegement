@@ -24,16 +24,22 @@ public class MappingViewModel
         }
     }
     
-    public async Task AddMappingAsync(Mapping mapping)
+    public Task AddMappingAsync(Mapping mapping)
     {
         mapping.RecordState = RecordStates.Created;
         Mappings.Add(mapping);
+        return Task.CompletedTask;
     }
     
-    public async Task RemoveMappingAsync(Mapping mapping)
+    public Task RemoveMappingAsync(Mapping mapping)
     {
-        if(!mapping.InDatabase) {Mappings.Remove(mapping); return;}
+        if(!mapping.InDatabase)
+        {
+            Mappings.Remove(mapping);
+            return Task.CompletedTask;
+        }
         mapping.RecordState = RecordStates.Deleted;
+        return Task.CompletedTask;
     }
 
     public async Task UploadChanges()

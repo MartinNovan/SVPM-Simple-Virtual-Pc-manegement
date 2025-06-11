@@ -4,6 +4,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="SVPM.Views.ConfigPages.SettingsPage">
     <ContentPage.Content>
-        
+        <Label TextColor="LightGray" Text="No settings available to display." Margin="5"/>
     </ContentPage.Content>
 </ContentPage>

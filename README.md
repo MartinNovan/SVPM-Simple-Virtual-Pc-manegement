@@ -1,105 +1,90 @@
-# 🌟 SVPM - Starlit Virtual PC Management 🌟
+<h1> <p "font-size:200px;"><img align="left" src="https://github.com/MartinNovan/SVPM-Simple-Virtual-Pc-manegement/blob/main/SVPM/SVPM/Resources/AppIcon/app_icon.png" width="100">SVPM - Simple Virtual PC Management</p> </h1>
 
-## 🖥️ Přehled
 
-**SVPM** je aplikace určená k správě virtuálních serverů a zákaznických účtů. Poskytuje intuitivní rozhraní pro administraci serverů, úpravu přihlašovacích údajů a zobrazení hardwarových specifikací jednotlivých serverů. Aplikace je navržena pro snadné použití v podnikových prostředích.
+## 🖥️ Overview
 
----
-
-## 🚀 Hlavní funkce (Některé funkce v beta verzi chybí)
-
-- **🔑 Správa zákazníků:** Možnost přidávat, upravovat a mazat zákazníky.
-- **🖥️ Správa serverů:** Seznam připojených serverů, jejich hardwarové specifikace a přihlašovací údaje.
-- **🔐 Účty na serverech:** Možnost spravovat uživatelské účty přiřazené k jednotlivým serverům.
-- **🔗 Připojení k SQL databázi:** Připojení k databázi pro načítání a ukládání dat.
-- **🔄 Synchronizace dat:** Automatická synchronizace přihlašovacích údajů s virtuálními servery.
+**SVPM** is an application designed to manage virtual computers, customer and accounts. It provides an intuitive interface to administer virtual PCs, edit login credentials and view hardware specifications of each virtual PC. The application is designed for ease of use in enterprise environments.
 
 ---
 
-## 🛠️ Instalace a spuštění
+## 🚀 Main features (Some features are missing in the beta version)
 
-### Požadavky:
-
-- **.NET 8.0 SDK** nebo novější
-- **Windows 10 nebo vyšší** (architektura x64)
-- **SQL Server** pro správu dat
-
-### Postup instalace:
-
-1. **Stažení aplikace:** Stáhni si poslední verzi aplikace [zde](https://drive.google.com/drive/folders/1m-GEgfXPfE_agB2caelzvXPlPX92VYDk?usp=sharing).
-2. **Rozbalení:** Rozbal stažený soubor do zvoleného adresáře.
-3. **Spuštění aplikace:** Dvojklikem na soubor `SVPM-Setup.exe` či `SVPM-Setup.msi` spusť instalaci.
-   - **Také**: Můžete použít `SVPM (portable).zip` a extrahováním ze zipu aplikaci spustíte.
+- **🔑 Customer Management:** Ability to add, edit and delete customers.
+- **🖥️ Virtual PC Management:** List of virtual PCs , their hardware specifications and login details.
+- **🔐 Virtual PC Accounts:** Ability to manage user accounts assigned to individual virtual PCs.
+- **🔗 SQL database connection:** Connection to the database for retrieving and storing data.
 
 ---
 
-## ⚙️ Nastavení SQL připojení (Některé funkce v beta verzi 1.0 chybí)
+## 🛠️ Installation and startup
 
-Při prvním spuštění aplikace je nutné nastavit připojení k SQL databázi:
+### Requirements:
 
-1. **Vyplň údaje**:
-   - **Server**: Název nebo IP adresa serveru.
-   - **Databáze**: Název databáze.
-   - **Přihlašovací údaje**: Uživatelské jméno a heslo k databázi či použítí windows auth.
+- **.NET 9.0 SDK** or later
+- **Windows 10 or higher** (x64 architecture)
+- **SQL Server** for data management
+
+### Installation procedure:
+
+1. **Download the application:** Download the latest version of the application.
+2. **Extract:** Unzip the downloaded file to the directory of your choice.
+3. **Start the application:** Double click on the `SVPM-Setup.msi` file to start the installation.
+
+### Database setup:
+#### If you do not have a SQL Server:
+1. **Install SQL Server**: Download and install SQL Server Express or any other version of SQL Server.
+1. **Create a new database**: Open SQL Server Management Studio and create a new database named `SVPM`.
+2. **Run the SQL script**: Execute the [`SVPM.sql`](/SVPM/SVPM/Resources/Scripts/SVPM.sql) script to create the necessary tables, procedures and triggers.
+3. **Configure the connection**: After installation, you will need to set up the SQL connection in the application settings.
+#### If you already have a SQL Server:
+1. **Create a new database**: Open SQL Server Management Studio and create a new database named `SVPM`.
+2. **Run the SQL script**: Execute the [`SVPM.sql`](/SVPM/SVPM/Resources/Scripts/SVPM.sql) script to create the necessary tables, procedures and triggers.
+3. **Configure the connection**: After installation, you will need to set up the SQL connection in the application settings.
+---
+
+## ⚙️ SQL Connection Settings
+
+When you run the application for the first time, you need to set up a connection to the SQL database:
+
+1. **Fill data**:
+   - **Server**: Server name or IP address.
+   - **Database**: Database name.
+   - **Login details**: Database username and password or use windows auth.
    
-2. **Uložení připojení**: Po vyplnění klikni na **Zapamatovat připojení** a připojení se uloží do šablony.
+2. **Save Connection**.
 
 ---
 
-## 📊 Hlavní obrazovka
+## 📊 Main Screen
 
-Po úspěšném přihlášení se zobrazí hlavní obrazovka aplikace, která se skládá ze tří záložek:
+After successful login, the main screen of the application will be displayed, which consists of three tabs:
 
-1. **👥 Zákazníci**:
-   - Zobrazení seznamu zákazníků.
-   - Možnost upravovat osobních údajů a kontaktní informace.
+1. **👥 Customers**:
+   - Display the list of customers.
+   - Option to edit personal details and contact information.
    
-2. **🌐 Servery**:
-   - Výpis přiřazených serverů s podrobnými informacemi o CPU, RAM a dalších specifikacích.
-   - Možnost upravit účty na jednotlivých serverech.
+2. **🌐 Virtual PCs**:
+   - List of assigned virtual PCs with detailed information about CPU, RAM and other specifications.
+   - Ability to edit accounts on individual virtual PCs.
 
-2. **🪪 Účty**:
-   - Výpis jednotlivých účtů ze všech serverů s informacemi jako je heslo, pokud je účet administátorský a datum i čas poslední změny.
-   - Možnost upravit data.
-
----
-
-## 📚 Databázová struktura
-
-Aplikace využívá tři hlavní tabulky pro správu dat:
-
-1. **Customers**:
-   - `CustomerID`, `FullName`, `Email`, `Phone`
-   
-2. **Servers**:
-   - `ServerID`, `CustomerID`, `CPU_Cores`, `RAM_Size_GB`, `Description`
-   
-3. **Accounts**:
-   - `AccountID`, `ServerID`, `Username`, `Password`, `IsAdmin`, `LastUpdated`
+2. **🔑 Accounts**:
+   - A listing of individual accounts from all servers with information such as password, if the account is an administrator account, and the date and time of the last change.
+   - Option to edit the data.
 
 ---
 
-## 💡 Tipy pro používání (Některé funkce v beta verzi chybí)
+## 💡 Usage tips
 
-- Pokud připojení k databázi selže, zkontroluj správnost údajů a dostupnost serveru.
-- Změny v údajích uživatelů a serverů jsou automaticky synchronizovány.
-
----
-
-## 🛠️ Údržba a podpora
-
-Pokud narazíte na chyby nebo potřebujete pomoc, neváhejte se obrátit na [martinnovan01@gmail.com](mailto:martinnovan01@gmail.com).
-
-Nebo vytvořte požadavek zde na gitu v [issues.](https://git.starlit.cz/Praktikanti/SVPM-Starlit-Virtual-Pc-manegement/issues)
+- If the database connection fails, check for correct data and server availability.
 
 ---
 
-### 📢 Kontaktní informace
-- **Email:** [martinnovan01@gmail.com](mailto:martinnovan01@gmail.com)
-- **Telefon:** +420 703 397 132
+## 🛠️ Maintenance and Support
+
+If you encounter bugs or need help, make a request here on git at [issues.](https://github.com/MartinNovan/SVPM-Simple-Virtual-Pc-manegement/issues)
 
 ---
 
-### 🌟 Poděkování
+### 🌟 Acknowledgements
 
-Děkujeme, že používáte **SVPM**! Vážíme si vaší podpory a doufáme, že vám aplikace usnadní správu vašich serverů.
+Thank you for using **SVPM**! We appreciate your support and hope that the application will make it easier for you to manage your servers.

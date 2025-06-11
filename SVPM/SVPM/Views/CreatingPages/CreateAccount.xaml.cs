@@ -1,5 +1,5 @@
 ﻿using SVPM.Models;
-using SVPM.Repositories;
+using SVPM.Services;
 using SVPM.ViewModels;
 
 namespace SVPM.Views.CreatingPages;
@@ -29,7 +29,7 @@ public partial class CreateAccount
         AccountOriginalPasswordEntry.Text = account?.BackupPassword ?? string.Empty;
         IsAdminCheckBox.IsChecked = account?.Admin ?? false;
         var itemToSelect = (VpcCollectionView.ItemsSource as IEnumerable<VirtualPc>)
-            ?.FirstOrDefault(vpc => vpc.VirtualPcId == account!.AssociatedVirtualPc!.VirtualPcId);
+            ?.FirstOrDefault(vpc => vpc.VirtualPcId == account!.VirtualPcId);
 
         if (itemToSelect != null)
         {
@@ -59,21 +59,27 @@ public partial class CreateAccount
                 return;
             }
 
-            var account = new Account
+            if (_updatedAccount != null)
             {
-                AccountId = Guid.NewGuid(),
-                Username = AccountUsernameEntry.Text,
-                Password = AccountPasswordEntry.Text,
-                Admin = IsAdminCheckBox.IsChecked,
-                Updated = DateTime.Now,
-                BackupPassword = AccountOriginalPasswordEntry.Text,
-                AssociatedVirtualPc = VpcCollectionView.SelectedItem as VirtualPc,
-                RecordState = RecordStates.Created
-            };
-            account.VerifyHash = CalculateHash.CalculateVerifyHash(null, null, account);
-            account.InitializeOriginalValues();
-            AccountRepository.Accounts.Add(account);
-            await DisplayAlert("Success", "Account successfully added/edited.", "OK");
+                await AccountService.Instance.UpdateAccount(
+                    _updatedAccount.AccountId,
+                    (VirtualPc)VpcCollectionView.SelectedItem,
+                    AccountUsernameEntry.Text,
+                    AccountPasswordEntry.Text,
+                    AccountOriginalPasswordEntry.Text,
+                    IsAdminCheckBox.IsChecked);
+                await DisplayAlert("Success", "Account successfully edited.", "OK");
+            }
+            else
+            {
+                await AccountService.Instance.CreateAccount(
+                    (VirtualPc)VpcCollectionView.SelectedItem,
+                    AccountUsernameEntry.Text,
+                    AccountPasswordEntry.Text,
+                    AccountOriginalPasswordEntry.Text,
+                    IsAdminCheckBox.IsChecked);
+                await DisplayAlert("Success", "Account successfully added.", "OK");
+            }
             await Navigation.PopAsync();
         }
         catch (Exception ex)

@@ -136,7 +136,7 @@ public static class LogRepository
                 AuditId = reader.GetGuid(reader.GetOrdinal("AuditId")),
                 AccountId = reader.GetGuid(reader.GetOrdinal("AccountId")),
                 OperationType = reader.GetString(reader.GetOrdinal("OperationType")),
-                AssociatedVirtualPc = new VirtualPc { VirtualPcId = reader.GetGuid(reader.GetOrdinal("VirtualPcId")) },
+                VirtualPcId = reader.GetGuid(reader.GetOrdinal("VirtualPcId")),
                 Username = reader.GetString(reader.GetOrdinal("Username")),
                 Password = reader.IsDBNull(reader.GetOrdinal("Password"))
                     ? ""

@@ -1,6 +1,5 @@
 ﻿using SVPM.Models;
-using SVPM.Repositories;
-using SVPM.Views.CreatingPages;
+using SVPM.Services;
 
 namespace SVPM.Views.SubPages
 {
@@ -14,38 +13,14 @@ namespace SVPM.Views.SubPages
             InitializeComponent();
             _virtualPc = virtualPc;
             BindingContext = _virtualPc;
-            LoadAccounts();
+            Init();
         }
-        private async void LoadAccounts()
+        private async void Init()
         {
             try
             {
-                AccountsListView.ItemsSource = AccountRepository.Accounts.Where(a => a.AssociatedVirtualPc?.VirtualPcId != null && a.AssociatedVirtualPc.VirtualPcId == _virtualPc.VirtualPcId);
-            }
-            catch (Exception ex)
-            {
-                await DisplayAlert("Error", ex.Message, "OK");
-            }
-        }
-        private void OnSearchBarTextChanged(object sender, TextChangedEventArgs e)
-        {
-            string searchText = e.NewTextValue?.ToLower() ?? "";
-            if (String.IsNullOrWhiteSpace(searchText))
-            {
-                return;
-            }
-            var match = AccountRepository.Accounts
-                .FirstOrDefault(a => a.AssociatedVirtualPc?.VirtualPcId != null && a.AssociatedVirtualPc.VirtualPcId == _virtualPc.VirtualPcId && a.Username!.ToLower().Contains(searchText));
-            if (match != null)
-            {
-                AccountsListView.ScrollTo(match, position: ScrollToPosition.Start, animated: true);
-            }
-        }
-        private async void AddButton_OnClicked(object? sender, EventArgs e)
-        {
-            try
-            {
-                await Navigation.PushAsync(new CreateAccount());
+                AccountsListView.ItemsSource = await VirtualPcService.Instance.GetVirtualPcAccounts(_virtualPc);
+                Customers.Text = await VirtualPcService.Instance.GetCustomerNamesAsString(_virtualPc);
             }
             catch (Exception ex)
             {

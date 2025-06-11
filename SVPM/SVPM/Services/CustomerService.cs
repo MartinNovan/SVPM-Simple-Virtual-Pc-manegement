@@ -6,15 +6,15 @@ namespace SVPM.Services;
 public class CustomerService
 {
     public static CustomerService Instance {get;} = new();
-    public async Task<List<VirtualPc?>> GetCustomerVirtualPCs(Customer customer)
+    public Task<List<VirtualPc?>> GetCustomerVirtualPCs(Customer customer)
     {
-        var idList = MappingViewModel.Instance.Mappings.Where(mapping => mapping.CustomerId == customer.CustomerId || mapping.RecordState != RecordStates.Deleted).Select(mapping => mapping.VirtualPcId).ToList();
+        var idList = MappingViewModel.Instance.Mappings.Where(mapping => mapping.CustomerId == customer.CustomerId && mapping.RecordState != RecordStates.Deleted).Select(mapping => mapping.VirtualPcId).ToList();
         var virtualPCs = new List<VirtualPc?>();
         foreach (var id in idList)
         {
             virtualPCs.Add(VirtualPcViewModel.Instance.VirtualPCs.FirstOrDefault(vpc => vpc.VirtualPcId == id));
         }
-        return virtualPCs.OrderBy(vpc =>vpc?.VirtualPcName).ToList();
+        return Task.FromResult(virtualPCs.OrderBy(vpc =>vpc?.VirtualPcName).ToList());
     }
     
     public async Task RemoveCustomer(Customer customer)
@@ -41,7 +41,7 @@ public class CustomerService
             RecordState = RecordStates.Created
         };
         
-        customer.VerifyHash = CalculateHash.CalculateVerifyHash(customer);
+        customer.VerifyHash = await CalculateHash.CalculateVerifyHash(customer);
         customer.InitializeOriginalValues();
 
         if(virtualPcs != null && virtualPcs.Count != 0) await CreateMappingsForCustomer(customer.CustomerId, virtualPcs);
@@ -63,7 +63,8 @@ public class CustomerService
             customer.RecordState = RecordStates.Updated;
 
             if(virtualPcs != null && virtualPcs.Count != 0) await CreateMappingsForCustomer(customer.CustomerId, virtualPcs);
-            
+            customer.VerifyHash = await CalculateHash.CalculateVerifyHash(customer);
+
             await CustomerViewModel.Instance.SaveCustomer(customer);
         }
     }

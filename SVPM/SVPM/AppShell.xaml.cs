@@ -3,13 +3,40 @@ using SVPM.Views.MainPages;
 using SqlConnection = SVPM.Models.SqlConnection;
 
 namespace SVPM;
-//TODO Dodělat setting page, ukládat neuložené hodnoty například to TEMP souboru, možnost automaticky (např. 5min intervali) ukládat do databáze a kontrolovat změny v databázi a dodělat setting JSON soubor
+//TODO Complete setting page, save unsaved values e.g. to TEMP file, option to automatically (e.g. 5 min intervals) save to database and check changes in database and complete setting JSON file
 public partial class AppShell
 {
     private int _lastlySelectedItem = -1;
     public AppShell()
     {
         InitializeComponent();
+        DispatchDelayed(TimeSpan.FromSeconds(15), CheckForUpdate);
+    }
+
+    private void DispatchDelayed(TimeSpan delay, Func<Task> action)
+    {
+        if (action == null) throw new ArgumentNullException(nameof(action));
+
+        Dispatcher.DispatchDelayed(delay, async void () =>
+        {
+            await action();
+        });
+    }
+    
+    private async Task CheckForUpdate()
+    {
+        try
+        {
+            bool isNewAvailable = await UpdateChecker.IsNewVersionAvailable();
+            if (isNewAvailable)
+            {
+                await DisplayAlert("Update Available", "A new version of the app is available. Please update to the latest version.", "OK");
+            }
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Error", $"Failed to check for updates: {ex.Message}", "OK");
+        }
     }
 
     private async void SqlPicker_OnSelectedIndexChanged(object? sender, EventArgs e)
@@ -61,26 +88,6 @@ public partial class AppShell
         catch (Exception ex)
         {
             await DisplayAlert("Error", $"Error when pushing to source: {ex.Message}", "OK");
-        }
-    }
-
-    private async void CheckBox_OnCheckedChanged(object? sender, CheckedChangedEventArgs e)
-    {
-        try
-        {
-            if (UploadAllCheckBox.IsChecked)
-            {
-                await DisplayAlert("Warning", "With this setting 'ON' all your local data will be pushed to database regardless if they were or weren't changed!", "OK" );
-                Console.WriteLine("Turning on this mode.");
-            }
-            else
-            {
-                Console.WriteLine("Turning it off");
-            }
-        }
-        catch (Exception ex)
-        {
-            await DisplayAlert("Error", $"Error when changing mode: {ex.Message}", "OK");
         }
     }
 }

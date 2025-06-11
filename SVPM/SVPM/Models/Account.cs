@@ -12,15 +12,15 @@ public class Account : INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
     public Guid AccountId { get; init; }
-    private VirtualPc? _associatedVirtualPc;
-    public VirtualPc? AssociatedVirtualPc
+    private Guid _virtualPcId;
+    public Guid VirtualPcId
     {
-        get => _associatedVirtualPc;
+        get => _virtualPcId;
         set
         {
-            if (_associatedVirtualPc != value)
+            if (_virtualPcId != value)
             {
-                _associatedVirtualPc = value;
+                _virtualPcId = value;
                 NotifyPropertyChanged();
             }
         }

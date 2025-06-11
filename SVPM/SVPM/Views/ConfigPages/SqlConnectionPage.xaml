@@ -13,8 +13,8 @@
         </Grid>
     </Shell.TitleView>
     <StackLayout Padding="10">
-        <CollectionView ItemsSource="{Binding SortedSqlConnections}" x:DataType="viewModels:SqlConnectionViewModel">
-            <CollectionView.ItemTemplate>
+        <CollectionView ItemsSource="{Binding SortedSqlConnections}" x:DataType="viewModels:SqlConnectionViewModel" SelectionMode="None" VerticalOptions="FillAndExpand">
+            <CollectionView.ItemTemplate>   
                 <DataTemplate x:DataType="models:SqlConnection">
                     <StackLayout>
                         <Grid ColumnDefinitions="Auto,*,Auto">

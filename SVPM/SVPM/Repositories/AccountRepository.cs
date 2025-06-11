@@ -1,17 +1,15 @@
-using System.Collections.ObjectModel;
 using System.Data;
 using Microsoft.Data.SqlClient;
 using SVPM.Models;
+using SVPM.ViewModels;
 using SqlConnection = Microsoft.Data.SqlClient.SqlConnection;
 
 namespace SVPM.Repositories;
 
 public static class AccountRepository
 {
-    public static ObservableCollection<Account> Accounts { get; } = [];
-    public static async Task GetAllAccountsAsync()
+    public static async Task<List<Account>> GetAllAccountsAsync()
     {
-        Accounts.Clear();
         await using var connection = new SqlConnection(GlobalSettings.ConnectionString);
         await connection.OpenAsync();
 
@@ -19,12 +17,14 @@ public static class AccountRepository
         getCommand.CommandType = CommandType.StoredProcedure;
 
         await using var reader = await getCommand.ExecuteReaderAsync();
+        
+        var accounts = new List<Account>();
         while (await reader.ReadAsync())
         {
-            Accounts.Add(new Account
+            var account = new Account
             {
                 AccountId = reader.GetGuid(reader.GetOrdinal("AccountId")),
-                AssociatedVirtualPc = new VirtualPc { VirtualPcId = reader.GetGuid(reader.GetOrdinal("VirtualPcId")) },
+                VirtualPcId = reader.GetGuid(reader.GetOrdinal("VirtualPcId")),
                 Username = reader.GetString(reader.GetOrdinal("Username")),
                 Password = reader.IsDBNull(reader.GetOrdinal("Password")) ? "" : reader.GetString(reader.GetOrdinal("Password")),
                 BackupPassword = reader.IsDBNull(reader.GetOrdinal("BackupPassword")) ? "" : reader.GetString(reader.GetOrdinal("BackupPassword")),
@@ -32,13 +32,11 @@ public static class AccountRepository
                 Updated = reader.GetDateTime(reader.GetOrdinal("Updated")),
                 VerifyHash = reader.GetString(reader.GetOrdinal("VerifyHash")),
                 RecordState = RecordStates.Loaded
-            });
-        }
-        foreach (var account in Accounts)
-        {
-            //account.AssociatedVirtualPc = VirtualPCs.FirstOrDefault(vpc => vpc.VirtualPcId == account.AssociatedVirtualPc!.VirtualPcId);
+            };
             account.InitializeOriginalValues();
+            accounts.Add(account);
         }
+        return accounts;
     }
 
     public static async Task AddAccount(Account account)
@@ -50,7 +48,7 @@ public static class AccountRepository
             await using var addCommand = new SqlCommand("AddAccount", connection);
             addCommand.CommandType = CommandType.StoredProcedure;
             addCommand.Parameters.AddWithValue("@AccountId", account.AccountId);
-            addCommand.Parameters.AddWithValue("@VirtualPcId", account.AssociatedVirtualPc!.VirtualPcId);
+            addCommand.Parameters.AddWithValue("@VirtualPcId", account.VirtualPcId);
             addCommand.Parameters.AddWithValue("@Username", account.Username);
             addCommand.Parameters.AddWithValue("@Password", account.Password ?? String.Empty);
             addCommand.Parameters.AddWithValue("@BackupPassword", account.BackupPassword ?? String.Empty);
@@ -69,7 +67,7 @@ public static class AccountRepository
 
     public static async Task DeleteAccount(Account account)
     {
-        if(account.OriginalRecordState != RecordStates.Loaded) {Accounts.Remove(account); return;}
+        if(account.OriginalRecordState != RecordStates.Loaded) {await AccountViewModel.Instance.RemoveAccount(account); return;}
         await using var connection = new SqlConnection(GlobalSettings.ConnectionString);
         await connection.OpenAsync();
 
@@ -83,7 +81,7 @@ public static class AccountRepository
             deleteCommand.Parameters.AddWithValue("@AccountId", account.AccountId);
 
             await deleteCommand.ExecuteNonQueryAsync();
-            Accounts.Remove(account);
+            await AccountViewModel.Instance.RemoveAccount(account);
         }
         catch (Exception ex)
         {
@@ -108,7 +106,7 @@ public static class AccountRepository
         {
             await using var updateCommand = new SqlCommand("UpdateAccount", connection);
             updateCommand.CommandType = CommandType.StoredProcedure;
-            updateCommand.Parameters.AddWithValue("@VirtualPcId", account.AssociatedVirtualPc!.VirtualPcId);
+            updateCommand.Parameters.AddWithValue("@VirtualPcId", account.VirtualPcId);
             updateCommand.Parameters.AddWithValue("@Username", account.Username);
             updateCommand.Parameters.AddWithValue("@Password", account.Password ?? String.Empty);
             updateCommand.Parameters.AddWithValue("@BackupPassword", account.BackupPassword ?? String.Empty);

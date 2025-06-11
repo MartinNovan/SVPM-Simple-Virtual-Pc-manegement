@@ -4,7 +4,7 @@ using SVPM.Models;
 namespace SVPM;
 public static class FileHelpers
 {
-    private const string baseFolderName = "Starlit\\SVPM-Starlit-Virtual-Pc-Management\\";
+    private const string baseFolderName = "MartinNovan\\SVPM-Simple-Virtual-Pc-Management\\";
 
     public static string GetUserProfilePath()
     {

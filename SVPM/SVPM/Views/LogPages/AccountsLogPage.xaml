@@ -32,7 +32,7 @@
                                 <Label HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontSize="10" Text="{Binding AuditId}" />
                                 <Label HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontSize="10" Text="{Binding AuditId}" Grid.Column="1"/>
                                 <Label HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontSize="10" Text="{Binding OperationType}" Grid.Column="2"/>
-                                <Label HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontSize="10" Text="{Binding AssociatedVirtualPc.VirtualPcId}" Grid.Column="3"/>
+                                <Label HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontSize="10" Text="{Binding VirtualPcId}" Grid.Column="3"/>
                                 <Label HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontSize="10" Text="{Binding Username}" Grid.Column="4"/>
                                 <Label HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontSize="10" Text="{Binding Password}" Grid.Column="5"/>
                                 <Label HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontSize="10" Text="{Binding BackupPassword}" Grid.Column="6"/>

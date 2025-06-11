@@ -79,7 +79,7 @@ public class VirtualPcViewModel
         }
     }
     
-    public async Task RemoveVirtualPc(VirtualPc virtualPc)
+    public void RemoveVirtualPc(VirtualPc virtualPc)
     {
         virtualPc.RecordState = RecordStates.Deleted;
         if (virtualPc.OriginalRecordState != RecordStates.Loaded)
@@ -88,7 +88,7 @@ public class VirtualPcViewModel
         }
     }
 
-    public async Task SaveVirtualPc(VirtualPc virtualPc)
+    public Task SaveVirtualPc(VirtualPc virtualPc)
     {
         var match = VirtualPCs.FirstOrDefault(vpc => vpc.VirtualPcId == virtualPc.VirtualPcId);
         if (match != null)
@@ -101,6 +101,7 @@ public class VirtualPcViewModel
             virtualPc.RecordState = RecordStates.Created;
         }
         VirtualPCs.Add(virtualPc);
+        return Task.CompletedTask;
     }
     
     public async Task UploadChanges()

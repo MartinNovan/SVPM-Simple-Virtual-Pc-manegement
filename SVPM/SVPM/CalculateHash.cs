@@ -1,12 +1,13 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 using SVPM.Models;
+using SVPM.Services;
 
 namespace SVPM;
 
 public static class CalculateHash
 {
-    public static string CalculateVerifyHash(Customer? customer = null, VirtualPc? virtualPc = null, Account? account = null)
+    public static async Task<string> CalculateVerifyHash(Customer? customer = null, VirtualPc? virtualPc = null, Account? account = null)
     {
         try
         {
@@ -19,21 +20,17 @@ public static class CalculateHash
             switch (customer, virtualPc, account)
             {
                 case (not null, null, null):
-                    verifyHash = customer.FullName + customer.CustomerTag + customer.Email + customer.Phone + customer.Notes;
+                    var vpc = await CustomerService.Instance.GetCustomerVirtualPCs(customer);
+                    verifyHash = customer.FullName + customer.CustomerTag + customer.Email + customer.Phone + customer.Notes + string.Join(",", vpc.Select(v => v?.VirtualPcName));
                     break;
                 case (null, not null, null):
-                    var customersId = "";
-                    /*
-                    if (virtualPc.OwningCustomers?.Count > 0)
-                    {
-                        customersId = string.Join(", ", virtualPc.OwningCustomers.Select(c => c.CustomerId));
-                    }*/
+                    var customers= await VirtualPcService.Instance.GetCustomerNamesAsString(virtualPc);
                     verifyHash = virtualPc.VirtualPcName + virtualPc.Service + virtualPc.OperatingSystem +
                                  virtualPc.CpuCores + virtualPc.RamSize + virtualPc.DiskSize + virtualPc.Backupping +
-                                 virtualPc.Administration + virtualPc.IpAddress + virtualPc.Fqdn + virtualPc.Notes + customersId;
+                                 virtualPc.Administration + virtualPc.IpAddress + virtualPc.Fqdn + virtualPc.Notes + customers;
                     break;
                 case(null, null, not null):
-                    verifyHash = account.AssociatedVirtualPc!.VirtualPcId + account.Username + account.Password +
+                    verifyHash = account.VirtualPcId + account.Username + account.Password +
                                  account.BackupPassword + account.Admin;
                     break;
                 default:
@@ -53,7 +50,7 @@ public static class CalculateHash
         }
         catch (Exception ex)
         {
-            Application.Current!.Windows[0].Page!.DisplayAlert("Error", $"Error generating verify hash: {ex.Message}", "OK");
+            await Application.Current!.Windows[0].Page!.DisplayAlert("Error", $"Error generating verify hash: {ex.Message}", "OK");
             throw;
         }
     }

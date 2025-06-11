@@ -7,15 +7,29 @@ public class VirtualPcService
 {
     public static VirtualPcService Instance {get;} = new();
     
-    public async Task<List<Customer?>> GetVirtualPcCustomers(VirtualPc virtualPc)
+    public Task<List<Customer?>> GetVirtualPcCustomers(VirtualPc virtualPc)
     {
-        var idList = MappingViewModel.Instance.Mappings.Where(mapping => mapping.VirtualPcId == virtualPc.VirtualPcId || mapping.RecordState != RecordStates.Deleted).Select(mapping => mapping.CustomerId).ToList();
+        var idList = MappingViewModel.Instance.Mappings.Where(mapping => mapping.VirtualPcId == virtualPc.VirtualPcId && mapping.RecordState != RecordStates.Deleted).Select(mapping => mapping.CustomerId).ToList();
         var customers = new List<Customer?>();
         foreach (var id in idList)
         {
             customers.Add(CustomerViewModel.Instance.SortedCustomers.FirstOrDefault(c => c.CustomerId == id));
         }
-        return customers.OrderBy(c =>c?.FullName).ToList();
+        return Task.FromResult(customers.OrderBy(c =>c?.FullName).ToList());
+    }
+    
+    public async Task<string> GetCustomerNamesAsString(VirtualPc vpc)
+    {
+        var customers = await Instance.GetVirtualPcCustomers(vpc);
+        return customers.Any()
+            ? string.Join(", ", customers.Where(c => c != null).Select(c => c!.FullName))
+            : "No Customers";
+    }
+    
+    public Task<List<Account>> GetVirtualPcAccounts(VirtualPc virtualPc)
+    {
+        List<Account> accounts = AccountViewModel.Instance.SortedAccounts.Where(account => account.VirtualPcId == virtualPc.VirtualPcId && account.RecordState != RecordStates.Deleted).OrderBy(a => a.Username).ToList();
+        return Task.FromResult(accounts);
     }
     
     public async Task RemoveVirtualPc(VirtualPc virtualPc)
@@ -24,7 +38,7 @@ public class VirtualPcService
         {
             await MappingViewModel.Instance.RemoveMappingAsync(mapping);  
         }
-        await VirtualPcViewModel.Instance.RemoveVirtualPc(virtualPc);
+        VirtualPcViewModel.Instance.RemoveVirtualPc(virtualPc);
     }
 
     public async Task CreateVirtualPc(string virtualPcName, string? service = null, string? operatingSystem = null,
@@ -49,7 +63,7 @@ public class VirtualPcService
             RecordState = RecordStates.Created
         };
         
-        virtualPc.VerifyHash = CalculateHash.CalculateVerifyHash(null, virtualPc);
+        virtualPc.VerifyHash = await CalculateHash.CalculateVerifyHash(null, virtualPc);
         virtualPc.InitializeOriginalValues();
 
         if(customers != null && customers.Count != 0) await CreateMappingsForVirtualPc(virtualPc.VirtualPcId, customers);
@@ -78,6 +92,7 @@ public class VirtualPcService
             virtualPc.RecordState = RecordStates.Updated;
 
             if(customers != null && customers.Count != 0) await CreateMappingsForVirtualPc(virtualPc.VirtualPcId, customers);
+            virtualPc.VerifyHash = await CalculateHash.CalculateVerifyHash(null, virtualPc);
             
             await VirtualPcViewModel.Instance.SaveVirtualPc(virtualPc);
         }

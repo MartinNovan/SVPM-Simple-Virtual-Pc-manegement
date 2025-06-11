@@ -1,7 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using Microsoft.IdentityModel.Tokens;
 using SVPM.Models;
 using SVPM.Repositories;
 
@@ -80,16 +79,18 @@ public class CustomerViewModel
         }
     }
     
-    public async Task RemoveCustomer(Customer customer)
+    public Task RemoveCustomer(Customer customer)
     {
         customer.RecordState = RecordStates.Deleted;
         if (customer.OriginalRecordState != RecordStates.Loaded)
         {
             Customers.Remove(customer);
         }
+
+        return Task.CompletedTask;
     }
 
-    public async Task SaveCustomer(Customer customer)
+    public Task SaveCustomer(Customer customer)
     {
         var match = Customers.FirstOrDefault(c => c.CustomerId == customer.CustomerId);
         if (match != null)
@@ -102,6 +103,7 @@ public class CustomerViewModel
             customer.RecordState = RecordStates.Created;
         }
         Customers.Add(customer);
+        return Task.CompletedTask;
     }
     
     public async Task UploadChanges()

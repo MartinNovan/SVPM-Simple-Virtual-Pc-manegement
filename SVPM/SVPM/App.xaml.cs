@@ -8,7 +8,6 @@ public partial class App
     {
         InitializeComponent();
     }
-    
     protected override async void OnStart()
     {
         try

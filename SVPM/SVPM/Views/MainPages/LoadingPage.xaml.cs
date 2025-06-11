@@ -1,6 +1,4 @@
-﻿using SVPM.Repositories;
-using SVPM.ViewModels;
-using static SVPM.Repositories.AccountRepository;
+﻿using SVPM.ViewModels;
 
 namespace SVPM.Views.MainPages;
 
@@ -37,7 +35,7 @@ public partial class LoadingPage
             await VirtualPcViewModel.Instance.LoadVirtualPCsAsync();
             ProgressBar.Progress = 0.6;
             Text.Text = "Loading Accounts...";
-            await GetAllAccountsAsync();
+            await AccountViewModel.Instance.LoadAccountsAsync();
             ProgressBar.Progress = 0.8;
             Text.Text = "Loading Logs...";
             await CustomerLogViewModel.Instance.LoadLogsAsync();
@@ -63,21 +61,13 @@ public partial class LoadingPage
             await CustomerViewModel.Instance.UploadChanges();
             ProgressBar.Progress = 0.25;
             Text.Text = "Uploading Virtual PCs changes...";
-            /*
-            foreach (var virtualPc in VirtualPCs.ToList())
-            {
-                await virtualPc.SaveChanges();
-            }
-            */
+            await VirtualPcViewModel.Instance.UploadChanges();
             ProgressBar.Progress = 0.5;
             Text.Text = "Uploading mappings changes...";
             await MappingViewModel.Instance.UploadChanges();
             ProgressBar.Progress = 0.75;
             Text.Text = "Uploading accounts changes...";
-            foreach (var account in AccountRepository.Accounts.ToList())
-            {
-                await account.SaveChanges();
-            }
+            await AccountViewModel.Instance.UploadChanges();
             ProgressBar.Progress = 1;
             Text.Text = "Done!";
             await Navigation.PopAsync();

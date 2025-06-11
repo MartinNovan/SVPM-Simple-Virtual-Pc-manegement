@@ -54,8 +54,7 @@ public partial class CreateCustomer
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(CustomerFullNameEntry.Text) ||
-                string.IsNullOrWhiteSpace(CustomerTagEntry.Text))
+            if (string.IsNullOrWhiteSpace(CustomerFullNameEntry.Text) || string.IsNullOrWhiteSpace(CustomerTagEntry.Text))
             {
                 await DisplayAlert("Error", "Customer full name and tag is required.", "OK");
                 return;
