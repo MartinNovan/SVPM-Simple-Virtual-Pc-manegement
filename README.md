@@ -26,7 +26,7 @@ Manage your VMs simply and cleanly!
 
 ### Installation procedure:
 
-1. **Download the application:** Download the latest version of the application.
+1. **Download the application:** Download the [latest version](https://github.com/MartinNovan/SVPM-Simple-Virtual-Pc-manegement/releases/latest) of the application.
 2. **Extract:** Unzip the downloaded file to the directory of your choice.
 3. **Start the application:** Double click on the `SVPM-Setup.msi` file to start the installation.
 
