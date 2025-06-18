@@ -7,7 +7,7 @@ Manage your VMs simply and cleanly!
 
 ---
 
-## 🚀 Main features (Some features are missing in the beta version)
+## 🚀 Main features
 
 - **🔑 Customer Management:** Ability to add, edit and delete customers.
 - **🖥️ Virtual PC Management:** List of virtual PCs , their hardware specifications and login details.
