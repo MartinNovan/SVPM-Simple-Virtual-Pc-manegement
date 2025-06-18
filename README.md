@@ -63,18 +63,57 @@ After successful login, the main screen of the application will be displayed, wh
    - Display the list of customers.
    - Option to edit personal details and contact information.
    
+![Customers Page](/Pictures/Customer-Page.png)
+   
 2. **🌐 Virtual PCs**:
    - List of assigned virtual PCs with detailed information about CPU, RAM and other specifications.
-   - Ability to edit accounts on individual virtual PCs.
+   - Ability to edit individual virtual PCs.
+   
+![Virtual PCs Page](/Pictures/VirtualPc-Page.png)
 
-2. **🔑 Accounts**:
-   - A listing of individual accounts from all servers with information such as password, if the account is an administrator account, and the date and time of the last change.
+3. **🔑 Accounts**:
+   - A listing of individual accounts from all virtual PCs with information such as password, if the account is an administrator account.
    - Option to edit the data.
+
+![Accounts Page](/Pictures/Accounts-Page.png)
 
 ---
 
+## 📊 Sub Screens
+
+This pages appear when you click on customer or virtual PC.
+
+1. **👥 Customers Info**:
+   - Display detailed informations of the customer.
+   - See his assigned virtual PCs.
+
+![Customer Info Page](/Pictures/CustomerInfo-Page.png)
+   
+2. **🌐 Virtual PCs Info**:
+   - Display detailed informations of the virtual PC.
+   - See it's assigned accounts.
+
+![Virtual PCs Info Page](/Pictures/VirtualPcInfo-Page.png)
+
+---
+
+## 📊 Config Screens
+
+1. **🔗 Sql Connections**:
+   - Display the list of saved SQL connections.
+   - Option to add/edit/remove connections.
+
+![SQL Connection Page](/Pictures/SQLConnection-Page.png)
+   
+2. **📜 Logs**:
+   - List of detailed informtaions about changes that was made in database.
+
+![Log Page](/Pictures/Log-Page.png)
+
 ## 💡 Usage tips
 
+- If you need help, you can read manual for your version, or you can contact us [here](https://github.com/MartinNovan/SVPM-Simple-Virtual-Pc-manegement/issues).
+- Black/White theme is automatically selected by your windows setting.
 - If the database connection fails, check for correct data and server availability.
 
 ---
@@ -87,4 +126,4 @@ If you encounter bugs or need help, make a request here on git at [issues.](http
 
 ### 🌟 Acknowledgements
 
-Thank you for using **SVPM**! We appreciate your support and hope that the application will make it easier for you to manage your servers.
+Thank you for using **SVPM**! We appreciate your support and hope that the application will make it easier for you to manage your virtual PCs.
